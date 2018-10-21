@@ -1,18 +1,14 @@
-package cgg.informatique.abl.webSocket;
+package cgg.informatique.abl.webSocket.dto;
+
+import cgg.informatique.abl.webSocket.entites.Compte;
 
 import java.util.Date;
 
 public class Reponse {
     private Long id;
-    private String de;
+    private Compte de;
     private String texte;
     private Long creation;
-
-    private String avatar = "";
-
-    public String getAvatar() {
-        return avatar;
-    }
 
     public void setCreation(Long creation) {
         this.creation = creation;
@@ -29,25 +25,12 @@ public class Reponse {
     public Reponse() {
     }
 
-    public void setAvatar(String avatar) {
-        this.avatar = avatar;
-    }
-
-    public Reponse(Long id, String de, String texte, Long creation, String avatar) {
+    public Reponse(Long id, Compte de, String texte) {
         this.id = id;
         this.de = de;
         this.texte = texte;
 
-        this.creation = creation;
-        this.avatar = avatar;
-    }
-
-    public String getDe() {
-        return de;
-    }
-
-    public void setDe(String de) {
-        this.de = de;
+        this.creation = System.currentTimeMillis();
     }
 
     public String getTexte() {
@@ -73,7 +56,7 @@ public class Reponse {
                 "de='" + de + '\'' +
                 ", texte='" + texte + '\'' +
                 ", creation=" + creation +
-                ", avatar=" + avatar +
+                ", avatar=" + de.getAvatar() +
                 '}';
     }
 }

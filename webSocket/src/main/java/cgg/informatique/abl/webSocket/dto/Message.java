@@ -1,30 +1,32 @@
-package cgg.informatique.abl.webSocket;
+package cgg.informatique.abl.webSocket.dto;
 
-public class Message {
+import cgg.informatique.abl.webSocket.TypeMessage;
+import cgg.informatique.abl.webSocket.entites.Compte;
 
-    private String de;
+public abstract class Message {
+
+    private Compte de;
     private String texte;
     private TypeMessage type;
     private Long   creation;
-    private String avatar  = "";
 
     public String getAvatar() {
-        return avatar;
-    }
-
-    public void setAvatar(String avatar) {
-        this.avatar = avatar;
+        return de.getAvatar();
     }
 
     public Message() {
     }
 
-    public Message(String de, String texte, TypeMessage type, Long creation, String avatar) {
+    public Message(Compte de, String texte, TypeMessage type) {
         this.de = de;
         this.texte = texte;
         this.type = type;
-        this.creation = creation;
-        this.avatar = avatar;
+        this.creation = System.currentTimeMillis();
+    }
+
+    public Message( String texte, TypeMessage type) {
+        this.texte = texte;
+        this.type = type;
     }
 
     public Long getCreation() {
@@ -35,32 +37,21 @@ public class Message {
         this.creation = creation;
     }
 
-    public Message(String de, String texte) {
-        this.de = de;
-        this.texte = texte;
-    }
-
-    public Message(  String texte) {
-        this.de = "anonyme";
-        this.texte = texte;
-    }
-
-
     @Override
     public String toString() {
         return "Reponse{" +
-                "de='" + de + '\'' +
+                "de='" + (de == null ? "anonyme" : de.getAlias()) + '\'' +
                 ", texte='" + texte + '\'' +
                 ", creation=" + creation +
-                ", avatar=" + avatar +
+                (de == null ? "" : ", avatar=" + de.getAvatar()) +
                 '}';
     }
 
-    public String getDe() {
+    public Compte getDe() {
         return de;
     }
 
-    public void setDe(String de) {
+    public void setDe(Compte de) {
         this.de = de;
     }
 
