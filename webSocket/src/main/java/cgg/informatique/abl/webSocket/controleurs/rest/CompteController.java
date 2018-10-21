@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController()
-@RequestMapping("/api")
+@RequestMapping("/api/comptes")
 public class CompteController {
     private CompteDao compteDao;
 
@@ -22,10 +22,10 @@ public class CompteController {
         this.compteDao = compteDao;
     }
 
-    @GetMapping("/compte")
+    @GetMapping("")
     public List<Compte> getAllCompte() { return compteDao.findAll(); }
 
-    @GetMapping("/compte/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<Compte> getCompte(@PathVariable Long id) {
         Optional<Compte> compte = compteDao.findById(id);
 
@@ -36,7 +36,7 @@ public class CompteController {
         }
     }
 
-    @PostMapping("/compte")
+    @PostMapping("")
     public ResponseEntity addCompte(@RequestBody Compte compte) {
         boolean compteExiste = compteDao.existsById(compte.getId());
         boolean emailExiste = compteDao.existsByCourriel(compte.getCourriel());
@@ -50,7 +50,7 @@ public class CompteController {
         return ResponseEntity.created(GenerateCreatedURI(compteAjoute)).build();
     }
 
-    @DeleteMapping("/compte")
+    @DeleteMapping("")
     public ResponseEntity deleteCompte(Long id){
         if (!compteDao.existsById(id)) {
             return ResponseEntity.badRequest().build();
