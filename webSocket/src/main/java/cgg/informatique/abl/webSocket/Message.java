@@ -1,12 +1,10 @@
 package cgg.informatique.abl.webSocket;
 
-
-import java.util.Date;
-
 public class Message {
 
     private String de;
     private String texte;
+    private TypeMessage type;
     private Long   creation;
     private String avatar  = "";
 
@@ -21,9 +19,10 @@ public class Message {
     public Message() {
     }
 
-    public Message(String de, String texte, Long creation, String avatar) {
+    public Message(String de, String texte, TypeMessage type, Long creation, String avatar) {
         this.de = de;
         this.texte = texte;
+        this.type = type;
         this.creation = creation;
         this.avatar = avatar;
     }
