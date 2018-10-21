@@ -1,13 +1,17 @@
 package cgg.informatique.abl.webSocket.entites;
 
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
 import javax.persistence.Id;
 import javax.persistence.Entity;
 import javax.persistence.Enumerated;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
+import java.util.Collection;
 
 @Entity
-public class Compte {
+public class Compte implements UserDetails {
     @Id
     private Long id;
     private String courriel;
@@ -55,6 +59,10 @@ public class Compte {
         }
     }
 
+    public static CourrielBuilder Builder() {
+        return new Builder();
+    }
+
     public static CourrielBuilder Builder(Long id) {
         return new Builder(id);
     }
@@ -87,6 +95,45 @@ public class Compte {
         return groupe;
     }
 
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        ArrayList<GrantedAuthority> authorities = new ArrayList<>();
+        authorities.add(role);
+        authorities.add(groupe);
+
+        return authorities;
+    }
+
+    @Override
+    public String getPassword() {
+        return motPasse;
+    }
+
+    @Override
+    public String getUsername() {
+        return courriel;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
+
     public static class Builder implements CourrielBuilder, MotPasseBuilder{
         private Long id;
         private String courriel;
@@ -96,9 +143,9 @@ public class Compte {
         private Role role;
         private Groupe groupe;
 
-        private Builder(Long id) {
-            this.id = id;
-        }
+        private Builder() { }
+
+        private Builder(Long id) { this.id = id; }
 
         public MotPasseBuilder avecCourriel(@NotNull String courriel) {
             this.courriel = courriel;
