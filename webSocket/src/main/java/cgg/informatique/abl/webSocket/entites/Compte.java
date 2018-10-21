@@ -8,9 +8,6 @@ import java.util.ArrayList;
 
 @Entity
 public class Compte {
-    private static final Role ROLE_DEFAUT = Role.NOUVEAU;
-    private static final Groupe GROUPE_DEFAUT = Groupe.BLANC;
-
     @Id
     private Long id;
     private String courriel;
@@ -18,9 +15,9 @@ public class Compte {
     private String alias;
     private String avatar;
     @Enumerated
-    private Role role;
+    private Role role = Role.NOUVEAU;
     @Enumerated
-    private Groupe groupe;
+    private Groupe groupe = Groupe.BLANC;
 
     protected Compte() { }
 
@@ -40,8 +37,10 @@ public class Compte {
         this.motPasse = motPasse;
         this.alias = alias;
         this.avatar = avatar;
-        this.role = role == null ? ROLE_DEFAUT : role;
-        this.groupe = groupe == null ? GROUPE_DEFAUT : groupe;
+        if (role != null)
+            this.role = role;
+        if (groupe != null)
+            this.groupe = groupe;
 
         Validate();
     }
