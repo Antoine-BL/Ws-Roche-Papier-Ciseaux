@@ -1,6 +1,10 @@
 package cgg.informatique.abl.webSocket;
 
 import cgg.informatique.abl.webSocket.configurations.MonStompSessionHandler;
+import cgg.informatique.abl.webSocket.dto.Courrier;
+import cgg.informatique.abl.webSocket.dto.Message;
+import cgg.informatique.abl.webSocket.dto.Reponse;
+import cgg.informatique.abl.webSocket.entites.Compte;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -30,6 +34,12 @@ public class WebSocketApplication implements CommandLineRunner {
 	private static final String PUBLIC_OUTPUT_QUEUE = "/app/messagepublique";
 	private static final int PING_DELAY = 5000;
 	private static final int INBOUND_MESSAGE_SIZE_LIMIT = 32 * 1024;
+	private static final Compte SERVER_ACCOUNT = Compte.Builder(9999L)
+			.avecCourriel("server@server.ca")
+			.avecMotDePasse("123")
+			.avecAvatar(SERVER_PROFILE_PIC)
+			.avecAlias("Serveur")
+			.build();
 
 	private WebSocketStompClient stompClient;
 	private StompSession stompSession;
@@ -99,7 +109,7 @@ public class WebSocketApplication implements CommandLineRunner {
 
 	private Message generateMessage() {
 		Long tempsCreation = System.currentTimeMillis();
-		return new Message("Serveur" , "hello", TypeMessage.COURRIER, tempsCreation, SERVER_PROFILE_PIC);
+		return new Courrier(SERVER_ACCOUNT , "hello");
 	}
 
 	private void attemptConnection() throws ExecutionException, InterruptedException {

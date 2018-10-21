@@ -1,7 +1,7 @@
 package cgg.informatique.abl.webSocket.controleurs.rest;
 
-import cgg.informatique.abl.webSocket.Message;
-import cgg.informatique.abl.webSocket.Reponse;
+import cgg.informatique.abl.webSocket.dto.Message;
+import cgg.informatique.abl.webSocket.dto.Reponse;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -16,6 +16,6 @@ public class ReponseControleur {
     @MessageMapping("/messagepublique")
     @SendTo("/sujet/reponsepublique")
     public Reponse reponse(Message message) {
-        return new Reponse( id++, message.getDe(), message.getTexte() ,message.getCreation() , message.getAvatar());
+        return new Reponse( id++, message.getDe(), message.getTexte());
     }
 }
