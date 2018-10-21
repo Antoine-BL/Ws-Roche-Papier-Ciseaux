@@ -38,34 +38,33 @@ function connexion() {
     stompClient.connect({}, function (frame) {
         setConnexion(true);
         console.log('Connected: ' + frame);
-        stompClient.subscribe('/sujet/reponse', function (reponse) {
-            var id = JSON.parse(reponse.body).id;
-            var de = JSON.parse(reponse.body).de;
-            var texte = JSON.parse(reponse.body).texte;
-            var avatar = JSON.parse(reponse.body).avatar;
-            var creation = JSON.parse(reponse.body).creation;
+        stompClient.subscribe('/sujet/reponsepublique',
+            function (reponse) {
+                var id = JSON.parse(reponse.body).id;
+                var de = JSON.parse(reponse.body).de;
+                var texte = JSON.parse(reponse.body).texte;
+                var avatar = JSON.parse(reponse.body).avatar;
+                var creation = JSON.parse(reponse.body).creation;
 
-            var delta = calculerDelta(creation);
-            calculerDeltaMinMax(delta);
-            afficherMinMaxDelta();
+                var delta = calculerDelta(creation);
+                calculerDeltaMinMax(delta);
+                afficherMinMaxDelta();
 
-            var message = {id : id, de: de, texte:texte, creation:creation, delta:delta, avatar:avatar};
-            nb = messages.push(message);
+                var message = {id : id, de: de, texte:texte, creation:creation, delta:delta, avatar:avatar};
+                nb = messages.push(message);
 
-            //On ne garde que les messages les plus récents (10 derniers)
-            if (nb > 10)
-                messages = messages.slice(1, 11);
+                //On ne garde que les messages les plus récents (10 derniers)
+                if (nb > 10)
+                    messages = messages.slice(1, 11);
 
-            $("#reponses").empty();
-            messages.forEach(function(message) {
-                   afficherReponse( message  );
-             });
+                $("#reponses").empty();
+                messages.forEach(function(message) {
+                       afficherReponse( message  );
+                 });
         });
     });
 }
 
-//calculerDelta calcule la différence de temps en millisecondes entre la création du message sur le serveur
-// et la réception par ce client. Typiquement, j'ai mesuré 10 millisecondes.
 function calculerDelta(creation)
 {
     var maintenant = Date.now();
@@ -73,8 +72,6 @@ function calculerDelta(creation)
     return delta;
 }
 
-//calculerDeltaMinMax permet de déterminer si la valeur courante de delta est plus petite que la valeur minimale et ou plus grande que la valeur maximale.
-//Dans l'affirmative, la valeur de minDelta ou maxDelta est mise à jour.
 function calculerDeltaMinMax(delta) {
     if (delta < minDelta)
     {
@@ -97,8 +94,8 @@ function deConnexion() {
 function envoyerMessage() {
     var creation = Date.now();
     var de = $("#de").val();
-
-    stompClient.send("/app/message", {}, JSON.stringify({'texte': $("#texte").val() , 'creation': creation , 'de' : de, 'avatar': avatar }));
+    console.log('wack');
+    stompClient.send("/app/messagepublique", {}, JSON.stringify({'texte': $("#texte").val() , 'creation': creation , 'de' : de, 'avatar': avatar }));
 }
 
 function afficherReponse(message) {
@@ -160,9 +157,9 @@ $(document).ready(function(){
 
              if (isChrome) {
                 mediaStreamTrack = mediaStream.getVideoTracks()[0];
-                uneVideo.srcObject = mediaStream;
                 imageCapture = new ImageCapture(mediaStreamTrack);
-                uneVideo.onloadedmetadata = function (e) {
+                 uneVideo.srcObject = mediaStream;
+                 uneVideo.onloadedmetadata = function (e) {
                      uneVideo.play();
                 };
              } else {
@@ -172,7 +169,7 @@ $(document).ready(function(){
                  };
              }
          })
-         .catch(function(err) { console.log(err.name + ": " + err.message); }); // always check for errors at the end.
+         .catch(function(err) { console.log(err.name + ": " + err.message); });
     };
 
     btnImage.onclick = uneVideo.onclick = function() {
@@ -185,7 +182,6 @@ $(document).ready(function(){
       unCanvas.width =   100;
       unCanvas.height =  75;
 
-      //https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/drawImage
       if (isChrome) {
           imageCapture.grabFrame()
               .then(imageBitmap => {
