@@ -13,8 +13,8 @@ public class ReponseControleur {
     static long id = 1;
 
     @CrossOrigin()
-    @MessageMapping("/message")
-    @SendTo("/sujet/reponse")
+    @MessageMapping("/messagepublique")
+    @SendTo("/sujet/reponsepublique")
     public Reponse reponse(Message message) {
         return new Reponse( id++, message.getDe(), message.getTexte() ,message.getCreation() , message.getAvatar());
     }
