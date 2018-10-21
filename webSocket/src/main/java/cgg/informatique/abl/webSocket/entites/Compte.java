@@ -125,8 +125,9 @@ public class Compte {
             return this;
         }
 
-        public void avecAvatar(String avatar) {
+        public Builder avecAvatar(String avatar) {
             this.avatar = avatar;
+            return this;
         }
 
         public Compte build() {
