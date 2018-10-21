@@ -24,8 +24,6 @@ public class WebSocketApplication implements CommandLineRunner {
 	public static void main(String[] args) {
 		SpringApplication.run(WebSocketApplication.class, args);
 	}
-	@Autowired
-	private WebSocketConfig webSocket;
 
 	@Override
 	public void run(String... args) throws Exception {
