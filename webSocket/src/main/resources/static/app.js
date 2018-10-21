@@ -139,6 +139,9 @@ $(document).ready(function(){
     const uneImage = document.querySelector('#uneImage');
     const uneVideo = document.querySelector('#uneVideo');
     const unCanvas = document.querySelector('#unCanvas');
+    let imageCapture;
+    let mediaStreamTrack;
+    const isChrome = !!window.chrome && !!window.chrome.webstore;
 
     uneImage.src =  avatar;
 
@@ -155,10 +158,19 @@ $(document).ready(function(){
          navigator.mediaDevices.getUserMedia(constraints)
          .then(function(mediaStream) {
 
-           uneVideo.srcObject = mediaStream;
-           uneVideo.onloadedmetadata = function(e) {
-             uneVideo.play();
-           };
+             if (isChrome) {
+                mediaStreamTrack = mediaStream.getVideoTracks()[0];
+                uneVideo.srcObject = mediaStream;
+                imageCapture = new ImageCapture(mediaStreamTrack);
+                uneVideo.onloadedmetadata = function (e) {
+                     uneVideo.play();
+                };
+             } else {
+                 uneVideo.srcObject = mediaStream;
+                 uneVideo.onloadedmetadata = function (e) {
+                     uneVideo.play();
+                 };
+             }
          })
          .catch(function(err) { console.log(err.name + ": " + err.message); }); // always check for errors at the end.
     };
@@ -174,15 +186,28 @@ $(document).ready(function(){
       unCanvas.height =  75;
 
       //https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/drawImage
-      unCanvas.getContext('2d').drawImage(uneVideo, 0, 0,uneVideo.videoWidth,uneVideo.videoHeight ,0,0, 100,75 );
-      uneVideo.srcObject.stop();
+      if (isChrome) {
+          imageCapture.grabFrame()
+              .then(imageBitmap => {
+                  afficherImage(imageBitmap, imageCapture.track)
+              })
+              .catch(error => console.error('grabFrame() error:', error));
+      } else {
+          uneVideo.width = uneVideo.videoWidth;
+          uneVideo.height = uneVideo.videoHeight;
 
-      image = unCanvas.toDataURL("image/jpeg");
-      avatar =  image;
-      uneImage.src =  avatar;
-
-
+          afficherImage(uneVideo, uneVideo.srcObject);
+      }
     };
+
+    function afficherImage(image, stream) {
+        unCanvas.getContext('2d').drawImage(image, 0, 0, image.width, image.height ,0,0, 100,75 );
+        stream.stop();
+
+        image = unCanvas.toDataURL("image/jpeg");
+        avatar =  image;
+        uneImage.src = image;
+    }
 
     function gererReussite(stream) {
       uneVideo.srcObject = stream;
