@@ -25,14 +25,19 @@ class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .permitAll()
                 .and()
                 .formLogin()
+                .passwordParameter("password")
+                .usernameParameter("username")
                 .loginProcessingUrl("/connexion")
                 .loginPage("/connexion")
                 .defaultSuccessUrl("/", true)
-                .failureUrl("/login?error=true")
+                .failureUrl("/connexion?error=true")
                 .and()
                 .logout()
                 .logoutUrl("/deconnexion")
-                .logoutSuccessUrl("/");
+                .logoutSuccessUrl("/")
+                .and()
+                .csrf()
+                .disable();
     }
 
     @Override

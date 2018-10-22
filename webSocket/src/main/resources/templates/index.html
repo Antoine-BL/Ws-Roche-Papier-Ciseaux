@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<html>
+<html   xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
 <head>
     <title>Laboratoire 6: WebSocket</title>
     <link href="/webjars/bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -50,8 +52,12 @@
             </table>
         </div>
     </div>
-    <a id="connexion" href="/connexion" class="btn btn-primary" role="button">Établir la connexion</a>
-    <a id="deconnexion" href="/deconnexion" class="btn btn-primary d-none" role="button">Déconnexion</a>
+    <div sec:authorize="isAnonymous()">
+        <a id="connexion" href="/connexion" class="btn btn-primary" role="button">Établir la connexion</a>
+    </div>
+    <div sec:authorize="isAuthenticated()">
+        <a id="deconnexion" href="/deconnexion" class="btn btn-primary" role="button">Déconnexion</a>
+    </div>
 </div>
 </body>
 </html>

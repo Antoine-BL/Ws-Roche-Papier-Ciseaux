@@ -1,18 +1,19 @@
 package cgg.informatique.abl.webSocket.entites;
 
+import org.hibernate.annotations.ColumnDefault;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import javax.persistence.Id;
-import javax.persistence.Entity;
-import javax.persistence.Enumerated;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.Collection;
 
 @Entity
+@Table(name="COMPTES")
 public class Compte implements UserDetails {
     @Id
+    @GeneratedValue
     private Long id;
     private String courriel;
     private String motPasse;

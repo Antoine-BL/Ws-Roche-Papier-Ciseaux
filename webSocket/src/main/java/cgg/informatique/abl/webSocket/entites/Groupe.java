@@ -19,6 +19,6 @@ public enum Groupe implements GrantedAuthority {
 
     @Override
     public String getAuthority() {
-        return authority;
+        return "ROLE_" + authority;
     }
 }

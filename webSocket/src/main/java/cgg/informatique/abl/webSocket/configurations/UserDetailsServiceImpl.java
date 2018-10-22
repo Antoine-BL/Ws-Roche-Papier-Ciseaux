@@ -5,6 +5,7 @@ import cgg.informatique.abl.webSocket.entites.Compte;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -22,10 +23,7 @@ class UserDetailsServiceImpl implements UserDetailsService {
         Optional<Compte> compte = compteDao.findByCourriel(email);
 
         return new UserDetailsImpl(
-                compte.orElseGet(() -> Compte.Builder()
-                .avecCourriel("anon@anon.ca")
-                .avecMotDePasse("")
-                .build())
+                compte.orElseThrow(() -> new UsernameNotFoundException(email))
         );
     }
 }
