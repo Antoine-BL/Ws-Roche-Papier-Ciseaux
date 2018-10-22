@@ -3,8 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <title>Création compte</title>
+
+    <link href="/webjars/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/main.css" rel="stylesheet">
+
+    <script src="/webjars/jquery/jquery.min.js"></script>
+    <script src="/js/creerCompte.js"></script>
+
 </head>
 <body>
-Création compte!
+<canvas id="vidCanvas" class="d-none"></canvas>
+<div class="vertical-center">
+    <div class="container">
+        <div class="row justify-content-center align-items-center">
+            <form method="POST" action="/compte/creer" class="jumbotron col-11 col-sm-12 col-md-9 col-lg-7 col-xl-6">
+                <div class="form-group">
+                    <h2 class="text-center">Créez votre compte</h2>
+                </div>
+                <div class="form-group d-flex justify-content-center">
+                    <video id="uneVideo" class="profile profile-grand" autoplay width="200" height="150"></video>
+                    <img id="uneImage" class="profile profile-grand" src="/images/anonyme.jpg">
+                </div>
+                <div class="form-group d-flex justify-content-center">
+                    <div class="btn-group">
+                        <button id="btnImage" type="button"  class="btn btn-default">Choisir une image</button>
+                        <button id="btnVideo" type="button" class="btn btn-default d-inline-flex align-items-baseline"><img class="camera" src="/open-iconic/svg/video.svg"></button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="tbCourriel">Courriel:</label><br/>
+                    <input id="tbCourriel" name="username" class="form-control" type="email"/>
+                </div>
+                <div class="form-group">
+                    <label for="tbAlias">Alias:</label><br/>
+                    <input id="tbAlias" name="alias" class="form-control" type="text"/>
+                </div>
+                <div class="form-group">
+                    <label for="tbPassword">Mot de passe:</label>
+                    <input id="tbPassword" name="password" class="form-control" type="password"/>
+                </div>
+                <div class="form-group">
+                    <label for="tbConfirmPassword">Confirmation du mot de passe:</label>
+                    <input id="tbConfirmPassword" class="form-control" type="password"/>
+                </div>
+                <div class="form-group d-flex justify-content-center">
+                    <button type="submit" class="btn btn-primary">S'incrire</button>
+                </div>
+                <input id="hidPic" type="hidden" name="profilePic"/>
+            </form>
+        </div>
+    </div>
+</div>
 </body>
 </html>
