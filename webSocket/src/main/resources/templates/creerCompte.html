@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<html lang="en">
+<html   xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
 <head>
     <meta charset="UTF-8">
     <title>Création compte</title>
@@ -16,7 +18,7 @@
 <div class="vertical-center">
     <div class="container">
         <div class="row justify-content-center align-items-center">
-            <form method="POST" action="/compte/creer" class="jumbotron col-11 col-sm-12 col-md-9 col-lg-7 col-xl-6">
+            <form method="POST" action="/compte/creer" th:object="${user}" enctype="utf-8" class="jumbotron col-11 col-sm-12 col-md-9 col-lg-7 col-xl-6">
                 <div class="form-group">
                     <h2 class="text-center">Créez votre compte</h2>
                 </div>
@@ -32,24 +34,25 @@
                 </div>
                 <div class="form-group">
                     <label for="tbCourriel">Courriel:</label><br/>
-                    <input id="tbCourriel" name="username" class="form-control" type="email"/>
+                    <input th:field="*{courriel}" id="tbCourriel" class="form-control" type="email"/>
                 </div>
                 <div class="form-group">
                     <label for="tbAlias">Alias:</label><br/>
-                    <input id="tbAlias" name="alias" class="form-control" type="text"/>
+                    <input th:field="*{alias}" id="tbAlias" class="form-control" type="text"/>
                 </div>
                 <div class="form-group">
                     <label for="tbPassword">Mot de passe:</label>
-                    <input id="tbPassword" name="password" class="form-control" type="password"/>
+                    <input th:field="*{password}" id="tbPassword" class="form-control" type="password"/>
                 </div>
                 <div class="form-group">
                     <label for="tbConfirmPassword">Confirmation du mot de passe:</label>
-                    <input id="tbConfirmPassword" class="form-control" type="password"/>
+                    <input th:field="*{matchingPassword}" id="tbConfirmPassword" class="form-control" type="password"/>
                 </div>
-                <div class="form-group d-flex justify-content-center">
-                    <button type="submit" class="btn btn-primary">S'incrire</button>
+                <div class="form-group d-flex justify-content-between align-items-baseline">
+                    <small class="form-text text-muted">Vous avez déjà un compte? <a href="/connexion" >Connectez vous!</a></small>
+                    <button type="submit" class="btn btn-primary">S'inscrire</button>
                 </div>
-                <input id="hidPic" type="hidden" name="profilePic"/>
+                <input th:field="*{avatar}" id="hidPic" type="hidden" name="profilePic"/>
             </form>
         </div>
     </div>

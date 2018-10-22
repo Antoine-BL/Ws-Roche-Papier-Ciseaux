@@ -12,4 +12,5 @@ public interface CompteDao extends JpaRepository<Compte, Long> {
     Optional<Compte> findById(Long id);
     Optional<Compte> findByCourriel(String courriel);
     boolean existsByCourriel(String courriel);
+    boolean existsByAlias(String alias);
 }

@@ -34,7 +34,7 @@ public class WebSocketApplication implements CommandLineRunner {
 	private static final String PUBLIC_OUTPUT_QUEUE = "/app/messagepublique";
 	private static final int PING_DELAY = 5000;
 	private static final int INBOUND_MESSAGE_SIZE_LIMIT = 32 * 1024;
-	private static final Compte SERVER_ACCOUNT = Compte.Builder(9999L)
+	private static final Compte SERVER_ACCOUNT = Compte.Builder()
 			.avecCourriel("server@server.ca")
 			.avecMotDePasse("123")
 			.avecAvatar(SERVER_PROFILE_PIC)

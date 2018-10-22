@@ -1,6 +1,7 @@
 package cgg.informatique.abl.webSocket.configurations;
 
 import cgg.informatique.abl.webSocket.entites.Compte;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 

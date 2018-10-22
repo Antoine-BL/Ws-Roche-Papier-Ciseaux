@@ -29,23 +29,23 @@ public class CompteTest {
         compteBuilder = initBuilder();
     }
 
-    private Compte.Builder initBuilder (Long id, String email, String password) {
-        return Compte.Builder(id)
+    private Compte.Builder initBuilder (String email, String password) {
+        return Compte.Builder()
                 .avecCourriel(email)
                 .avecMotDePasse(password);
     }
 
     private Compte.Builder initBuilder () {
-        return initBuilder(AN_ID, AN_EMAIL, A_PASSWORD);
+        return initBuilder(AN_EMAIL, A_PASSWORD);
     }
 
     private Compte.Builder initBuilderWithID (Long id) {
-        return initBuilder(id, AN_EMAIL, A_PASSWORD);
+        return initBuilder(AN_EMAIL, A_PASSWORD);
     }
 
     @Test
     public void compteClassShouldHaveBuilder() {
-        Compte.CourrielBuilder builder = Compte.Builder(1L);
+        Compte.CourrielBuilder builder = Compte.Builder();
 
         Assert.assertNotNull(builder);
     }

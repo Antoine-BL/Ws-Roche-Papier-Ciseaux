@@ -1,10 +1,11 @@
 package cgg.informatique.abl.webSocket.entites;
 
-import org.hibernate.annotations.ColumnDefault;
+import cgg.informatique.abl.webSocket.dto.CompteDto;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -13,11 +14,12 @@ import java.util.Collection;
 @Table(name="COMPTES")
 public class Compte implements UserDetails {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String courriel;
     private String motPasse;
     private String alias;
+    @Column(length = Integer.MAX_VALUE)
     private String avatar;
     @Enumerated
     private Role role = Role.NOUVEAU;
@@ -27,17 +29,13 @@ public class Compte implements UserDetails {
     protected Compte() { }
 
     private Compte(
-            final Long id,
-            final String courriel,
-            final String motPasse,
+            final @NotNull @NotEmpty String courriel,
+            final @NotNull @NotEmpty String motPasse,
             final String alias,
             final String avatar,
             final Role role,
             final Groupe groupe
     ) {
-        ArrayList<String> errors = new ArrayList<>();
-
-        this.id = id;
         this.courriel = courriel;
         this.motPasse = motPasse;
         this.alias = alias;
@@ -46,26 +44,14 @@ public class Compte implements UserDetails {
             this.role = role;
         if (groupe != null)
             this.groupe = groupe;
-
-        Validate();
-    }
-
-    private void Validate() {
-        if (courriel == null) {
-            throw new IllegalArgumentException("Courriel ne peut pas être null");
-        }
-
-        if (motPasse == null) {
-            throw new IllegalArgumentException("Mot de passe ne peut pas être null");
-        }
     }
 
     public static CourrielBuilder Builder() {
         return new Builder();
     }
 
-    public static CourrielBuilder Builder(Long id) {
-        return new Builder(id);
+    public static Builder Builder(CompteDto compteDto) {
+        return new Builder(compteDto);
     }
 
     public Long getId() {
@@ -136,7 +122,6 @@ public class Compte implements UserDetails {
     }
 
     public static class Builder implements CourrielBuilder, MotPasseBuilder{
-        private Long id;
         private String courriel;
         private String motPasse;
         private String alias;
@@ -146,7 +131,13 @@ public class Compte implements UserDetails {
 
         private Builder() { }
 
-        private Builder(Long id) { this.id = id; }
+        private Builder(CompteDto compteDto) {
+            this.courriel = compteDto.getCourriel();
+            this.motPasse = compteDto.getPassword();
+            this.alias = compteDto.getAlias();
+            this.avatar = compteDto.getAvatar();
+        }
+
 
         public MotPasseBuilder avecCourriel(@NotNull String courriel) {
             this.courriel = courriel;
@@ -179,7 +170,7 @@ public class Compte implements UserDetails {
         }
 
         public Compte build() {
-            return new Compte(id, courriel, motPasse, alias, avatar, role, groupe);
+            return new Compte(courriel, motPasse, alias, avatar, role, groupe);
         }
     }
 

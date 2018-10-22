@@ -38,6 +38,7 @@ class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .csrf()
                 .disable();
+        http.headers().frameOptions().sameOrigin();
     }
 
     @Override
