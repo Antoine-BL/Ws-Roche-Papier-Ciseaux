@@ -33,18 +33,8 @@
                 <input type="text" id="texte" class="form-control" placeholder="Entrez votre texte ici...">
             </div>
             <button id="envoyer" class="btn btn-default" type="submit" disabled="disabled">Envoyer</button>
-
         </div>
         <div class="col-md-4">
-        </div>
-
-
-        <div class="col-md-4">
-            <div class="form-group">
-                <label for="connexion">Connexion:</label>
-                <button id="connexion" class="btn btn-default" type="submit">Établir la connexion</button>
-                <button id="deConnexion" class="btn btn-default" type="submit" disabled="disabled">Fermer la connexion</button>
-            </div>
         </div>
     </div>
     <div class="row">
@@ -60,6 +50,8 @@
             </table>
         </div>
     </div>
+    <a id="connexion" href="/connexion" class="btn btn-primary" role="button">Établir la connexion</a>
+    <a id="deconnexion" href="/deconnexion" class="btn btn-primary d-none" role="button">Déconnexion</a>
 </div>
 </body>
 </html>

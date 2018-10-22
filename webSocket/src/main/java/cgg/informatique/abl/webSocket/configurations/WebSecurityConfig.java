@@ -22,7 +22,17 @@ class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
                 .anyRequest()
-                .permitAll();
+                .permitAll()
+                .and()
+                .formLogin()
+                .loginProcessingUrl("/connexion")
+                .loginPage("/connexion")
+                .defaultSuccessUrl("/", true)
+                .failureUrl("/login?error=true")
+                .and()
+                .logout()
+                .logoutUrl("/deconnexion")
+                .logoutSuccessUrl("/");
     }
 
     @Override

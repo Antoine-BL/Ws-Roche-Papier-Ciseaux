@@ -118,8 +118,8 @@ $(function () {
     $("form").on('submit', function (e) {
         e.preventDefault();
     });
-    $( "#connexion" ).click(function() { connexion(); });
-    $( "#deConnexion" ).click(function() { deConnexion(); });
+    // $( "#connexion" ).click(function() { connexion(); });
+    // $( "#deConnexion" ).click(function() { deConnexion(); });
     $( "#envoyer" ).click(function() { envoyerMessage(); });
 });
 
