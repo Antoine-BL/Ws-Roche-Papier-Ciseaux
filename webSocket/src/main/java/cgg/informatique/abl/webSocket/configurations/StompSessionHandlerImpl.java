@@ -4,9 +4,7 @@ import org.springframework.messaging.simp.stomp.*;
 
 import java.lang.reflect.Type;
 
-public class MonStompSessionHandler implements StompSessionHandler {
-
-
+public class StompSessionHandlerImpl implements StompSessionHandler {
     @Override
     public void afterConnected(StompSession session, StompHeaders connectedHeaders) {
 

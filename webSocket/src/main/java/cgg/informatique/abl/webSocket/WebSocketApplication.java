@@ -1,6 +1,6 @@
 package cgg.informatique.abl.webSocket;
 
-import cgg.informatique.abl.webSocket.configurations.MonStompSessionHandler;
+import cgg.informatique.abl.webSocket.configurations.StompSessionHandlerImpl;
 import cgg.informatique.abl.webSocket.dto.Courrier;
 import cgg.informatique.abl.webSocket.dto.Message;
 import cgg.informatique.abl.webSocket.dto.Reponse;
@@ -77,7 +77,7 @@ public class WebSocketApplication implements CommandLineRunner {
 	}
 
 	private void connectToWebSocket() throws ExecutionException, InterruptedException {
-		sessionHandler = new MonStompSessionHandler();
+		sessionHandler = new StompSessionHandlerImpl();
 		stompSession = stompClient.connect(URL, sessionHandler).get();
 	}
 
