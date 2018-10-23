@@ -21,6 +21,12 @@ public class UserDetailsImpl implements UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return compte.getAuthorities();
     }
+    public String getAvatar() {
+        return compte.getAvatar();
+    }
+    public String getAlias() {
+        return compte.getAlias();
+    }
     @Override
     public String getPassword() { return compte.getPassword();}
     @Override
