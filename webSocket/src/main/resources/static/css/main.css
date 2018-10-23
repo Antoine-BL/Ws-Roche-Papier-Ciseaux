@@ -5,16 +5,54 @@
     align-items: center;
 }
 
-.camera {
+.icon {
     width:15px;
 }
 
+.icon-small{
+    width: 5px
+}
+
 .profile {
-    border-radius: 50%;
+    border-radius: 4px;
+}
+
+.profile-petit {
+    border-radius: 4px;
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
 }
 
 .profile-grand {
     width: 150px;
     height: 150px;
     object-fit: cover;
+}
+
+.profile-petit {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+}
+
+.chip {
+    display: inline-block;
+    padding: 0 25px;
+    height: 50px;
+    font-size: 16px;
+    line-height: 50px;
+    border-radius: 25px;
+    background-color: #f1f1f1;
+}
+
+.chat-col {
+    height: 80vh;
+}
+
+.chat-window {
+    overflow-x: hidden;
+    overflow-y: scroll;
+    white-space: normal;
+    word-wrap: break-word;
 }
