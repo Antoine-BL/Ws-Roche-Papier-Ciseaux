@@ -3,7 +3,7 @@ package cgg.informatique.abl.webSocket.dto;
 import cgg.informatique.abl.webSocket.TypeMessage;
 import cgg.informatique.abl.webSocket.entites.Compte;
 
-public abstract class Message {
+public class Message {
 
     private Compte de;
     private String texte;

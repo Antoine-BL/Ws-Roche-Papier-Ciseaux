@@ -47,11 +47,11 @@ public class WebSocketApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-		configureWebSocket();
-
-		subscribeToPublicMessageQueue();
-
-		periodicallyPingClient();
+//		configureWebSocket();
+//
+//		subscribeToPublicMessageQueue();
+//
+//		periodicallyPingClient();
 	}
 
 	private void configureWebSocket() throws ExecutionException, InterruptedException {
