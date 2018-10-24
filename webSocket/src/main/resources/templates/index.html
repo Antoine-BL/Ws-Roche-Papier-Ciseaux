@@ -16,35 +16,33 @@
     <script src="/app.js"></script>
 </head>
 <body>
+<input type="hidden" id="estAuth" th:value="${authentifie}"/>
 <noscript><h2 style="color: #ff0000">Activer Javascript</h2></noscript>
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark text-light align-items-center justify-content-between">
     <div class="navbar-brand d-inline-flex align-items-center"><img class="profile-petit" src="/images/websocket_logo_white.png"/> Projet Websocket</div>
-    <button sec:authorize="isAuthenticated()" class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
-    <a sec:authorize="isAnonymous()" class="nav-item active btn btn-success ml-auto" id="connexion" href="/connexion" role="button">Se connecter</a>
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav ml-auto">
+        <ul class="navbar-nav ml-auto align-items-center">
             <li class="nav-item">
-                <a href="/ecole">Notre École</a>
-            </li>
-            <li class="nav-item" sec:authorize="isAuthenticated()">
-                <a href="/kumite">Kumite</a>
+                <a href="/ecole" class="nav-link active">Notre École</a>
             </li>
             <li class="nav-item" sec:authorize="hasAnyRole('Sensei', 'Venerable')">
-                <a href="/passage">Passages de grade</a>
+                <a href="/passage" class="nav-link active">Passages de grade</a>
             </li>
-            <li class="nav-item dropdown">
+            <a sec:authorize="isAnonymous()" class="nav-item active btn btn-success mr-auto" id="connexion" href="/connexion" role="button">Se connecter</a>
+            <li class="nav-item dropdown" sec:authorize="isAuthenticated()">
                 <a class="text-light dropdown-toggle" role="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <img th:src="${profilePic}" class="profile profile-petit" width="96" height="96"/>
                 </a>
-                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
-                    <h5 class="dropdown-header font-weight-bold" th:text="'Connecté en tant que: ' + ${username}"></h5>
-                    <div class="dropdown-item-text" th:text="'Rôle: ' + ${role}"></div>
-                    <div class="dropdown-item-text" th:text="'Groupe: ' + ${groupe}"></div>
-                    <div class="dropdown-divider"></div>
+                <div class="dropdown-menu dropdown-menu-right bg-dark text-light" aria-labelledby="dropdownMenuButton">
+                    <h5 class="dropdown-header font-weight-bold  text-light" th:text="'Connecté en tant que: ' + ${username}"></h5>
+                    <div class="dropdown-item-text text-light" th:text="'Rôle: ' + ${role}"></div>
+                    <div class="dropdown-item-text  text-light" th:text="'Groupe: ' + ${groupe}"></div>
+                    <div class="dropdown-divider text-light"></div>
                     <form action="/deconnexion" method="POST">
-                        <button class="dropdown-item" type="submit">Déconnexion</button>
+                        <button class="dropdown-item text-light deconnexion" type="submit">Déconnexion</button>
                         <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
                     </form>
                 </div>
@@ -52,38 +50,33 @@
         </ul>
     </div>
 </nav>
-<div id="main-content" class="container">
-    <h1 class="text-center">Messagerie</h1>
-    <div class="row">
-        <div class="col border border-right-0 chat-col d-flex flex-column" sec:authorize="isAuthenticated()">
-            <h2 class="text-center">Messagerie Privée</h2>
-            <div id="messageriePrivee" class="border-top row flex-grow-1">
-            </div>
-            <div id="connexionMessageriePrivee" class="border-top row flex-grow-1 align-items-center justify-content-center">
-                <button id="btnConnexionMessageriePrivee" class="btn btn-primary  d-block">Cliquez ici pour recevoir des messages</button>
-            </div>
-            <div class="row">
-                <form id="frmEnvoyerPrive" class="form-inline w-100 border-top">
-                    <input id="tbMessagePrive" class="form-control mb-2 mr-sm-2 flex-grow-1" type="text" placeholder="Entrez votre message ici...(privé)" />
-                    <button id="btnEnvoyerPrive" type="submit" class="btn btn-primary mb-2">Envoyer</button>
-                </form>
-            </div>
-        </div>
-        <div class="col border chat-col d-flex flex-column">
-            <h2 class="text-center ">Messagerie Publique</h2>
-            <div id="messageriePublique" class="border-top row flex-grow-1">
-            </div>
-            <div id="connexionMessageriePublique" class="border-top row flex-grow-1  align-items-center justify-content-center">
-                <button id="btnConnexionMessageriePublique" class="btn btn-primary d-block">Cliquez ici pour recevoir des messages</button>
-            </div>
-            <div class="row">
-                <form id="frmEnvoyer" class="form-inline w-100 border-top">
-                    <input id="tbMessagePublique" class="form-control mb-2 mr-sm-2 flex-grow-1" type="text" placeholder="Entrez votre message ici...(privé)" />
-                    <button id="btnEnvoyer" type="submit" class="btn btn-primary mb-2">Envoyer</button>
-                </form>
+<div class="vertical-center">
+    <div class="container">
+        <div class="justify-content-center align-items-center">
+             <div class="col border chat-col d-flex flex-column">
+                <h2 class="text-center ">Messagerie</h2>
+                <div id="messagerie" style="display: none" class="border-top row flex-grow-1">
+                </div>
+                <div id="connexionMessagerie" class="border-top row flex-grow-1  align-items-center justify-content-center">
+                    <button id="btnConnexionMessagerie" class="btn btn-primary d-block">Cliquez ici pour recevoir des messages</button>
+                </div>
+                <div class="row">
+                    <form id="frmEnvoyer" class="form-inline w-100 border-top">
+                        <input disabled id="tbMessage" class="form-control mb-2 mr-sm-2 flex-grow-1" type="text" placeholder="Entrez votre message ici...(privé)" />
+                        <div sec:authorize="isAuthenticated()" class="dropdown mb-2 mr-2" id="ddlPubPrive">
+                            <button disabled id="ddBtn" class="btn btn-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Public
+                            </button>
+                            <div id="menuDD" class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                <a class="dropdown-item" href="#">Public</a>
+                                <a class="dropdown-item" href="#">Privé</a>
+                            </div>
+                        </div>
+                        <button disabled id="btnEnvoyer" type="submit" class="btn btn-primary mb-2">Envoyer</button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
-</div>
 </body>
 </html>

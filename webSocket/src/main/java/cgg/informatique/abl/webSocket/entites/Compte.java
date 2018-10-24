@@ -25,6 +25,8 @@ public class Compte implements UserDetails {
     private Role role = Role.NOUVEAU;
     @Enumerated
     private Groupe groupe = Groupe.BLANC;
+    private int points;
+    private int credits;
 
     protected Compte() { }
 

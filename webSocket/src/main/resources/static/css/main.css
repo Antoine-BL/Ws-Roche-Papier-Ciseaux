@@ -56,3 +56,11 @@
     white-space: normal;
     word-wrap: break-word;
 }
+
+.dropdown-item:hover {
+    background-color: inherit;
+}
+
+.navbar-brand {
+    padding: 0;
+}

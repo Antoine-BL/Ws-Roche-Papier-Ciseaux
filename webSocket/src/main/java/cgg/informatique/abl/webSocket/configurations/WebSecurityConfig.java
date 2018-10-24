@@ -22,7 +22,7 @@ class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
                 .antMatchers("/", "/connexion", "/authenticate", "/compte/creer").permitAll()
-                .antMatchers("/passage").hasAnyAuthority("Sensei", "Venerable")
+                .antMatchers("/passage").hasAnyAuthority("ROLE_Sensei", "ROLE_Venerable")
                 .antMatchers("/kumite").authenticated()
                 .anyRequest().permitAll()
                 .and()
@@ -31,7 +31,7 @@ class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .usernameParameter("username")
                 .loginProcessingUrl("/connexion")
                 .loginPage("/connexion")
-                .defaultSuccessUrl("/", true)
+                .defaultSuccessUrl("/")
                 .failureUrl("/connexion?error=true")
                 .and()
                 .logout()
