@@ -36,14 +36,7 @@ $(document).ready(() => {
         if (stompClient.connected) {
             subscribePrive();
         } else {
-            $('#btnConnexionMessageriePrivee').prop("disabled", true);
-            stompClient.connect({}, function (frame) {
-                $('#btnConnexionMessageriePrivee').prop("disabled", false);
-                $('#connexionMessageriePrivee').hide();
-                $('#messageriePrivee').show();
-
-                subscribePrive()
-            });
+            stompClient.connect({}, subscribePrive);
         }
     }
 
@@ -58,15 +51,8 @@ $(document).ready(() => {
 
         if (stompClient.connected) {
             subscribePublique();
-            setPublicConnection(true);
         } else {
-            $('#btnConnexionMessageriePublique').prop("disabled", true);
-
-            stompClient.connect({}, function (frame) {
-                setPublicConnection(true);
-
-                subscribePublique();
-            });
+            stompClient.connect({}, subscribePublique);
         }
     }
 
@@ -93,13 +79,15 @@ $(document).ready(() => {
     }
 
     function subscribePublique() {
-        stompClient.subscribe('/topic/chat-output', function (greeting) {
+        setPublicConnection(true);
+        stompClient.subscribe('/topic/public/chat', function (greeting) {
             showPublique(JSON.parse(greeting.body).texte);
         });
     }
 
     function subscribePrive() {
-        stompClient.subscribe('/topic/chat-output-private', function (greeting) {
+        setPrivateConnection(true);
+        stompClient.subscribe('/topic/private/chat', function (greeting) {
             showPrive(JSON.parse(greeting.body).texte);
         });
     }
@@ -114,13 +102,13 @@ $(document).ready(() => {
 });
 
 function sendName(from) {
-    stompClient.send("/app/chat-input",
+    stompClient.send("/app/public/chat",
         {},
         serializeMessage(from));
 }
 
 function sendNamePrivate() {
-    stompClient.send("/app/chat-input-private",
+    stompClient.send("/app/private/chat",
         {},
         serializeMessage($('#tbMessagePrive')));
 }

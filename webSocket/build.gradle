@@ -37,6 +37,7 @@ dependencies {
 	implementation('org.springframework.boot:spring-boot-starter-web')
 	implementation(group: 'org.thymeleaf.extras', name: 'thymeleaf-extras-springsecurity4', version: '3.0.2.RELEASE')
 
+	compile(group: 'org.springframework.security', name: 'spring-security-messaging', version: '5.1.1.RELEASE')
 	compile('org.springframework.boot:spring-boot-starter-data-rest')
 	compile("org.springframework.boot:spring-boot-starter-websocket")
 	compile("org.webjars:webjars-locator-core")

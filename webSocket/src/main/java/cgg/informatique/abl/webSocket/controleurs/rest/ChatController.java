@@ -10,14 +10,14 @@ import org.springframework.web.util.HtmlUtils;
 
 @RestController
 public class ChatController {
-    @MessageMapping("/chat-input-private")
-    @SendTo("/topic/chat-output-private")
+    @MessageMapping("/public/chat")
+    @SendTo("/topic/public/chat")
     public Reponse publicMessage(Message message) throws Exception {
         return new Reponse(1L, message.getDe(),HtmlUtils.htmlEscape(message.getTexte()));
     }
 
-    @MessageMapping("/chat-input")
-    @SendTo("/topic/chat-output")
+    @MessageMapping("/private/chat")
+    @SendTo("/topic/private/chat")
     public Reponse privateMessage(Message message) throws Exception {
         return new Reponse(1L, message.getDe(),HtmlUtils.htmlEscape(message.getTexte()));
     }
