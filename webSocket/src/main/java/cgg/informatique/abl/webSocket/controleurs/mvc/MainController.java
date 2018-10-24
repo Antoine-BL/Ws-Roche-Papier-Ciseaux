@@ -16,8 +16,25 @@ public class MainController {
 
             model.addAttribute("username", details.getAlias());
             model.addAttribute("profilePic", details.getAvatar());
+            model.addAttribute("role", details.getRole().toString().toLowerCase());
+            model.addAttribute("groupe", details.getGroupe().toString().toLowerCase());
         }
 
         return "index";
+    }
+
+    @GetMapping("/ecole")
+    public String ecole() {
+        return "ecole";
+    }
+
+    @GetMapping("/kumite")
+    public String kumite() {
+        return "kumite";
+    }
+
+    @GetMapping("/passage")
+    public String passage() {
+        return "passage";
     }
 }

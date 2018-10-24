@@ -23,14 +23,25 @@
         <span class="navbar-toggler-icon"></span>
     </button>
     <a sec:authorize="isAnonymous()" class="nav-item active btn btn-success ml-auto" id="connexion" href="/connexion" role="button">Se connecter</a>
-    <div sec:authorize="isAuthenticated()" class="collapse navbar-collapse" id="navbarSupportedContent">
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+                <a href="/ecole">Notre École</a>
+            </li>
+            <li class="nav-item" sec:authorize="isAuthenticated()">
+                <a href="/kumite">Kumite</a>
+            </li>
+            <li class="nav-item" sec:authorize="hasAnyRole('Sensei', 'Venerable')">
+                <a href="/passage">Passages de grade</a>
+            </li>
             <li class="nav-item dropdown">
                 <a class="text-light dropdown-toggle" role="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <img th:src="${profilePic}" class="profile profile-petit" width="96" height="96"/>
                 </a>
                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
                     <h5 class="dropdown-header font-weight-bold" th:text="'Connecté en tant que: ' + ${username}"></h5>
+                    <div class="dropdown-item-text" th:text="'Rôle: ' + ${role}"></div>
+                    <div class="dropdown-item-text" th:text="'Groupe: ' + ${groupe}"></div>
                     <div class="dropdown-divider"></div>
                     <form action="/deconnexion" method="POST">
                         <button class="dropdown-item" type="submit">Déconnexion</button>

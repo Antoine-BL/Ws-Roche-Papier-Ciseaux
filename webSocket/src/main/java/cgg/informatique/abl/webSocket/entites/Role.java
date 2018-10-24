@@ -5,7 +5,8 @@ import org.springframework.security.core.GrantedAuthority;
 public enum Role implements GrantedAuthority {
     NOUVEAU("Nouveau"),
     ANCIEN("Ancien"),
-    SENSEI("Sensei");
+    SENSEI("Sensei"),
+    VENERABLE("Venerable");
 
     private String authority;
 

@@ -1,6 +1,8 @@
 package cgg.informatique.abl.webSocket.configurations;
 
 import cgg.informatique.abl.webSocket.entites.Compte;
+import cgg.informatique.abl.webSocket.entites.Groupe;
+import cgg.informatique.abl.webSocket.entites.Role;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -27,6 +29,15 @@ public class UserDetailsImpl implements UserDetails {
     public String getAlias() {
         return compte.getAlias();
     }
+
+    public Groupe getGroupe() {
+        return compte.getGroupe();
+    }
+
+    public Role getRole() {
+        return compte.getRole();
+    }
+
     @Override
     public String getPassword() { return compte.getPassword();}
     @Override

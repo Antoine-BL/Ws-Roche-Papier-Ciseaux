@@ -1,2 +1,2 @@
 --Password:admin
-INSERT INTO COMPTES (id, courriel, mot_passe, alias, avatar, role, groupe) VALUES (1, 'admin@admin.ca', '$2a$10$v4yvxNB3LFS2qox3hCmopeA1HlnaJm5G0iYVXk/Xq0eG2gLNpzCLS', 'admin', '', 0, 2)
+INSERT INTO COMPTES (id, courriel, mot_passe, alias, avatar, role, groupe) VALUES (1, 'admin@admin.ca', '$2a$10$v4yvxNB3LFS2qox3hCmopeA1HlnaJm5G0iYVXk/Xq0eG2gLNpzCLS', 'admin', '', 3, 0)
