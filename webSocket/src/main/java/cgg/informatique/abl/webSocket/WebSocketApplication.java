@@ -1,9 +1,9 @@
 package cgg.informatique.abl.webSocket;
 
 import cgg.informatique.abl.webSocket.configurations.StompSessionHandlerImpl;
-import cgg.informatique.abl.webSocket.dto.Courrier;
-import cgg.informatique.abl.webSocket.dto.Message;
-import cgg.informatique.abl.webSocket.dto.Reponse;
+import cgg.informatique.abl.webSocket.messaging.Courrier;
+import cgg.informatique.abl.webSocket.messaging.Message;
+import cgg.informatique.abl.webSocket.messaging.Reponse;
 import cgg.informatique.abl.webSocket.entites.Compte;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;

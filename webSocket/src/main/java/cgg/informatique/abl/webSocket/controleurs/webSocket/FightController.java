@@ -1,0 +1,24 @@
+package cgg.informatique.abl.webSocket.controleurs.webSocket;
+
+import cgg.informatique.abl.webSocket.messaging.Commande;
+import cgg.informatique.abl.webSocket.messaging.Courrier;
+import cgg.informatique.abl.webSocket.messaging.Reponse;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.util.HtmlUtils;
+
+@RestController
+public class FightController {
+    @MessageMapping("/battle/chat")
+    @SendTo("/topic/battle/chat")
+    public Reponse fightChatMessage(Courrier message) throws Exception {
+        return new Reponse(1L, message.getDe(), HtmlUtils.htmlEscape(message.getTexte()));
+    }
+
+    @MessageMapping("/battle/command")
+    @SendTo("/topic/battle/command")
+    public Reponse fightCommandMessage(Commande message) throws Exception {
+        return message.execute();
+    }
+}

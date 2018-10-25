@@ -1,4 +1,4 @@
-package cgg.informatique.abl.webSocket.dto;
+package cgg.informatique.abl.webSocket.messaging;
 
 import cgg.informatique.abl.webSocket.entites.Compte;
 
@@ -23,6 +23,13 @@ public class Reponse {
     }
 
     public Reponse() {
+    }
+
+    public Reponse(Long id, String texte) {
+        this.id = id;
+        this.texte = texte;
+
+        this.creation = System.currentTimeMillis();
     }
 
     public Reponse(Long id, Compte de, String texte) {

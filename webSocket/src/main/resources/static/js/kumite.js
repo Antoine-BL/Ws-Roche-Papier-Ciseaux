@@ -1,9 +1,11 @@
 $(document).ready(() => {
     const inputTopics = Object.freeze({
         CHAT: '/topic/battle/chat',
+        COMMAND: '/topic/battle/command'
     });
     const outputTopics = Object.freeze({
         CHAT: '/app/battle/chat',
+        COMMAND: '/app/battle/command',
     });
     const websocket = new WebSocketClient($('#tbMessage'), $('#messagerie'));
     $("#frmMessage").on('submit', function (e) {
@@ -19,6 +21,7 @@ $(document).ready(() => {
     function subscribe() {
         setConnection(true);
         websocket.subscribeTo(inputTopics.CHAT, '');
+        websocket.subscribeTo(inputTopics.COMMAND, '');
     }
 
     function setConnection(connected) {
@@ -30,6 +33,10 @@ $(document).ready(() => {
     }
 
     function send() {
-        websocket.sendTo(outputTopics.CHAT);
+        if (websocket.isCommand) {
+            websocket.sendCommandTo(outputTopics.COMMAND);
+        } else {
+            websocket.sendTo(outputTopics.CHAT);
+        }
     }
 });
