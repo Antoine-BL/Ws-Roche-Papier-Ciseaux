@@ -1,5 +1,5 @@
 $(document).ready(() => {
-    const wsu = new WebSocket($('#tbMessage'), $('#messagerie'));
+    const wsu = new WebSocketClient($('#tbMessage'), $('#messagerie'));
     let envoyerPub = true;
 
     const inputTopics = Object.freeze({
@@ -27,13 +27,14 @@ $(document).ready(() => {
 
     function send() {
         if (envoyerPub) {
-            wsu.send(inputTopics.PUBLIC);
+            wsu.sendTo(inputTopics.PUBLIC);
         } else {
-            wsu.send(inputTopics.PRIVATE);
+            wsu.sendTo(inputTopics.PRIVATE);
         }
     }
 
     function setConnection(connected) {
+        console.log('test');
         $('#btnConnexionMessagerie').prop("disabled", connected);
         $('#btnEnvoyer').prop("disabled", !connected);
         $('#tbMessage').prop("disabled", !connected);

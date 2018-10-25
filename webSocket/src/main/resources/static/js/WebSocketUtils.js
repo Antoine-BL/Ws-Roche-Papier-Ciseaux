@@ -1,5 +1,5 @@
 
-class WebSocket {
+class WebSocketClient {
     constructor(readFrom, displayTo){
         this.readFrom = readFrom;
         this.displayTo = displayTo;
@@ -30,11 +30,11 @@ class WebSocket {
         displayTo.append( message + '<br/>');
     }
 
-    send(topic) {
+    sendTo(topic) {
         this.stompClient.send(
             topic,
             {},
-            WebSocket.serializeMessage(this.readFrom.val())
+            WebSocketClient.serializeMessage(this.readFrom.val())
         );
 
         this.readFrom.val('');

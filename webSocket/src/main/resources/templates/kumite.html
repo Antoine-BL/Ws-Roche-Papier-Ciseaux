@@ -78,16 +78,14 @@
                 [surface]
             </div>
         </div>
-        <div id="chat" class="border col-4 d-flex flex-column">
-            <h4>Messagerie</h4>
-            <div id="messagerie" style="display: none;" class="row flex-grow-1">
+        <div id="chat" class="border col-4 d-flex flex-column p-0">
+            <h4 class="text-center border-bottom p-2">Messagerie</h4>
+            <div id="messagerie" style="display: none;" class="row flex-grow-1 p-2">
             </div>
             <div id="msgAttente" class="row flex-grow-1 d-flex justify-content-center align-items-center">
-                <div>
-                    En attente de la connexion...
-                </div>
+                En attente de la connexion...
             </div>
-            <form class="form-inline border-top">
+            <form id="frmMessage" class="form-inline border-top p-2">
                 <input disabled id="tbMessage" class="form-control mb-2 mr-sm-2 flex-grow-1" type="text" placeholder="Entrez votre message ici...(privé)" />
                 <button disabled id="btnEnvoyer" type="submit" class="btn btn-primary mb-2">Envoyer</button>
             </form>
