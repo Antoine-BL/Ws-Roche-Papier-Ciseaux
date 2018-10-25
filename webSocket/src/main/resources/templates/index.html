@@ -14,6 +14,7 @@
     <script src="/webjars/stomp-websocket/stomp.min.js"></script>
 
     <script src="/app.js"></script>
+    <script src="/js/WebSocketUtils.js"></script>
 </head>
 <body>
 <input type="hidden" id="estAuth" th:value="${authentifie}"/>
@@ -27,6 +28,9 @@
         <ul class="navbar-nav ml-auto align-items-center">
             <li class="nav-item">
                 <a href="/ecole" class="nav-link active">Notre École</a>
+            </li>
+            <li class="nav-item" sec:authorize="isAuthenticated()">
+                <a href="/kumite" class="nav-link active">Kumite</a>
             </li>
             <li class="nav-item" sec:authorize="hasAnyRole('Sensei', 'Venerable')">
                 <a href="/passage" class="nav-link active">Passages de grade</a>

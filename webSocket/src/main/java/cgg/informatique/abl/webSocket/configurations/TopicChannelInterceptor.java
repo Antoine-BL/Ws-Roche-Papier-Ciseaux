@@ -1,14 +1,10 @@
 package cgg.informatique.abl.webSocket.configurations;
 
-import cgg.informatique.abl.webSocket.entites.Compte;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
@@ -45,13 +41,13 @@ class TopicChannelInterceptor implements ChannelInterceptor {
     }
 
     private boolean validerAcces(Principal utilisateur, String destination) {
-        if (destinationEstPublique(destination)) return true;
+        if (!destinationEstPrivee(destination)) return true;
 
         return utilisateur != null;
     }
 
     private boolean validerPermissionEnvoi(Principal utilisateur, String destination){
-        if (destinationEstPublique(destination)) return true;
+        if (!destinationEstPrivee(destination)) return true;
 
         if (utilisateur == null) return false;
 
@@ -69,8 +65,8 @@ class TopicChannelInterceptor implements ChannelInterceptor {
                 );
     }
 
-    private boolean destinationEstPublique(String destination) {
+    private boolean destinationEstPrivee(String destination) {
         if (destination == null) return true;
-        return destination.matches(".*/public/.*");
+        return destination.matches(".*/private/.*");
     }
 }

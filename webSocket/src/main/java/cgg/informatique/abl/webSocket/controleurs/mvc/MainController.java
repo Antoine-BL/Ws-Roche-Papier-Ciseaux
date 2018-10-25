@@ -26,22 +26,15 @@ public class MainController {
 
     @GetMapping("/")
     public String index(@Autowired Authentication auth, Model model) {
-        if (auth != null) {
-            UserDetailsImpl details = (UserDetailsImpl)auth.getPrincipal();
-
-            model.addAttribute("username", details.getAlias());
-            model.addAttribute("profilePic", details.getAvatar());
-            model.addAttribute("role", details.getRole().toString().toLowerCase());
-            model.addAttribute("groupe", details.getGroupe().toString().toLowerCase());
-        }
-
-        model.addAttribute("authentifie", auth != null);
+        loadUserInfoIntoModel(auth, model);
 
         return "index";
     }
 
     @GetMapping("/ecole")
-    public String ecole(Model model) {
+    public String ecole(@Autowired Authentication auth, Model model) {
+        loadUserInfoIntoModel(auth, model);
+
         List<Compte> comptes = compteDao.findAll();
         HashMap<Role, List<Compte>> roles = new HashMap<>();
 
@@ -63,12 +56,29 @@ public class MainController {
     }
 
     @GetMapping("/kumite")
-    public String kumite() {
+    public String kumite(@Autowired Authentication auth, Model model) {
+        loadUserInfoIntoModel(auth, model);
+
         return "kumite";
     }
 
     @GetMapping("/passage")
-    public String passage() {
+    public String passage(@Autowired Authentication auth, Model model) {
+        loadUserInfoIntoModel(auth, model);
+
         return "passage";
+    }
+
+    private void loadUserInfoIntoModel(Authentication auth, Model model) {
+        if (auth != null) {
+            UserDetailsImpl details = (UserDetailsImpl)auth.getPrincipal();
+
+            model.addAttribute("username", details.getAlias());
+            model.addAttribute("profilePic", details.getAvatar());
+            model.addAttribute("role", details.getRole().toString().toLowerCase());
+            model.addAttribute("groupe", details.getGroupe().toString().toLowerCase());
+        }
+
+        model.addAttribute("authentifie", auth != null);
     }
 }
