@@ -26,7 +26,7 @@ $(document).ready(() => {
 
     function setConnection(connected) {
         $('#msgAttente').toggle(!connected);
-        $('#msgAttente').removeClass('d-flex');
+        $('#msgAttente').toggleClass('d-flex', !connected);
         $('#messagerie').toggle(connected);
         $('#btnEnvoyer').prop('disabled', !connected);
         $('#tbMessage').prop('disabled', !connected);

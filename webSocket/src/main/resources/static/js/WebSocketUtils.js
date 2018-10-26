@@ -24,6 +24,14 @@ class WebSocketClient {
         return JSON.stringify({
             parametres: commande.params,
             typeCommande: commande.name.toUpperCase(),
+            de: {
+                id: 1,
+                courriel: "admin@admin.ca",
+                motPasse: "admin",
+                alias: "admin",
+                role: "VENERABLE",
+                groupe: "BLANC",
+            }
         });
     }
 

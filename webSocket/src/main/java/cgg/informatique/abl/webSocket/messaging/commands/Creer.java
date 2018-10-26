@@ -4,23 +4,23 @@ import cgg.informatique.abl.webSocket.controleurs.webSocket.FightController;
 import cgg.informatique.abl.webSocket.messaging.Reponse;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-import java.util.ArrayList;
+import java.util.List;
 
-@JsonDeserialize
-public class Error extends Commande {
-    private String className;
-
-    public Error() {
+@JsonDeserialize()
+public class Creer extends Commande{
+    public Creer() {
 
     }
 
-    public Error(String className) {
-        super(new ArrayList<>());
-        this.className = className;
+    public Creer(List<String> args) {
+        super(args);
     }
 
     @Override
     public Reponse execute(FightController context) {
-        return new Reponse(1L, "Erreur, commande: " + className + " est inconnue");
+        Thread thread = new Thread(context.getLobby());
+        thread.start();
+
+        return new Reponse(1L, "Lobby en création...");
     }
 }

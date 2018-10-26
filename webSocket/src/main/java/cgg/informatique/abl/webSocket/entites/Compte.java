@@ -9,6 +9,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Objects;
 
 @Entity
 @Table(name="COMPTES")
@@ -182,6 +183,27 @@ public class Compte implements UserDetails {
 
     public interface MotPasseBuilder {
         Builder avecMotDePasse(String motPasse);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Compte compte = (Compte) o;
+        return points == compte.points &&
+                credits == compte.credits &&
+                Objects.equals(id, compte.id) &&
+                Objects.equals(courriel, compte.courriel) &&
+                Objects.equals(motPasse, compte.motPasse) &&
+                Objects.equals(alias, compte.alias) &&
+                Objects.equals(avatar, compte.avatar) &&
+                role == compte.role &&
+                groupe == compte.groupe;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, courriel, motPasse, alias, avatar, role, groupe, points, credits);
     }
 }
 

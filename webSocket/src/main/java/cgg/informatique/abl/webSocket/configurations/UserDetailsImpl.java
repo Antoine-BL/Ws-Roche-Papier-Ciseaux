@@ -38,6 +38,10 @@ public class UserDetailsImpl implements UserDetails {
         return compte.getRole();
     }
 
+    public Compte getCompte() {
+        return compte;
+    }
+
     @Override
     public String getPassword() { return compte.getPassword();}
     @Override

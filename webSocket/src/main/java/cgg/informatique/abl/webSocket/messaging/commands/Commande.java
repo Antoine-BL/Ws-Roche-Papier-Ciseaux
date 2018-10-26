@@ -1,16 +1,18 @@
-package cgg.informatique.abl.webSocket.messaging;
+package cgg.informatique.abl.webSocket.messaging.commands;
 
-import cgg.informatique.abl.webSocket.dto.Match;
+import cgg.informatique.abl.webSocket.configurations.UserDetailsImpl;
+import cgg.informatique.abl.webSocket.controleurs.webSocket.FightController;
 import cgg.informatique.abl.webSocket.entites.Compte;
+import cgg.informatique.abl.webSocket.messaging.Message;
+import cgg.informatique.abl.webSocket.messaging.Reponse;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import java.util.List;
 
 @JsonDeserialize(using = CommandDeserializer.class)
 public abstract class Commande extends Message {
-    private List<String> parametres;
-    private TypeCommande typeCommande;
-    private Match match;
+    protected List<String> parametres;
+    protected TypeCommande typeCommande;
 
     public Commande(){}
 
@@ -40,5 +42,5 @@ public abstract class Commande extends Message {
         this.typeCommande = typeCommande;
     }
 
-    public abstract Reponse execute();
+    public abstract Reponse execute(FightController context);
 }

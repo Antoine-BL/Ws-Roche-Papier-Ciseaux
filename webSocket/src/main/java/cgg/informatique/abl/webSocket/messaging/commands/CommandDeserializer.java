@@ -1,13 +1,16 @@
-package cgg.informatique.abl.webSocket.messaging;
+package cgg.informatique.abl.webSocket.messaging.commands;
 
-import cgg.informatique.abl.webSocket.messaging.commands.Error;
+import cgg.informatique.abl.webSocket.entites.Compte;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -24,29 +27,22 @@ public class CommandDeserializer extends StdDeserializer<Commande> {
     @Override
     public Commande deserialize(JsonParser jp, DeserializationContext ctxt)
             throws IOException, JsonProcessingException {
-        JsonNode node = jp.getCodec().readTree(jp);
+        ObjectNode node = jp.getCodec().readTree(jp);
         JsonNode typeNode = node.get("typeCommande");
-        JsonNode parametersNode = node.get("parametres");
 
-        if (!typeNode.isTextual()) throw new IOException("Invalid JSON, typeCommande is not textual");
-        if (!parametersNode.isArray()) throw new IOException("Invalid JSON, parameters not an array");
+        if (typeNode == null || !typeNode.isTextual()) throw new IOException("Invalid JSON, typeCommande is not textual");
 
         String type = typeNode.textValue();
-        Iterator<JsonNode> itParamsJson = parametersNode.elements();
-
-        List<String> params = new ArrayList<>();
-
-        while(itParamsJson.hasNext()) {
-            params.add(itParamsJson.next().textValue());
-        }
-
         try {
-            return TypeCommande.valueOf(type).construct(params);
+            TypeCommande typeCommande = TypeCommande.valueOf(type);
+            node.remove("typeCommande");
+
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, true);
+
+            return mapper.treeToValue(node, typeCommande.getMappedSubtype());
         } catch (IllegalArgumentException e) {
             return new Error(type);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new IOException("Error creating Command class", e);
         }
     }
 }

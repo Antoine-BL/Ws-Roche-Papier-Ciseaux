@@ -7,7 +7,6 @@ import java.lang.reflect.Type;
 public class StompSessionHandlerImpl implements StompSessionHandler {
     @Override
     public void afterConnected(StompSession session, StompHeaders connectedHeaders) {
-
     }
 
     @Override
@@ -27,6 +26,6 @@ public class StompSessionHandlerImpl implements StompSessionHandler {
 
     @Override
     public void handleFrame(StompHeaders headers, Object payload) {
-
+        headers.add("simpUser", "Server");
     }
 }

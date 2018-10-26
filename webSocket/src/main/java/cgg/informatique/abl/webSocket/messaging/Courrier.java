@@ -1,5 +1,6 @@
 package cgg.informatique.abl.webSocket.messaging;
 
+import cgg.informatique.abl.webSocket.configurations.UserDetailsImpl;
 import cgg.informatique.abl.webSocket.entites.Compte;
 
 public class Courrier extends Message {

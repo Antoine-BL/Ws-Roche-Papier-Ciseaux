@@ -1,21 +1,30 @@
 package cgg.informatique.abl.webSocket.configurations;
 
+import cgg.informatique.abl.webSocket.entites.Compte;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
 import java.security.Principal;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 class TopicChannelInterceptor implements ChannelInterceptor {
     private Collection<String> authPourEcrire = Arrays.asList("ROLE_Sensei",
             "ROLE_Venerable");
     private UserDetailsService userDetailsService;
+    private static final Compte SERVER_ACCOUNT = Compte.Builder()
+            .avecCourriel("server@server.ca")
+            .avecMotDePasse("123")
+            .avecAvatar("")
+            .avecAlias("Serveur")
+            .build();
 
     public TopicChannelInterceptor(UserDetailsService userDetailsService) {
         this.userDetailsService = userDetailsService;
@@ -26,6 +35,7 @@ class TopicChannelInterceptor implements ChannelInterceptor {
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(message);
 
         Principal userPrincipal = headerAccessor.getUser();
+
         StompCommand commande = headerAccessor.getCommand();
 
         if (StompCommand.SUBSCRIBE.equals(commande)) {
@@ -41,13 +51,13 @@ class TopicChannelInterceptor implements ChannelInterceptor {
     }
 
     private boolean validerAcces(Principal utilisateur, String destination) {
-        if (!destinationEstPrivee(destination)) return true;
+        if (destinationEstPublique(destination)) return true;
 
         return utilisateur != null;
     }
 
     private boolean validerPermissionEnvoi(Principal utilisateur, String destination){
-        if (!destinationEstPrivee(destination)) return true;
+        if (destinationEstPublique(destination)) return true;
 
         if (utilisateur == null) return false;
 
@@ -65,8 +75,8 @@ class TopicChannelInterceptor implements ChannelInterceptor {
                 );
     }
 
-    private boolean destinationEstPrivee(String destination) {
-        if (destination == null) return true;
-        return destination.matches(".*/private/.*");
+    private boolean destinationEstPublique(String destination) {
+        if (destination == null) return false;
+        return !destination.matches(".*/private/.*");
     }
 }
