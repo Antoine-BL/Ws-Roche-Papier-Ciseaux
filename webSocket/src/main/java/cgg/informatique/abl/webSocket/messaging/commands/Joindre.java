@@ -23,7 +23,10 @@ public class Joindre extends Commande{
     public Reponse execute(FightController context) {
         try {
             Lobby lobby = context.getLobby();
+
             lobby.connect(this.getDe());
+
+            lobby.getLobbyUserData(getDe()).sentCommand();
 
             return new Reponse(1L, "Vous avez rejoint le lobby!");
         } catch (Exception e) {

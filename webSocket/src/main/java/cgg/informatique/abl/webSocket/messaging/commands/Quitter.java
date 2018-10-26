@@ -23,8 +23,10 @@ public class Quitter extends Commande{
     public Reponse execute(FightController context) {
         try {
             Lobby lobby = context.getLobby();
+
             LobbyUserData lub = lobby.getLobbyUserData(getDe());
-            context.getLobby().quitter(lub);
+            lobby.quitter(lub);
+
             return new Reponse(1L, "Lobby quitté avec succès");
         } catch (Exception e) {
             return new Reponse(1L, "Erreur en quittant le lobby");

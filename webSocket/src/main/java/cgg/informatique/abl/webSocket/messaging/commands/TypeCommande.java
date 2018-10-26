@@ -17,4 +17,3 @@ public enum TypeCommande {
         this.mappedSubtype = mappedSubtype;
     }
 }
-

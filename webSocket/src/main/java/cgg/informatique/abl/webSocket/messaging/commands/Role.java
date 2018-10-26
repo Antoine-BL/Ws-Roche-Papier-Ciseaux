@@ -29,9 +29,13 @@ public class Role extends Commande{
             try {
                 LobbyRole role = LobbyRole.valueOf(parametres.get(ROLE_INDEX).toUpperCase());
 
-                role.changeRole(context.getLobby(), getDe());
+                Lobby lobby = context.getLobby();
 
-                return new Reponse(1L, "Role changé à: " + role);
+                role.changeRole(lobby, getDe());
+
+                lobby.getLobbyUserData(getDe()).sentCommand();
+
+                return new Reponse(1L, "");
             } catch (Exception e){
                 return new Reponse(1L, "Echec du changement de rôle. Raison: " + e.getMessage());
             }

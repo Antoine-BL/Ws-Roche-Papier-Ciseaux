@@ -15,6 +15,7 @@ import org.springframework.web.socket.sockjs.client.WebSocketTransport;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Predicate;
@@ -49,9 +50,9 @@ public class Lobby implements Runnable{
     public Lobby() {
         lobbyState = LobbyState.CLOSED;
 
-        users = new ArrayList<>(27);
-        spectateurs = new ArrayList<>(12);
-        combattants = new ArrayList<>(12);
+        users = Collections.synchronizedList(new ArrayList<>(27));
+        spectateurs = Collections.synchronizedList(new ArrayList<>(12));
+        combattants = Collections.synchronizedList(new ArrayList<>(12));
 
         initStompClient();
     }
@@ -91,10 +92,30 @@ public class Lobby implements Runnable{
 
             System.out.println("tick!");
 
+            purgeInactiveUsers();
+            
             if (isEmpty()) {
                 send("Lobby inactif");
                 lobbyState = LobbyState.STANDBY;
                 waitForPlayers();
+            }
+        }
+    }
+
+    private void purgeInactiveUsers() {
+        for (int i = 0; i < users.size(); i++) {
+            LobbyUserData user = users.get(i);
+
+            if (user.isTimedOut()) {
+                removeFromLobby(user);
+                send(user.getUser().getAlias() + " kicked due to inactivity");
+                System.out.println(user.getUser().getAlias() + " kicked due to inactivity");
+            }
+
+            if (user.isInactive() && !user.isWarned()) {
+                user.setWarned(true);
+                send(user.getUser().getAlias() + " est inactif. Il sera bientôt sorti du lobby.");
+                System.out.println(user.getUser().getAlias() + " inactive");
             }
         }
     }
@@ -135,6 +156,8 @@ public class Lobby implements Runnable{
 
         this.users.add(userData);
         this.spectateurs.add(userData);
+
+        send("Bienvenu au lobby " + u.getAlias());
     }
 
     private void removeFromCurrentRole(LobbyUserData u) {
@@ -184,7 +207,6 @@ public class Lobby implements Runnable{
                     throw new IllegalArgumentException("");
                 combattants.add(u);
                 break;
-
         }
 
         u.setRole(role);
@@ -196,6 +218,7 @@ public class Lobby implements Runnable{
     }
 
     public void quitter(LobbyUserData u) {
+        send(u.getUser().getAlias() + " a quitté");
         removeFromLobby(u);
     }
 
@@ -203,13 +226,13 @@ public class Lobby implements Runnable{
         return (cpt) -> cpt.equals(utilisateur);
     }
 
-    private void removeFromList(LobbyUserData utilisateur, List<LobbyUserData> liste) {
+    private synchronized void removeFromList(LobbyUserData utilisateur, List<LobbyUserData> liste) {
         liste.removeIf(isPresent(utilisateur));
     }
 
-    private void removeFromLobby(LobbyUserData utilisateur) {
+    private synchronized void removeFromLobby(LobbyUserData utilisateur) {
         removeFromCurrentRole(utilisateur);
-        users.removeIf(u -> u.equals(utilisateur));
+        removeFromList(utilisateur, users);
     }
 
     public LobbyUserData getLobbyUserData(Compte compte) {

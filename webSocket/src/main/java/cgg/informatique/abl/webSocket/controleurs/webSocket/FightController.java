@@ -3,6 +3,7 @@ package cgg.informatique.abl.webSocket.controleurs.webSocket;
 import cgg.informatique.abl.webSocket.configurations.UserDetailsImpl;
 import cgg.informatique.abl.webSocket.dto.Lobby;
 import cgg.informatique.abl.webSocket.entites.Compte;
+import cgg.informatique.abl.webSocket.messaging.Heartbeat;
 import cgg.informatique.abl.webSocket.messaging.commands.Commande;
 import cgg.informatique.abl.webSocket.messaging.Courrier;
 import cgg.informatique.abl.webSocket.messaging.Reponse;
@@ -49,5 +50,13 @@ public class FightController {
         }
 
         return lobby;
+    }
+
+
+    @MessageMapping("/battle/heartbeat")
+    public String heartBeat(Heartbeat message) throws Exception {
+        lobby.getLobbyUserData(message.getDe()).sentHeartbeat();
+
+        return "ok";
     }
 }
