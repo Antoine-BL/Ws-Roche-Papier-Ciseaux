@@ -1,7 +1,6 @@
 package cgg.informatique.abl.webSocket.messaging.commands;
 
-import cgg.informatique.abl.webSocket.configurations.UserDetailsImpl;
-import cgg.informatique.abl.webSocket.controleurs.webSocket.FightController;
+import cgg.informatique.abl.webSocket.dto.SanitaryCompte;
 import cgg.informatique.abl.webSocket.entites.Compte;
 import cgg.informatique.abl.webSocket.messaging.Message;
 import cgg.informatique.abl.webSocket.messaging.Reponse;
@@ -16,7 +15,7 @@ public abstract class Commande extends Message {
 
     public Commande(){}
 
-    public Commande(Compte de, List<String> parametres) {
+    public Commande(SanitaryCompte de, List<String> parametres) {
         super(de);
         this.parametres = parametres;
     }
@@ -42,5 +41,5 @@ public abstract class Commande extends Message {
         this.typeCommande = typeCommande;
     }
 
-    public abstract Reponse execute(FightController context);
+    public abstract Reponse execute(LobbyCommandContext context);
 }

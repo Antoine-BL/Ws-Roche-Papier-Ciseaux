@@ -1,4 +1,4 @@
-package cgg.informatique.abl.webSocket.configurations;
+package cgg.informatique.abl.webSocket.configurations.http;
 
 import cgg.informatique.abl.webSocket.entites.Compte;
 import cgg.informatique.abl.webSocket.entites.Groupe;

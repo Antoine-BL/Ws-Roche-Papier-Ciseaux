@@ -1,4 +1,4 @@
-package cgg.informatique.abl.webSocket.configurations;
+package cgg.informatique.abl.webSocket.configurations.stomp;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +11,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
-import org.springframework.web.socket.config.annotation.WebSocketTransportRegistration;
 
 import java.util.List;
 

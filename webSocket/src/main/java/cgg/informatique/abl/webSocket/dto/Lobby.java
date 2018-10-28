@@ -1,6 +1,6 @@
 package cgg.informatique.abl.webSocket.dto;
 
-import cgg.informatique.abl.webSocket.configurations.StompSessionHandlerImpl;
+import cgg.informatique.abl.webSocket.configurations.stomp.StompSessionHandlerImpl;
 import cgg.informatique.abl.webSocket.entites.Compte;
 import cgg.informatique.abl.webSocket.messaging.commands.LobbyMessage;
 import cgg.informatique.abl.webSocket.messaging.commands.TypeCommande;
@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Predicate;
 
-public class Lobby implements Runnable{
+public class Lobby implements Runnable, MatchHandler{
     private static final String URL = "ws://localhost:8100/webSocket";
     private static final String OUTPUT_TOPIC = "/app/battle/command";
 
@@ -46,6 +46,7 @@ public class Lobby implements Runnable{
     private StompSession stompSession;
 
     private volatile LobbyState lobbyState;
+    private Match matchInProgress;
 
     public Lobby() {
         lobbyState = LobbyState.CLOSED;
@@ -94,12 +95,15 @@ public class Lobby implements Runnable{
 
             purgeInactiveUsers();
             
-            if (isEmpty()) {
-                send("Lobby inactif");
-                lobbyState = LobbyState.STANDBY;
-                waitForPlayers();
-            }
+            if (isEmpty()) becomeInactive();
+            if (matchInProgress != null) matchInProgress.tick();
         }
+    }
+
+    private void becomeInactive() {
+        send("Lobby inactif");
+        lobbyState = LobbyState.STANDBY;
+        waitForPlayers();
     }
 
     private void purgeInactiveUsers() {
@@ -124,7 +128,9 @@ public class Lobby implements Runnable{
         LobbyMessage lobbyMessage = new LobbyMessage(Arrays.asList(message));
         lobbyMessage.setTypeCommande(TypeCommande.LOBBYMESSAGE);
 
-        stompSession.send(OUTPUT_TOPIC, lobbyMessage);
+        synchronized (stompSession) {
+            stompSession.send(OUTPUT_TOPIC, lobbyMessage);
+        }
     }
 
     private void waitForPlayers() {
@@ -150,14 +156,16 @@ public class Lobby implements Runnable{
         return users.isEmpty();
     }
 
-    public void connect(Compte u) {
+    public void connect(SanitaryCompte u) {
         if (lobbyState == LobbyState.STANDBY) this.lobbyThread.interrupt();
+        if (users.stream().anyMatch(isPresent(u))) throw  new IllegalArgumentException("utilisateur déjà présemt");
+
         LobbyUserData userData = new LobbyUserData(u, LobbyRole.SPECTATEUR);
 
         this.users.add(userData);
         this.spectateurs.add(userData);
 
-        send("Bienvenu au lobby " + u.getAlias());
+        send("Bienvenue au lobby " + u.getAlias());
     }
 
     private void removeFromCurrentRole(LobbyUserData u) {
@@ -215,6 +223,7 @@ public class Lobby implements Runnable{
     public void devenirRole(LobbyUserData u, LobbyRole role) {
         removeFromCurrentRole(u);
         switchToRole(u, role);
+        send (u.getUser().getAlias() + " est maintenant un " + role);
     }
 
     public void quitter(LobbyUserData u) {
@@ -226,6 +235,11 @@ public class Lobby implements Runnable{
         return (cpt) -> cpt.equals(utilisateur);
     }
 
+    private Predicate<LobbyUserData> isPresent(SanitaryCompte cpt) {
+        return (lud) -> cpt.getCourriel().equals(lud.getUser().getCourriel());
+    }
+
+
     private synchronized void removeFromList(LobbyUserData utilisateur, List<LobbyUserData> liste) {
         liste.removeIf(isPresent(utilisateur));
     }
@@ -235,10 +249,46 @@ public class Lobby implements Runnable{
         removeFromList(utilisateur, users);
     }
 
-    public LobbyUserData getLobbyUserData(Compte compte) {
+    public LobbyUserData getLobbyUserData(SanitaryCompte compte) throws IllegalArgumentException {
         return users.stream()
-                .filter((LobbyUserData lud) -> lud.getUser().equals(compte))
+                .filter((LobbyUserData lud) -> lud.getUser().getCourriel().equals(compte.getCourriel()))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("No such user"));
+    }
+
+    public void startMatch() {
+        ensureReadyForMatch();
+
+        matchInProgress = new Match(arbitre, rouge, blanc, this);
+    }
+
+    private void ensureReadyForMatch() {
+        if (matchInProgress != null) throw new IllegalStateException("Un match est déjà en cours.");
+
+        if (rouge == null) throw new IllegalStateException("Le combattant rouge doit être présent");
+        if (blanc == null) throw new IllegalStateException("Le combattant blanc doit être présent");
+        if (arbitre == null) throw new IllegalStateException("Le combattant blanc doit être présent");
+    }
+
+    @Override
+    public void matchEnded() {
+        matchInProgress = null;
+        blanc.setRole(LobbyRole.COMBATTANT);
+        rouge.setRole(LobbyRole.COMBATTANT);
+    }
+
+    @Override
+    public void sendMessage(String transitionMessage) {
+        send(transitionMessage);
+    }
+
+    @Override
+    public void sendRound(Attack blancAttack, Attack rougeAttack) {
+        send("Attaque du participant en blanc: " + blancAttack);
+        send("Attaque du participant en rouge: " + rougeAttack);
+    }
+
+    public Match getCurrentMatch() {
+        return matchInProgress;
     }
 }

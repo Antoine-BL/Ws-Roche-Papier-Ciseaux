@@ -1,4 +1,4 @@
-package cgg.informatique.abl.webSocket.configurations;
+package cgg.informatique.abl.webSocket.configurations.http;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -20,24 +20,38 @@ class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.authorizeRequests()
-                .antMatchers("/", "/connexion", "/authenticate", "/compte/creer").permitAll()
-                .antMatchers("/passage").hasAnyAuthority("ROLE_Sensei", "ROLE_Venerable")
-                .antMatchers("/kumite").authenticated()
-                .anyRequest().permitAll()
-                .and()
-                .formLogin()
-                .passwordParameter("password")
-                .usernameParameter("username")
-                .loginProcessingUrl("/connexion")
-                .loginPage("/connexion")
-                .defaultSuccessUrl("/")
-                .failureUrl("/connexion?error=true")
-                .and()
-                .logout()
-                .logoutUrl("/deconnexion")
-                .logoutSuccessUrl("/");
+        mainConfig(http);
+        loginConfig(http);
+        logoutConfig(http);
+        miscConfig(http);
+    }
 
+    private void mainConfig(HttpSecurity http) throws Exception {
+        http.authorizeRequests()
+            .antMatchers("/", "/connexion", "/compte/creer").permitAll()
+            .antMatchers("/passage").hasAnyAuthority("ROLE_Sensei", "ROLE_Venerable")
+            .antMatchers("/kumite", "/api/monCompte").authenticated()
+            .antMatchers("/api/comptes*").hasAuthority("ROLE_Venerable")
+            .anyRequest().permitAll();
+    }
+
+    private void loginConfig(HttpSecurity http) throws Exception {
+        http.formLogin()
+            .passwordParameter("password")
+            .usernameParameter("username")
+            .loginProcessingUrl("/connexion")
+            .loginPage("/connexion")
+            .defaultSuccessUrl("/")
+            .failureUrl("/connexion?error=true");
+    }
+
+    private void logoutConfig(HttpSecurity http) throws Exception {
+        http.logout()
+            .logoutUrl("/deconnexion")
+            .logoutSuccessUrl("/");
+    }
+
+    private void miscConfig(HttpSecurity http) throws Exception {
         http.headers().frameOptions().sameOrigin();
     }
 

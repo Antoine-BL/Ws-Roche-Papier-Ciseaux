@@ -1,6 +1,6 @@
 package cgg.informatique.abl.webSocket.controleurs.mvc;
 
-import cgg.informatique.abl.webSocket.configurations.UserDetailsImpl;
+import cgg.informatique.abl.webSocket.configurations.http.UserDetailsImpl;
 import cgg.informatique.abl.webSocket.dao.CompteDao;
 import cgg.informatique.abl.webSocket.entites.Compte;
 import cgg.informatique.abl.webSocket.entites.Role;
@@ -9,6 +9,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.ArrayList;
 import java.util.HashMap;

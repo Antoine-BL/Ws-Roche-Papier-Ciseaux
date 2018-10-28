@@ -7,14 +7,16 @@ import cgg.informatique.abl.webSocket.entites.Role;
 import java.util.Objects;
 
 public class LobbyUserData {
-    private static long ACTIVE_TIMEOUT = 3 * 60 * 1000;
-    private static long PASSIVE_TIMEOUT = 60 * 1000;
-    private static long INACTIVE_THRESHOLD = 15 * 1000;
+    private static int SECONDS = 1000;
+    private static int MINUTES = 60 * SECONDS;
+    private static int ACTIVE_TIMEOUT = 60 * MINUTES;
+    private static int PASSIVE_TIMEOUT = 1 * MINUTES;
+    private static int INACTIVE_THRESHOLD = 15 * SECONDS;
     private LobbyRole role;
-    private Compte user;
+    private SanitaryCompte user;
     private boolean warned = false;
 
-    public LobbyUserData(Compte user, LobbyRole role) {
+    public LobbyUserData(SanitaryCompte user, LobbyRole role) {
         this.user = user;
         this.role = role;
         lastPassive = System.currentTimeMillis();
@@ -39,11 +41,11 @@ public class LobbyUserData {
         this.warned = false;
     }
 
-    public Compte getUser() {
+    public SanitaryCompte getUser() {
         return user;
     }
 
-    public void setUser(Compte user) {
+    public void setUser(SanitaryCompte user) {
         this.user = user;
     }
 
@@ -96,7 +98,7 @@ public class LobbyUserData {
 
     public boolean isInactive() {
         return Math.abs(ACTIVE_TIMEOUT - lastActive) < INACTIVE_THRESHOLD ||
-                Math.abs(PASSIVE_TIMEOUT - lastPassive) < PASSIVE_TIMEOUT;
+                Math.abs(PASSIVE_TIMEOUT - lastPassive) < INACTIVE_THRESHOLD;
     }
 
     public void setWarned(boolean warned) {

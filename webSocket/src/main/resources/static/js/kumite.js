@@ -1,28 +1,58 @@
 $(document).ready(() => {
-    const inputTopics = Object.freeze({
+    let heartbeatIntervalId;
+    const subscribeTopics = Object.freeze({
         CHAT: '/topic/battle/chat',
-        COMMAND: '/topic/battle/command'
+        COMMAND: '/topic/battle/command',
     });
-    const outputTopics = Object.freeze({
+    const sendTopics = Object.freeze({
         CHAT: '/app/battle/chat',
         COMMAND: '/app/battle/command',
+        HEARTBEAT: '/app/battle/heartbeat',
     });
-    const websocket = new WebSocketClient($('#tbMessage'), $('#messagerie'));
-    $("#frmMessage").on('submit', function (e) {
-        e.preventDefault();
+
+    $.ajax("/api/monCompte", {
+        success: initWebSocket
     });
+
+    function initWebSocket(data){
+        const account = data;
+        const websocket = new WebSocketClient($('#tbMessage'), $('#messagerie'), account);
+        $("#frmMessage").on('submit', function (e) {
+            e.preventDefault();
+        });
+
+        $('#btnEnvoyer').click(() => send());
+
+        websocket.connect('/webSocket', subscribe);
+
+        function subscribe() {
+            setConnection(true);
+            websocket.subscribeTo(subscribeTopics.CHAT, '');
+            websocket.subscribeTo(subscribeTopics.COMMAND, '');
+        }
+
+        function heartbeat() {
+            websocket.sendTo(sendTopics.HEARTBEAT, {
+                de: account,
+                heartbeat: true,
+            });
+        }
+
+        function send() {
+            if (websocket.isCommand) {
+                const commandName = websocket.readCommand().name.toUpperCase()
+                if (commandName === "JOINDRE")
+                    heartbeatIntervalId = window.setInterval(heartbeat, 500);
+                else if (commandName === "QUITTER")
+                    window.clearInterval(heartbeatIntervalId);
+                websocket.sendCommandTo(sendTopics.COMMAND);
+            } else {
+                websocket.sendTo(sendTopics.CHAT);
+            }
+        }
+    }
 
     setConnection(false);
-
-    $('#btnEnvoyer').click(send);
-
-    websocket.connect('/webSocket', subscribe);
-
-    function subscribe() {
-        setConnection(true);
-        websocket.subscribeTo(inputTopics.CHAT, '');
-        websocket.subscribeTo(inputTopics.COMMAND, '');
-    }
 
     function setConnection(connected) {
         $('#msgAttente').toggle(!connected);
@@ -32,11 +62,5 @@ $(document).ready(() => {
         $('#tbMessage').prop('disabled', !connected);
     }
 
-    function send() {
-        if (websocket.isCommand) {
-            websocket.sendCommandTo(outputTopics.COMMAND);
-        } else {
-            websocket.sendTo(outputTopics.CHAT);
-        }
-    }
+
 });

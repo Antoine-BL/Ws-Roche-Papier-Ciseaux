@@ -1,26 +1,23 @@
 package cgg.informatique.abl.webSocket.messaging;
 
-import cgg.informatique.abl.webSocket.TypeMessage;
-import cgg.informatique.abl.webSocket.configurations.UserDetailsImpl;
-import cgg.informatique.abl.webSocket.entites.Compte;
-import org.springframework.security.core.userdetails.UserDetails;
+import cgg.informatique.abl.webSocket.dto.SanitaryCompte;
 
 public abstract class Message {
 
-    private Compte de;
+    private SanitaryCompte de;
 
     public Message() {
     }
 
-    public Message(Compte de) {
+    public Message(SanitaryCompte de) {
         this.de = de;
     }
 
-    public Compte getDe() {
+    public SanitaryCompte getDe() {
         return de;
     }
 
-    public void setDe(Compte de) {
+    public void setDe(SanitaryCompte de) {
         this.de = de;
     }
 }

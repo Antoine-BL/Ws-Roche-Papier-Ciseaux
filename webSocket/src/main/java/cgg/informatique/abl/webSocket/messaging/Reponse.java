@@ -1,13 +1,11 @@
 package cgg.informatique.abl.webSocket.messaging;
 
-import cgg.informatique.abl.webSocket.configurations.UserDetailsImpl;
+import cgg.informatique.abl.webSocket.dto.SanitaryCompte;
 import cgg.informatique.abl.webSocket.entites.Compte;
-
-import java.util.Date;
 
 public class Reponse {
     private Long id;
-    private Compte de;
+    private SanitaryCompte de;
     private String texte;
     private Long creation;
 
@@ -33,7 +31,7 @@ public class Reponse {
         this.creation = System.currentTimeMillis();
     }
 
-    public Reponse(Long id, Compte de, String texte) {
+    public Reponse(Long id, SanitaryCompte de, String texte) {
         this.id = id;
         this.de = de;
         this.texte = texte;

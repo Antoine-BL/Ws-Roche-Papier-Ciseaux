@@ -61,14 +61,6 @@ public class Compte implements UserDetails {
         return id;
     }
 
-    public String getCourriel() {
-        return courriel;
-    }
-
-    public String getMotPasse() {
-        return motPasse;
-    }
-
     public String getAlias() {
         return alias;
     }
@@ -204,6 +196,14 @@ public class Compte implements UserDetails {
     @Override
     public int hashCode() {
         return Objects.hash(id, courriel, motPasse, alias, avatar, role, groupe, points, credits);
+    }
+
+    public int getPoints() {
+        return points;
+    }
+
+    public int getCredits() {
+        return credits;
     }
 }
 

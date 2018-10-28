@@ -1,4 +1,4 @@
-package cgg.informatique.abl.webSocket.configurations;
+package cgg.informatique.abl.webSocket.configurations.stomp;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.messaging.MessageSecurityMetadataSourceRegistry;

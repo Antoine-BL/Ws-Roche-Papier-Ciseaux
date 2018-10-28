@@ -1,12 +1,12 @@
 package cgg.informatique.abl.webSocket.messaging;
 
-import cgg.informatique.abl.webSocket.configurations.UserDetailsImpl;
+import cgg.informatique.abl.webSocket.dto.SanitaryCompte;
 import cgg.informatique.abl.webSocket.entites.Compte;
 
 public class Courrier extends Message {
     private String texte;
 
-    public Courrier(Compte de, String texte) {
+    public Courrier(SanitaryCompte de, String texte) {
         super(de);
         this.texte = texte;
     }

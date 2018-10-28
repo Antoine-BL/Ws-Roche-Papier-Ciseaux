@@ -1,4 +1,4 @@
-package cgg.informatique.abl.webSocket.configurations;
+package cgg.informatique.abl.webSocket.configurations.stomp;
 
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHeaders;

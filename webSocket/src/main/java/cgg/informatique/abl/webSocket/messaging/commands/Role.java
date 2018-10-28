@@ -14,28 +14,19 @@ import java.util.List;
 public class Role extends Commande{
     private static final int ROLE_INDEX = 0;
 
-    public Role() {
-
-    }
-
-    public Role(Compte de, List<String> params) {
-        super(de, params);
-        typeCommande = TypeCommande.LOBBYMESSAGE;
-    }
+    public Role() {}
 
     @Override
-    public Reponse execute(FightController context) {
+    public Reponse execute(LobbyCommandContext context) {
         if (parametres.size() == 1) {
             try {
                 LobbyRole role = LobbyRole.valueOf(parametres.get(ROLE_INDEX).toUpperCase());
-
                 Lobby lobby = context.getLobby();
 
                 role.changeRole(lobby, getDe());
-
                 lobby.getLobbyUserData(getDe()).sentCommand();
 
-                return new Reponse(1L, "");
+                return new Reponse(1L, "Envoi du changement de role");
             } catch (Exception e){
                 return new Reponse(1L, "Echec du changement de rôle. Raison: " + e.getMessage());
             }

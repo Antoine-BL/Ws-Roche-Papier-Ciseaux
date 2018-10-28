@@ -20,7 +20,7 @@ public class LobbyMessage extends Commande{
     }
 
     @Override
-    public Reponse execute(FightController context) {
+    public Reponse execute(LobbyCommandContext context) {
         return new Reponse(1L, parametres.get(0));
     }
 }

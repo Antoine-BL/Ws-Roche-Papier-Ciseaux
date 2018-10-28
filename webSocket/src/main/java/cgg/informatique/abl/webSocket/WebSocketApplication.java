@@ -1,6 +1,7 @@
 package cgg.informatique.abl.webSocket;
 
-import cgg.informatique.abl.webSocket.configurations.StompSessionHandlerImpl;
+import cgg.informatique.abl.webSocket.configurations.stomp.StompSessionHandlerImpl;
+import cgg.informatique.abl.webSocket.dto.SanitaryCompte;
 import cgg.informatique.abl.webSocket.messaging.Courrier;
 import cgg.informatique.abl.webSocket.messaging.Message;
 import cgg.informatique.abl.webSocket.messaging.Reponse;
@@ -109,7 +110,7 @@ public class WebSocketApplication implements CommandLineRunner {
 
 	private Message generateMessage() {
 		Long tempsCreation = System.currentTimeMillis();
-		return new Courrier(SERVER_ACCOUNT , "hello");
+		return new Courrier(new SanitaryCompte(SERVER_ACCOUNT) , "hello");
 	}
 
 	private void attemptConnection() throws ExecutionException, InterruptedException {

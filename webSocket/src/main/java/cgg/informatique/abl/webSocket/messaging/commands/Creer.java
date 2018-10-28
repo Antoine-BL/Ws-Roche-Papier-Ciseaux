@@ -17,7 +17,7 @@ public class Creer extends Commande{
     }
 
     @Override
-    public Reponse execute(FightController context) {
+    public Reponse execute(LobbyCommandContext context) {
         Thread thread = new Thread(context.getLobby());
         thread.start();
 

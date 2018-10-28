@@ -10,7 +10,7 @@ public enum LobbyRole {
     BLANC,
     ARBITRE;
 
-    public void changeRole(Lobby lobby, Compte user) {
+    public void changeRole(Lobby lobby, SanitaryCompte user) {
         lobby.devenirRole(lobby.getLobbyUserData(user), this);
     }
 }

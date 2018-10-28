@@ -1,10 +1,13 @@
 package cgg.informatique.abl.webSocket.controleurs.rest;
 
+import cgg.informatique.abl.webSocket.configurations.http.UserDetailsImpl;
 import cgg.informatique.abl.webSocket.dao.CompteDao;
+import cgg.informatique.abl.webSocket.dto.SanitaryCompte;
 import cgg.informatique.abl.webSocket.entites.Compte;
 import com.sun.jndi.toolkit.url.Uri;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.util.UriBuilder;
@@ -14,7 +17,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController()
-@RequestMapping("/api/comptes")
+@RequestMapping("/api")
 public class CompteController {
     private CompteDao compteDao;
 
@@ -22,10 +25,10 @@ public class CompteController {
         this.compteDao = compteDao;
     }
 
-    @GetMapping("")
+    @GetMapping("/comptes")
     public List<Compte> getAllCompte() { return compteDao.findAll(); }
 
-    @GetMapping("/{id}")
+    @GetMapping("/comptes/{id}")
     public ResponseEntity<Compte> getCompte(@PathVariable Long id) {
         Optional<Compte> compte = compteDao.findById(id);
 
@@ -36,10 +39,10 @@ public class CompteController {
         }
     }
 
-    @PostMapping("")
+    @PostMapping("/comptes")
     public ResponseEntity addCompte(@RequestBody Compte compte) {
         boolean compteExiste = compteDao.existsById(compte.getId());
-        boolean emailExiste = compteDao.existsByCourriel(compte.getCourriel());
+        boolean emailExiste = compteDao.existsByCourriel(compte.getUsername());
 
         if (compteExiste || emailExiste) {
             return ResponseEntity.badRequest().build();
@@ -50,7 +53,7 @@ public class CompteController {
         return ResponseEntity.created(GenerateCreatedURI(compteAjoute)).build();
     }
 
-    @DeleteMapping("")
+    @DeleteMapping("/comptes")
     public ResponseEntity deleteCompte(Long id){
         if (!compteDao.existsById(id)) {
             return ResponseEntity.badRequest().build();
@@ -59,6 +62,15 @@ public class CompteController {
         compteDao.deleteById(id);
 
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/monCompte")
+    public ResponseEntity<SanitaryCompte> getCurrentAccount(@Autowired Authentication auth) {
+        if (auth != null) {
+            UserDetailsImpl udi = (UserDetailsImpl)auth.getPrincipal();
+            return ResponseEntity.ok(new SanitaryCompte(udi.getCompte()));
+        }
+        return ResponseEntity.noContent().build();
     }
 
     private URI GenerateCreatedURI(Compte compte) {

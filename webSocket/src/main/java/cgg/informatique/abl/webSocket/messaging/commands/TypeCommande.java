@@ -5,7 +5,11 @@ public enum TypeCommande {
     LOBBYMESSAGE(LobbyMessage.class),
     CREER(Creer.class),
     JOINDRE(Joindre.class),
-    ROLE(Role.class);
+    ROLE(Role.class),
+    COMBATTRE(Combattre.class),
+    ATTAQUER(Attaquer.class),
+    SALUER(Saluer.class),
+    SIGNALER(Signaler.class);
 
     public Class<? extends Commande> getMappedSubtype() {
         return mappedSubtype;

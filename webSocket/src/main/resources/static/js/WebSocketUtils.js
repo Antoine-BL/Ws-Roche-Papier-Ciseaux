@@ -1,8 +1,9 @@
 class WebSocketClient {
-    constructor(readFrom, displayTo){
+    constructor(readFrom, displayTo, user){
         this.readFrom = readFrom;
         this.displayTo = displayTo;
         this.stompClient = null;
+        this.user = user;
     }
 
     static get COMMAND_PREFIX() {
@@ -19,19 +20,13 @@ class WebSocketClient {
         });
     }
 
-    static serializeCommand(commande){
+    serializeCommand(commande){
         console.log(commande);
+        console.log(this.user);
         return JSON.stringify({
             parametres: commande.params,
             typeCommande: commande.name.toUpperCase(),
-            de: {
-                id: 1,
-                courriel: "admin@admin.ca",
-                motPasse: "admin",
-                alias: "admin",
-                role: "VENERABLE",
-                groupe: "BLANC",
-            }
+            de: this.user,
         });
     }
 
@@ -75,21 +70,25 @@ class WebSocketClient {
         };
     }
 
-    sendCommandTo(topic) {
+    sendCommandTo(topic, message) {
+        message = message ? message : this.readCommand();
+
         this.stompClient.send(
             topic,
             {},
-            WebSocketClient.serializeCommand(this.readCommand())
+            this.serializeCommand(message),
         );
 
         this.clear();
     }
 
-    sendTo(topic) {
+    sendTo(topic, message) {
+        message = message ? message : this.read();
+
         this.stompClient.send(
             topic,
             {},
-            WebSocketClient.serializeMessage(this.read())
+            WebSocketClient.serializeMessage(message)
         );
 
         this.clear();
