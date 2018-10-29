@@ -5,7 +5,9 @@ import cgg.informatique.abl.webSocket.dto.Lobby;
 import cgg.informatique.abl.webSocket.dto.LobbyUserData;
 import cgg.informatique.abl.webSocket.dto.Match;
 import cgg.informatique.abl.webSocket.messaging.Reponse;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
+@JsonDeserialize()
 public class Attaquer  extends Commande{
     private static final int ATTACK = 0;
 
@@ -15,7 +17,7 @@ public class Attaquer  extends Commande{
         Match match = lobby.getCurrentMatch();
         LobbyUserData lud = lobby.getLobbyUserData(getDe());
 
-        Attack attack = Attack.valueOf(parametres.get(ATTACK));
+        Attack attack = Attack.valueOf(parametres.get(ATTACK).toUpperCase());
 
         match.getParticipant(lud).setAttack(attack);
 

@@ -1,5 +1,7 @@
 package cgg.informatique.abl.webSocket.dto;
 
+import com.fasterxml.jackson.databind.deser.DataFormatReaders;
+
 public class Match {
     private final MatchUserData arbitre;
     private final MatchUserData blanc;
@@ -13,6 +15,7 @@ public class Match {
         this.blanc = new MatchUserData(blanc);
         this.rouge = new MatchUserData(rouge);
         this.matchHandler = matchHandler;
+        setMatchState(MatchState.WAITING);
     }
 
     public void join(MatchUserData player) {
@@ -47,6 +50,9 @@ public class Match {
             case DECIDE:
                 refLeft();
                 break;
+            case OVER:
+                matchHandler.matchEnded();
+                break;
             case EXIT:
                 setMatchState(MatchState.OVER);
                 break;
@@ -65,8 +71,8 @@ public class Match {
     }
 
     private void handleRound() {
-        matchHandler.sendRound(rouge.getAttack(), blanc.getAttack());
-        state = MatchState.DECIDE;
+        matchHandler.sendMessage(String.format("rouge: %s, blanc: %s", rouge.getAttack(), blanc.getAttack()));
+        setMatchState(MatchState.DECIDE);
     }
 
     private void disqualify() {
@@ -124,15 +130,15 @@ public class Match {
     public void tie() {
         blanc.tieAgainst(rouge);
         rouge.tieAgainst(blanc);
-        matchHandler.matchEnded();
-        state = MatchState.EXIT;
+        matchHandler.sendMessage(String.format("Match nul entre %s et %s", rouge.getNom(), blanc.getNom()));
+        setMatchState(MatchState.OVER);
     }
 
     private void matchEnd(MatchUserData victor, MatchUserData loser) {
         victor.winAgainst(loser);
         loser.loseAgainst(victor);
-        matchHandler.matchEnded();
-        state = MatchState.EXIT;;
+        matchHandler.sendMessage(String.format("%s a remporté son combat contre %s", victor.getNom(), loser.getNom()));
+        setMatchState(MatchState.OVER);
     }
 
     private long timeSinceLastChange() {

@@ -5,7 +5,9 @@ import cgg.informatique.abl.webSocket.dto.LobbyUserData;
 import cgg.informatique.abl.webSocket.dto.Match;
 import cgg.informatique.abl.webSocket.dto.MatchUserData;
 import cgg.informatique.abl.webSocket.messaging.Reponse;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
+@JsonDeserialize()
 public class Saluer  extends Commande{
 
     @Override

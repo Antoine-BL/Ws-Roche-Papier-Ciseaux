@@ -2,7 +2,7 @@ package cgg.informatique.abl.webSocket.dto;
 
 public class MatchUserData {
     private LobbyUserData user;
-    private PlayerState state;
+    private PlayerState state = PlayerState.ESTRADE;
     private boolean saluting;
     private Attack attack = Attack.RIEN;
 
@@ -56,5 +56,9 @@ public class MatchUserData {
 
     public void setAttack(Attack attack) {
         this.attack = attack;
+    }
+
+    public String getNom() {
+        return user.getUser().getAlias();
     }
 }

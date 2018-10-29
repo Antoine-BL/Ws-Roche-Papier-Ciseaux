@@ -2,11 +2,11 @@ package cgg.informatique.abl.webSocket.dto;
 
 public enum MatchState {
     WAITING(15, "Que les combattants se présentent"),
-    READY(5, "Rei!"),
+    READY(15, "Rei!"),
     START(3, "Hajime!"),
-    DECIDE(15, "L'arbitre doit rendre sa décision"),
-    EXIT(15, "Les combattants peuvent quitter"),
-    OVER(0, "Fin du match");
+    DECIDE(5, "L'arbitre doit décider d'un verdict"),
+    EXIT(2, "Les combattants peuvent quitter"),
+    OVER(0, "Fin du match. Les joueurs sont retournés à leurs positions");
     private static final long SECOND = 1000;
     private long duration;
     private String transitionMessage;

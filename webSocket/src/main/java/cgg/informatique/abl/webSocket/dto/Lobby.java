@@ -192,27 +192,27 @@ public class Lobby implements Runnable, MatchHandler{
         switch (role) {
             case BLANC:
                 if (blanc != null)
-                    throw new IllegalArgumentException("");
+                    throw new IllegalArgumentException("il y a déjà un combattant blanc");
                 blanc = u;
                 break;
             case ROUGE:
                 if (rouge != null)
-                    throw new IllegalArgumentException("");
+                    throw new IllegalArgumentException("Il y a déjà un combattant rouge");
                 rouge = u;
                 break;
             case ARBITRE:
                 if (arbitre != null)
-                    throw new IllegalArgumentException("");
+                    throw new IllegalArgumentException("Il y a déjà un arbitre");
                 arbitre = u;
                 break;
             case SPECTATEUR:
                 if (spectateurs.size() >= 12)
-                    throw new IllegalArgumentException("");
+                    throw new IllegalArgumentException("Nombre maximal de spectateurs déjà atteint");
                 spectateurs.add(u);
                 break;
             case COMBATTANT:
                 if (combattants.size() >= 12)
-                    throw new IllegalArgumentException("");
+                    throw new IllegalArgumentException("Nombre maximal de combattants déjà atteint");
                 combattants.add(u);
                 break;
         }
@@ -223,7 +223,7 @@ public class Lobby implements Runnable, MatchHandler{
     public void devenirRole(LobbyUserData u, LobbyRole role) {
         removeFromCurrentRole(u);
         switchToRole(u, role);
-        send (u.getUser().getAlias() + " est maintenant un " + role);
+        send (u.getUser().getAlias() + " a maintenant le role de: " + role);
     }
 
     public void quitter(LobbyUserData u) {
@@ -265,13 +265,14 @@ public class Lobby implements Runnable, MatchHandler{
     private void ensureReadyForMatch() {
         if (matchInProgress != null) throw new IllegalStateException("Un match est déjà en cours.");
 
-        if (rouge == null) throw new IllegalStateException("Le combattant rouge doit être présent");
-        if (blanc == null) throw new IllegalStateException("Le combattant blanc doit être présent");
-        if (arbitre == null) throw new IllegalStateException("Le combattant blanc doit être présent");
+        if (rouge == null) throw new IllegalStateException("Le combattant en rouge doit être présent");
+        if (blanc == null) throw new IllegalStateException("Le combattant en blanc doit être présent");
+        if (arbitre == null) throw new IllegalStateException("L'arbitre doit être présent");
     }
 
     @Override
     public void matchEnded() {
+        send("fin du match");
         matchInProgress = null;
         blanc.setRole(LobbyRole.COMBATTANT);
         rouge.setRole(LobbyRole.COMBATTANT);

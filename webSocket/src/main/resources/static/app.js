@@ -31,10 +31,10 @@ $(document).ready(() => {
         } else {
             wsu.sendTo(inputTopics.PRIVATE);
         }
+        wsu.clear();
     }
 
     function setConnection(connected) {
-        console.log('test');
         $('#btnConnexionMessagerie').prop("disabled", connected);
         $('#btnEnvoyer').prop("disabled", !connected);
         $('#tbMessage').prop("disabled", !connected);

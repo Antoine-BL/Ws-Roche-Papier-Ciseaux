@@ -15,9 +15,7 @@ class WebSocketClient {
     }
 
     static serializeMessage(message){
-        return JSON.stringify({
-            texte: message
-        });
+        return JSON.stringify(message);
     }
 
     serializeCommand(commande){
@@ -78,20 +76,16 @@ class WebSocketClient {
             {},
             this.serializeCommand(message),
         );
-
-        this.clear();
     }
 
     sendTo(topic, message) {
-        message = message ? message : this.read();
-
+        message = message ? message : { texte: this.read()};
+        console.log(message);
         this.stompClient.send(
             topic,
             {},
             WebSocketClient.serializeMessage(message)
         );
-
-        this.clear();
     }
 
     clear() {

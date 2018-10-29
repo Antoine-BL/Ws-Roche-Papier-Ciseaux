@@ -2,7 +2,9 @@ package cgg.informatique.abl.webSocket.messaging.commands;
 
 import cgg.informatique.abl.webSocket.dto.*;
 import cgg.informatique.abl.webSocket.messaging.Reponse;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
+@JsonDeserialize()
 public class Signaler extends Commande{
     private static int SIGNAL = 0;
     private static int CIBLE = 1;
@@ -15,7 +17,7 @@ public class Signaler extends Commande{
 
         MatchUserData mud = match.getParticipant(lud);
 
-        Signal signalDonne = Signal.valueOf(parametres.get(SIGNAL));
+        Signal signalDonne = Signal.valueOf(parametres.get(SIGNAL).toUpperCase());
 
         switch (signalDonne) {
             case REI:
@@ -25,13 +27,13 @@ public class Signaler extends Commande{
                 match.setMatchState(MatchState.START);
                 break;
             case IPPON:
-                LobbyRole cible = LobbyRole.valueOf(parametres.get(CIBLE));
+                LobbyRole cible = LobbyRole.valueOf(parametres.get(CIBLE).toUpperCase());
                 if (cible == LobbyRole.ROUGE) {
                     match.deciderVerdict(match.getRouge(), match.getBlanc());
                 } else if (cible == LobbyRole.BLANC){
-                    match.deciderVerdict(match.getRouge(), match.getBlanc());
+                    match.deciderVerdict(match.getBlanc(), match.getRouge());
                 } else {
-                    throw new IllegalArgumentException("");
+                    throw new IllegalArgumentException("Doit être rouge ou blanc");
                 }
                 break;
             case EGAL:

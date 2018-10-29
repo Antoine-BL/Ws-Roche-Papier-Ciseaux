@@ -4,4 +4,5 @@ import cgg.informatique.abl.webSocket.dto.Lobby;
 
 public interface LobbyCommandContext {
     Lobby getLobby();
+    void createLobby();
 }

@@ -18,6 +18,7 @@ public class Creer extends Commande{
 
     @Override
     public Reponse execute(LobbyCommandContext context) {
+        context.createLobby();
         Thread thread = new Thread(context.getLobby());
         thread.start();
 

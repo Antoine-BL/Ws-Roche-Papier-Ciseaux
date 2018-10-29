@@ -33,13 +33,12 @@ public class FightController implements LobbyCommandContext {
     }
 
     public Lobby getLobby() {
-        if (lobby == null) {
-            lobby = new Lobby();
-        }
-
         return lobby;
     }
 
+    public void createLobby() {
+        if (lobby == null) lobby = new Lobby();
+    }
 
     @MessageMapping("/battle/heartbeat")
     public void heartBeat(Heartbeat message) throws Exception {

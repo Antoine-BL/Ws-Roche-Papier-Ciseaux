@@ -21,6 +21,6 @@ public class Error extends Commande {
 
     @Override
     public Reponse execute(LobbyCommandContext context) {
-        return new Reponse(1L, "Erreur, commande: " + className + " est inconnue");
+        return new Reponse(1L, "Erreur, commande " + className + " est inconnue");
     }
 }

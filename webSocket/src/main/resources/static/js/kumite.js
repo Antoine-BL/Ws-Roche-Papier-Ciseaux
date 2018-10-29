@@ -49,6 +49,7 @@ $(document).ready(() => {
             } else {
                 websocket.sendTo(sendTopics.CHAT);
             }
+            websocket.clear();
         }
     }
 
