@@ -55,6 +55,7 @@ class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private void miscConfig(HttpSecurity http) throws Exception {
         http.headers().frameOptions().sameOrigin();
+        http.csrf().disable();
     }
 
     @Override

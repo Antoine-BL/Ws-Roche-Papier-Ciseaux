@@ -29,11 +29,13 @@ public class CompteController {
     public List<Compte> getAllCompte() { return compteDao.findAll(); }
 
     @GetMapping("/comptes/{id}")
-    public ResponseEntity<Compte> getCompte(@PathVariable Long id) {
+    public ResponseEntity<SanitaryCompte> getCompte(@PathVariable Long id) {
         Optional<Compte> compte = compteDao.findById(id);
 
+
         if (compte.isPresent()) {
-            return ResponseEntity.ok(compte.get());
+            SanitaryCompte compteSan = compte.get().sanitize();
+            return ResponseEntity.ok(compteSan);
         } else {
             return ResponseEntity.badRequest().build();
         }
@@ -68,7 +70,8 @@ public class CompteController {
     public ResponseEntity<SanitaryCompte> getCurrentAccount(@Autowired Authentication auth) {
         if (auth != null) {
             UserDetailsImpl udi = (UserDetailsImpl)auth.getPrincipal();
-            return ResponseEntity.ok(udi.getCompte().sanitize());
+            SanitaryCompte compteSan = udi.getCompte().sanitize();
+            return ResponseEntity.ok(compteSan);
         }
         return ResponseEntity.noContent().build();
     }

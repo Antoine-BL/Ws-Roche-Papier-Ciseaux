@@ -3,18 +3,22 @@ package cgg.informatique.abl.webSocket.dto;
 import cgg.informatique.abl.webSocket.entites.Compte;
 import cgg.informatique.abl.webSocket.entites.Groupe;
 import cgg.informatique.abl.webSocket.entites.Role;
+import cgg.informatique.abl.webSocket.messaging.commands.CommandDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.*;
 
-@JsonDeserialize(as=SanitaryCompte.class)
+@JsonSerialize(as=SanitaryCompte.class)
+@JsonDeserialize(as=Compte.class)
 public interface SanitaryCompte {
-    public String getUsername();
-    public String getAlias();
-    public Long getAvatarId();
-    public Role getRole();
-    public Groupe getGroupe();
-    public int getPoints();
-    public int getCredits();
+    String getCourriel();
+    String getAlias();
+    Long getAvatarId();
+    void setAvatarId(Long id);
+    Role getRole();
+    Groupe getGroupe();
+    int getPoints();
+    int getCredits();
 }

@@ -10,12 +10,21 @@ $(document).ready(() => {
         HEARTBEAT: '/app/battle/heartbeat',
     });
 
+    app = new Vue({
+        el: '#app',
+        data: {
+            user: null
+        }
+    });
+
     $.ajax("/api/monCompte", {
         success: initWebSocket
     });
 
     function initWebSocket(data){
         const account = data;
+        app.user = data;
+
         const websocket = new WebSocketClient($('#tbMessage'), $('#messagerie'), account);
         $("#frmMessage").on('submit', function (e) {
             e.preventDefault();

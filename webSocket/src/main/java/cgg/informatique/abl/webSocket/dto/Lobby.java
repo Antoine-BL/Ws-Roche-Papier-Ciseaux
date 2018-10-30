@@ -235,7 +235,7 @@ public class Lobby implements Runnable, MatchHandler{
     }
 
     private Predicate<LobbyUserData> isPresent(SanitaryCompte cpt) {
-        return (lud) -> cpt.getUsername().equals(lud.getUser().getUsername());
+        return (lud) -> cpt.getCourriel().equals(lud.getUser().getCourriel());
     }
 
 
@@ -250,7 +250,7 @@ public class Lobby implements Runnable, MatchHandler{
 
     public LobbyUserData getLobbyUserData(SanitaryCompte compte) throws IllegalArgumentException {
         return users.stream()
-                .filter((LobbyUserData lud) -> lud.getUser().getUsername().equals(compte.getUsername()))
+                .filter((LobbyUserData lud) -> lud.getUser().getCourriel().equals(compte.getCourriel()))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("No such user"));
     }

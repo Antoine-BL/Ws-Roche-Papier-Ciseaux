@@ -1,8 +1,30 @@
+var app
 $(document).ready(() => {
     let wsu;
     let envoyerPub = true;
     let user = null;
     let pretAConnecter = false;
+
+    app = new Vue({
+        el: '#app',
+        data: {
+            user: null
+        }
+    });
+
+    $.ajax("/api/monCompte", {
+        success: (data) => {
+            user = data;
+            wsu = new WebSocketClient($('#tbMessage'), $('#messagerie'), user);
+            app.user = data;
+            pretAConnecter = true;
+        },
+        error: () => {
+            wsu = new WebSocketClient($('#tbMessage'), $('#messagerie'));
+            pretAConnecter = true;
+        }
+    });
+
 
     const inputTopics = Object.freeze({
         PUBLIC: '/app/public/chat',
@@ -21,18 +43,6 @@ $(document).ready(() => {
 
     $("#frmEnvoyer").on('submit', function (e) {
         e.preventDefault();
-    });
-
-    $.ajax("/api/monCompte", {
-        success: (data) => {
-            user = data;
-            wsu = new WebSocketClient($('#tbMessage'), $('#messagerie'), user);
-            pretAConnecter = true;
-        },
-        error: () => {
-            wsu = new WebSocketClient($('#tbMessage'), $('#messagerie'));
-            pretAConnecter = true;
-        }
     });
 
     function connexion() {

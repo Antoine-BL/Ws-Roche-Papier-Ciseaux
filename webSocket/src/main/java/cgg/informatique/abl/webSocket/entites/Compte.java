@@ -2,6 +2,7 @@ package cgg.informatique.abl.webSocket.entites;
 
 import cgg.informatique.abl.webSocket.dto.CompteDto;
 import cgg.informatique.abl.webSocket.dto.SanitaryCompte;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -67,6 +68,11 @@ public class Compte implements UserDetails, SanitaryCompte {
         return id;
     }
 
+    @Override
+    public String getCourriel() {
+        return courriel;
+    }
+
     public String getAlias() {
         return alias;
     }
@@ -74,6 +80,14 @@ public class Compte implements UserDetails, SanitaryCompte {
     @Override
     public Long getAvatarId() {
         return this.avatar.getId();
+    }
+
+    @Override
+    public void setAvatarId(Long id) {
+        if (avatar == null){
+            avatar = new Avatar();
+        }
+        avatar.setId(id);
     }
 
     public Avatar getAvatar() {

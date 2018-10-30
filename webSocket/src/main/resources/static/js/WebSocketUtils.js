@@ -19,8 +19,6 @@ class WebSocketClient {
     }
 
     serializeCommand(commande){
-        console.log(commande);
-        console.log(this.user);
         return JSON.stringify({
             parametres: commande.params,
             typeCommande: commande.name.toUpperCase(),
@@ -42,7 +40,7 @@ class WebSocketClient {
     }
 
     showMessage(message, cssClass) {
-        this.displayTo.append( message.texte + '<br/>');
+        this.displayTo.append( '<div>' + message.texte + '</div>');
     }
 
     get isCommand() {
