@@ -47,6 +47,13 @@ public class Reponse {
         this.texte = texte;
     }
 
+    public SanitaryCompte getDe() {
+        return de;
+    }
+
+    public void setDe(SanitaryCompte de) {
+        this.de = de;
+    }
 
     public Long getCreation() {
         return creation;

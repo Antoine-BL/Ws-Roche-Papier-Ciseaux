@@ -1,7 +1,7 @@
 Vue.component('app-nav', {
     props: ['user', 'currentPage'],
     template: '<nav class="navbar navbar-expand-lg navbar-dark bg-dark text-light align-items-center justify-content-between">\n' +
-        '    <div class="navbar-brand d-inline-flex align-items-center"><img class="profile-petit" src="/images/websocket_logo_white.png"/> Projet Websocket</div>\n' +
+        '    <a href="/" class="navbar-brand d-inline-flex align-items-center"><img class="profile-petit" src="/images/websocket_logo_white.png"/> Projet Websocket</a>\n' +
         '    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">\n' +
         '        <span class="navbar-toggler-icon"></span>\n' +
         '    </button>\n' +
@@ -21,6 +21,48 @@ Vue.component('app-nav', {
 Vue.component('app-nav-item', {
     props: ['text', 'destination'],
     template: '<li class="nav-link"><a v-bind:href="destination" class="nav-link active">{{text}}</a></li>'
+});
+
+Vue.component('app-chat-message', {
+   props: ['message'],
+    data: function() { return {
+           now: new Date()
+        }
+    },
+    computed: {
+        timeMessage: function () {
+            const delta = this.$data.now.getTime() - this.message.creation;
+            const ONE_SECOND = 1000;
+            const ONE_MINUTE = 60 * ONE_SECOND;
+            const ONE_HOUR = 60 * ONE_MINUTE;
+            const ONE_DAY = 24 * ONE_HOUR;
+
+            if (this.intervalId) {
+                clearInterval(this.intervalId);
+            }
+            this.intervalId = setInterval(() => {
+                this.now = new Date()
+            }, delta*5);
+
+            if (delta < ONE_MINUTE) {
+                return 'Il y a ' + Math.round(delta / ONE_SECOND) + ' secondes';
+            } else if (delta < ONE_HOUR) {
+                return 'Il y a ' + Math.round(delta / ONE_MINUTE) + ' minutes';
+            } else if (delta < ONE_DAY) {
+                return 'Il y a ' + Math.round(delta / ONE_HOUR) + ' heures';
+            } else {
+                const date = new Date(this.message.creatiom);
+                return date.getFullYear() + '-' + date.getMonth() + '-' + date.getDate();
+            }
+        }
+    },
+   template: '<div v-bind:class="[\'chat-message\', message.fromSelf ? \'self-chat\' : \'other-chat\', \'d-flex\', \'m-2\', \'border-bottom\']">' +
+       '<img v-bind:src="message.avatarUrl" class="profile profile-petit d-inline-block"/>' +
+       '<div class="d-inline-block chat-message-content flex-grow-1 p-1">' +
+       '<div class="chat-message-header d-flex flex-grow-1"><strong class="flex-grow-1">{{message.de.alias}} {{message.de.role}} {{message.de.groupe}}</strong><small><img class="icon m-2 d-inline-block" src="/open-iconic/svg/clock.svg">{{timeMessage}}</small></div>'+
+       '<div class="chat-message-text">{{message.texte}}</div>' +
+       '</div>' +
+       '</div>'
 });
 
 Vue.component('app-profile', {

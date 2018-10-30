@@ -23,7 +23,7 @@ public class FightController implements LobbyCommandContext {
     @MessageMapping("/battle/chat")
     @SendTo("/topic/battle/chat")
     public Reponse fightChatMessage(Courrier message) throws Exception {
-        return new Reponse(1L, message.getDe(), HtmlUtils.htmlEscape(message.getTexte()));
+        return new Reponse(1L, message.getDe(), message.getTexte());
     }
 
     @MessageMapping("/battle/command")

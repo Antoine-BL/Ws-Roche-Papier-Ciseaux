@@ -12,12 +12,12 @@ public class ChatController {
     @MessageMapping("/public/chat")
     @SendTo("/topic/public/chat")
     public Reponse publicMessage(Courrier message) throws Exception {
-        return new Reponse(1L, message.getDe(),HtmlUtils.htmlEscape(message.getTexte()));
+        return new Reponse(1L, message.getDe(),message.getTexte());
     }
 
     @MessageMapping("/private/chat")
     @SendTo("/topic/private/chat")
     public Reponse privateMessage(Courrier message) throws Exception {
-        return new Reponse(1L, message.getDe(),HtmlUtils.htmlEscape(message.getTexte()));
+        return new Reponse(1L, message.getDe(),message.getTexte());
     }
 }

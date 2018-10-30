@@ -1,9 +1,19 @@
 class WebSocketClient {
-    constructor(readFrom, displayTo, user){
+    constructor(readFrom, displayTo, user, vueApp){
         this.readFrom = readFrom;
         this.displayTo = displayTo;
         this.stompClient = null;
         this.user = user;
+        this.justSent = false;
+        this.vueApp = vueApp;
+    }
+
+    static get ANONYMOUS_USER() {
+        return {
+            alias: 'Anonyme',
+            role: '',
+            groupe: '',
+        };
     }
 
     static get COMMAND_PREFIX() {
@@ -16,6 +26,10 @@ class WebSocketClient {
 
     static serializeMessage(message){
         return JSON.stringify(message);
+    }
+
+    static makeTimeMessage(dateTime) {
+
     }
 
     serializeCommand(commande){
@@ -40,7 +54,19 @@ class WebSocketClient {
     }
 
     showMessage(message, cssClass) {
-        this.displayTo.append( '<div>' + message.texte + '</div>');
+        if (!message.de) {
+            message.de = WebSocketClient.ANONYMOUS_USER;
+            message.avatarUrl = '/images/anonyme.jpg';
+            message.fromSelf = this.justSent;
+        } else {
+            message.avatarUrl = '/api/avatars/' + message.de.avatarId;
+            message.fromSelf = message.de.courriel === this.user.courriel;
+        }
+
+        message.timeMessage = WebSocketClient.makeTimeMessage();
+
+        this.displayTo.push(message);
+        this.justSent = false;
     }
 
     get isCommand() {
@@ -77,6 +103,7 @@ class WebSocketClient {
     }
 
     sendTo(topic, message) {
+        this.justSent = true;
         message = message ? message : {
             de: this.user,
             texte: this.read()
@@ -86,6 +113,8 @@ class WebSocketClient {
             {},
             WebSocketClient.serializeMessage(message)
         );
+
+        this.vueApp.$forceUpdate();
     }
 
     clear() {

@@ -8,23 +8,19 @@ $(document).ready(() => {
     app = new Vue({
         el: '#app',
         data: {
-            user: null
+            user: null,
+            messages: [],
         }
     });
 
     $.ajax("/api/monCompte", {
         success: (data) => {
             user = data;
-            wsu = new WebSocketClient($('#tbMessage'), $('#messagerie'), user);
+            wsu = new WebSocketClient($('#tbMessage'), app.messages, user, app);
             app.user = data;
-            pretAConnecter = true;
-        },
-        error: () => {
-            wsu = new WebSocketClient($('#tbMessage'), $('#messagerie'));
             pretAConnecter = true;
         }
     });
-
 
     const inputTopics = Object.freeze({
         PUBLIC: '/app/public/chat',

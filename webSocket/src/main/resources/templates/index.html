@@ -14,7 +14,7 @@
     <script src="/webjars/stomp-websocket/stomp.min.js"></script>
     <script src="/webjars/vue/vue.js"></script>
 
-    <script src="/js/VueLibrary.js"></script>
+    <script src="/js/VueComponents.js"></script>
     <script src="/js/WebSocketUtils.js"></script>
     <script src="/app.js"></script>
 </head>
@@ -30,6 +30,7 @@
                 <div class="col border chat-col d-flex flex-column">
                     <h2 class="text-center p-2">Messagerie</h2>
                     <div id="messagerie" style="display: none;" class="border-top row flex-grow-1 chat-text flex-column">
+                        <app-chat-message v-for="msg in messages" v-bind:message="msg"></app-chat-message>
                     </div>
                     <div id="connexionMessagerie" class="border-top row flex-grow-1  align-items-center justify-content-center">
                         <button id="btnConnexionMessagerie" class="btn btn-primary d-block">Cliquez ici pour recevoir des messages</button>

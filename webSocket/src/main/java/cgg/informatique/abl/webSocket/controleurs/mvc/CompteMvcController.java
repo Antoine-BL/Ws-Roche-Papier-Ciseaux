@@ -3,14 +3,12 @@ package cgg.informatique.abl.webSocket.controleurs.mvc;
 import cgg.informatique.abl.webSocket.dao.CompteService;
 import cgg.informatique.abl.webSocket.dto.CompteDto;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.Errors;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -50,7 +48,7 @@ public class CompteMvcController {
         }
     }
 
-    @GetMapping("/connexion")
+    @GetMapping(value = "/connexion")
     public String login(Model model) {
         CompteDto compteDto = new CompteDto();
 
