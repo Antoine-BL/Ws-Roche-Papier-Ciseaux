@@ -72,10 +72,10 @@ public class MainController {
 
     private void loadUserInfoIntoModel(Authentication auth, Model model) {
         if (auth != null) {
-            UserDetailsImpl details = (UserDetailsImpl)auth.getPrincipal();
+            Compte details = ((UserDetailsImpl)auth.getPrincipal()).getCompte();
 
             model.addAttribute("username", details.getAlias());
-            model.addAttribute("profilePic", details.getAvatar());
+            model.addAttribute("profilePic", details.getAvatarId());
             model.addAttribute("role", details.getRole().toString().toLowerCase());
             model.addAttribute("groupe", details.getGroupe().toString().toLowerCase());
         }

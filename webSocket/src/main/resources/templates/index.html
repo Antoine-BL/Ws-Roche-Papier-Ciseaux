@@ -38,7 +38,7 @@
             <a sec:authorize="isAnonymous()" class="nav-item active btn btn-success mr-auto" id="connexion" href="/connexion" role="button">Se connecter</a>
             <li class="nav-item dropdown" sec:authorize="isAuthenticated()">
                 <a class="text-light dropdown-toggle" role="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <img th:src="${profilePic}" class="profile profile-petit" width="96" height="96"/>
+                    <img th:src="'/api/avatars/' + ${profilePic}" class="profile profile-petit" width="96" height="96"/>
                 </a>
                 <div class="dropdown-menu dropdown-menu-right bg-dark text-light" aria-labelledby="dropdownMenuButton">
                     <h5 class="dropdown-header font-weight-bold  text-light" th:text="'Connecté en tant que: ' + ${username}"></h5>

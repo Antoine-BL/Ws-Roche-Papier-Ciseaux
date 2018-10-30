@@ -1,6 +1,7 @@
 package cgg.informatique.abl.webSocket.entites;
 
 import cgg.informatique.abl.webSocket.dto.CompteDto;
+import cgg.informatique.abl.webSocket.dto.SanitaryCompte;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -13,15 +14,16 @@ import java.util.Objects;
 
 @Entity
 @Table(name="COMPTES")
-public class Compte implements UserDetails {
+public class Compte implements UserDetails, SanitaryCompte {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String courriel;
     private String motPasse;
     private String alias;
-    @Column(length = Integer.MAX_VALUE)
-    private String avatar;
+    @ManyToOne(targetEntity = Avatar.class)
+    @JoinColumn(name="AVATAR")
+    private Avatar avatar;
     @Enumerated
     private Role role = Role.NOUVEAU;
     @Enumerated
@@ -35,7 +37,7 @@ public class Compte implements UserDetails {
             final @NotNull @NotEmpty String courriel,
             final @NotNull @NotEmpty String motPasse,
             final String alias,
-            final String avatar,
+            final Avatar avatar,
             final Role role,
             final Groupe groupe
     ) {
@@ -47,6 +49,10 @@ public class Compte implements UserDetails {
             this.role = role;
         if (groupe != null)
             this.groupe = groupe;
+    }
+
+    public SanitaryCompte sanitize() {
+        return this;
     }
 
     public static CourrielBuilder Builder() {
@@ -65,7 +71,12 @@ public class Compte implements UserDetails {
         return alias;
     }
 
-    public String getAvatar() {
+    @Override
+    public Long getAvatarId() {
+        return this.avatar.getId();
+    }
+
+    public Avatar getAvatar() {
         return avatar;
     }
 
@@ -120,7 +131,7 @@ public class Compte implements UserDetails {
         private String courriel;
         private String motPasse;
         private String alias;
-        private String avatar;
+        private Avatar avatar;
         private Role role;
         private Groupe groupe;
 
@@ -130,7 +141,7 @@ public class Compte implements UserDetails {
             this.courriel = compteDto.getCourriel();
             this.motPasse = compteDto.getPassword();
             this.alias = compteDto.getAlias();
-            this.avatar = compteDto.getAvatar();
+            this.avatar = new Avatar(compteDto.getAvatar());
         }
 
 
@@ -160,7 +171,7 @@ public class Compte implements UserDetails {
         }
 
         public Builder avecAvatar(String avatar) {
-            this.avatar = avatar;
+            this.avatar = new Avatar(avatar);
             return this;
         }
 

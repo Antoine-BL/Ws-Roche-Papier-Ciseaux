@@ -1,5 +1,6 @@
 package cgg.informatique.abl.webSocket.configurations.http;
 
+import cgg.informatique.abl.webSocket.entites.Avatar;
 import cgg.informatique.abl.webSocket.entites.Compte;
 import cgg.informatique.abl.webSocket.entites.Groupe;
 import cgg.informatique.abl.webSocket.entites.Role;
@@ -22,20 +23,6 @@ public class UserDetailsImpl implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return compte.getAuthorities();
-    }
-    public String getAvatar() {
-        return compte.getAvatar();
-    }
-    public String getAlias() {
-        return compte.getAlias();
-    }
-
-    public Groupe getGroupe() {
-        return compte.getGroupe();
-    }
-
-    public Role getRole() {
-        return compte.getRole();
     }
 
     public Compte getCompte() {

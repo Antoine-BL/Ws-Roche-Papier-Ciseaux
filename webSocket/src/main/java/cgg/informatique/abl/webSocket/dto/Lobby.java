@@ -1,7 +1,6 @@
 package cgg.informatique.abl.webSocket.dto;
 
 import cgg.informatique.abl.webSocket.configurations.stomp.StompSessionHandlerImpl;
-import cgg.informatique.abl.webSocket.entites.Compte;
 import cgg.informatique.abl.webSocket.messaging.commands.LobbyMessage;
 import cgg.informatique.abl.webSocket.messaging.commands.TypeCommande;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
@@ -236,7 +235,7 @@ public class Lobby implements Runnable, MatchHandler{
     }
 
     private Predicate<LobbyUserData> isPresent(SanitaryCompte cpt) {
-        return (lud) -> cpt.getCourriel().equals(lud.getUser().getCourriel());
+        return (lud) -> cpt.getUsername().equals(lud.getUser().getUsername());
     }
 
 
@@ -251,7 +250,7 @@ public class Lobby implements Runnable, MatchHandler{
 
     public LobbyUserData getLobbyUserData(SanitaryCompte compte) throws IllegalArgumentException {
         return users.stream()
-                .filter((LobbyUserData lud) -> lud.getUser().getCourriel().equals(compte.getCourriel()))
+                .filter((LobbyUserData lud) -> lud.getUser().getUsername().equals(compte.getUsername()))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("No such user"));
     }

@@ -62,7 +62,7 @@ public class Reponse {
                 "de='" + de + '\'' +
                 ", texte='" + texte + '\'' +
                 ", creation=" + creation +
-                ", avatar=" + de.getAvatar() +
+                ", avatar=" + de.getAvatarId() +
                 '}';
     }
 }

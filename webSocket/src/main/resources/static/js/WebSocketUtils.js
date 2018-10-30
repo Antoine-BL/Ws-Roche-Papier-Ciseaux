@@ -41,8 +41,8 @@ class WebSocketClient {
         callback();
     }
 
-    showMessage(message, displayTo, cssClass) {
-        displayTo.append( message.texte + '<br/>');
+    showMessage(message, cssClass) {
+        this.displayTo.append( message.texte + '<br/>');
     }
 
     get isCommand() {
@@ -79,8 +79,10 @@ class WebSocketClient {
     }
 
     sendTo(topic, message) {
-        message = message ? message : { texte: this.read()};
-        console.log(message);
+        message = message ? message : {
+            de: this.user,
+            texte: this.read()
+        };
         this.stompClient.send(
             topic,
             {},
@@ -101,10 +103,8 @@ class WebSocketClient {
     }
 
     generateSubscribeHandler(cssClass) {
-        const fct = this.showMessage;
-        const displayTo = this.displayTo;
-        return function (message) {
-            fct(JSON.parse(message.body), displayTo, cssClass);
+        return (message) => {
+            this.showMessage(JSON.parse(message.body), cssClass);
         }
     }
 }

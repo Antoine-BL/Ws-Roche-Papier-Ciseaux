@@ -1,6 +1,8 @@
 $(document).ready(() => {
-    const wsu = new WebSocketClient($('#tbMessage'), $('#messagerie'));
+    let wsu;
     let envoyerPub = true;
+    let user = null;
+    let pretAConnecter = false;
 
     const inputTopics = Object.freeze({
         PUBLIC: '/app/public/chat',
@@ -21,8 +23,22 @@ $(document).ready(() => {
         e.preventDefault();
     });
 
+    $.ajax("/api/monCompte", {
+        success: (data) => {
+            user = data;
+            wsu = new WebSocketClient($('#tbMessage'), $('#messagerie'), user);
+            pretAConnecter = true;
+        },
+        error: () => {
+            wsu = new WebSocketClient($('#tbMessage'), $('#messagerie'));
+            pretAConnecter = true;
+        }
+    });
+
     function connexion() {
-        wsu.connect('/webSocket', subscribe);
+        if (pretAConnecter) {
+            wsu.connect('/webSocket', subscribe);
+        }
     }
 
     function send() {

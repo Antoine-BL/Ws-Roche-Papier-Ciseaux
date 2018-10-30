@@ -68,7 +68,7 @@ public class CompteController {
     public ResponseEntity<SanitaryCompte> getCurrentAccount(@Autowired Authentication auth) {
         if (auth != null) {
             UserDetailsImpl udi = (UserDetailsImpl)auth.getPrincipal();
-            return ResponseEntity.ok(new SanitaryCompte(udi.getCompte()));
+            return ResponseEntity.ok(udi.getCompte().sanitize());
         }
         return ResponseEntity.noContent().build();
     }
@@ -79,7 +79,7 @@ public class CompteController {
                 .path("/{id}")
                 .buildAndExpand(compte.getId())
                 .toUri();
-    };
+    }
 
     public CompteDao getDao() {
         return compteDao;
