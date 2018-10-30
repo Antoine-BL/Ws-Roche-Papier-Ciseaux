@@ -4,6 +4,7 @@ import cgg.informatique.abl.webSocket.configurations.http.UserDetailsImpl;
 import cgg.informatique.abl.webSocket.dao.CompteDao;
 import cgg.informatique.abl.webSocket.dto.SanitaryCompte;
 import cgg.informatique.abl.webSocket.entites.Compte;
+import cgg.informatique.abl.webSocket.entites.Role;
 import com.sun.jndi.toolkit.url.Uri;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +16,7 @@ import org.springframework.web.util.UriBuilder;
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController()
 @RequestMapping("/api")
@@ -26,7 +28,7 @@ public class CompteController {
     }
 
     @GetMapping("/comptes")
-    public List<Compte> getAllCompte() { return compteDao.findAll(); }
+    public List<SanitaryCompte> getAllCompte() { return compteDao.findAll().stream().map(Compte::sanitize).collect(Collectors.toList()); }
 
     @GetMapping("/comptes/{id}")
     public ResponseEntity<SanitaryCompte> getCompte(@PathVariable Long id) {

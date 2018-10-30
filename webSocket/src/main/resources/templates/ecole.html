@@ -16,7 +16,6 @@
 
     <script src="/js/ecole.js"></script>
     <script src="/js/VueLibrary.js"></script>
-    <script src="/app.js"></script>
     <script src="/js/WebSocketUtils.js"></script>
 </head>
 <body>
@@ -26,44 +25,32 @@
     <div>
         <h3>Venerables</h3>
         <hr/>
-        <ul th:each="compte: ${VENERABLE}">
-            <li>
-                <img class="profile d-inline-block" th:src="${compte.avatar}" src=""/>
-                <span th:text="${compte.alias} + ', ' + ${compte.role} + ', ' + ${compte.groupe} + ', ' + ${compte.courriel}"></span>
-            </li>
+        <ul>
+            <app-membre-ecole v-for="venerable in venerables" v-bind:utilisateur="venerable"></app-membre-ecole>
         </ul>
     </div>
     <div>
         <hr/>
         <h3>Sensei</h3>
         <hr/>
-        <ul th:each="compte: ${SENSEI}">
-            <li>
-                <img class="profile d-inline-block" th:src="${compte.avatar}" src=""/>
-                <span th:text="${compte.alias} + ', ' + ${compte.role} + ', ' + ${compte.groupe} + ', ' + ${compte.courriel}"></span>
-            </li>
+        <ul>
+            <app-membre-ecole v-for="sensei in senseis" v-bind:utilisateur="sensei"></app-membre-ecole>
         </ul>
     </div>
     <div>
         <hr/>
         <h3>Ancien</h3>
         <hr/>
-        <ul th:each="compte: ${ANCIEN}">
-            <li>
-                <img class="profile d-inline-block" th:src="${compte.avatar}" src=""/>
-                <span th:text="${compte.alias} + ', ' + ${compte.role} + ', ' + ${compte.groupe} + ', ' + ${compte.courriel}"></span>
-            </li>
+        <ul>
+            <app-membre-ecole v-for="ancien in anciens" v-bind:utilisateur="ancien"></app-membre-ecole>
         </ul>
     </div>
     <div>
         <hr/>
         <h3>Nouveau</h3>
         <hr/>
-        <ul th:each="compte: ${NOUVEAU}">
-            <li>
-                <img class="profile d-inline-block" th:src="${compte.avatar}" src=""/>
-                <span th:text="${compte.alias} + ', ' + ${compte.role} + ', ' + ${compte.groupe} + ', ' + ${compte.courriel}"></span>
-            </li>
+        <ul>
+            <app-membre-ecole v-for="nouveau in nouveaux" v-bind:utilisateur="nouveau"></app-membre-ecole>
         </ul>
     </div>
 </div>
