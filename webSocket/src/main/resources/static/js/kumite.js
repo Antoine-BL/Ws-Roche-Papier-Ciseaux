@@ -13,7 +13,13 @@ $(document).ready(() => {
     app = new Vue({
         el: '#app',
         data: {
-            user: null
+            user: null,
+            messages: [],
+            spectateurs: [null, null, null, null, null, null, null, null, null, null, null, null],
+            combattants: [null, null, null, null, null, null, null, null, null, null, null, null],
+            rouge: null,
+            arbitre: null,
+            blanc: null,
         }
     });
 
@@ -25,7 +31,7 @@ $(document).ready(() => {
         const account = data;
         app.user = data;
 
-        const websocket = new WebSocketClient($('#tbMessage'), $('#messagerie'), account);
+        const websocket = new WebSocketClient($('#tbMessage'), app.messages, account, app);
         $("#frmMessage").on('submit', function (e) {
             e.preventDefault();
         });
@@ -49,7 +55,7 @@ $(document).ready(() => {
 
         function send() {
             if (websocket.isCommand) {
-                const commandName = websocket.readCommand().name.toUpperCase()
+                const commandName = websocket.readCommand().name.toUpperCase();
                 if (commandName === "JOINDRE")
                     heartbeatIntervalId = window.setInterval(heartbeat, 500);
                 else if (commandName === "QUITTER")

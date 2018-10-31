@@ -67,5 +67,10 @@
 }
 
 .chat-text {
+    flex-wrap: nowrap;
     overflow-y: scroll;
+}
+
+.chat-text > * {
+    flex-wrap: wrap;
 }

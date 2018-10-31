@@ -84,3 +84,15 @@ Vue.component('app-profile', {
         '                </div>\n' +
         '            </li>'
 });
+
+Vue.component('app-rangee', {
+    props: ['users'],
+    template: '<div class="row justify-content-center">' +
+        '<app-slot v-for="u in users" v-bind:initial-user="u"></app-slot>' +
+        '</div>'
+});
+
+Vue.component('app-slot', {
+    props: ['user'],
+   template: '<div class="col-2 col-xl-1 slot"><img v-bind:src="user == null ? \'/images/anonyme.jpg\' : \'/api/avatars/\' + user.avatarId"></div>'
+});
