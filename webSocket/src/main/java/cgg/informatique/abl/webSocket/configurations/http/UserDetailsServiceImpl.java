@@ -24,8 +24,6 @@ class UserDetailsServiceImpl implements UserDetailsService {
     public UserDetails loadUserByUsername(String email) {
         Optional<Compte> compte = compteDao.findByCourriel(email);
 
-        return new UserDetailsImpl(
-                compte.orElseThrow(() -> new UsernameNotFoundException(email))
-        );
+        return compte.orElseThrow(() -> new UsernameNotFoundException(email));
     }
 }

@@ -1,17 +1,13 @@
 package cgg.informatique.abl.webSocket.controleurs.rest;
 
-import cgg.informatique.abl.webSocket.configurations.http.UserDetailsImpl;
 import cgg.informatique.abl.webSocket.dao.CompteDao;
 import cgg.informatique.abl.webSocket.dto.SanitaryCompte;
 import cgg.informatique.abl.webSocket.entites.Compte;
-import cgg.informatique.abl.webSocket.entites.Role;
-import com.sun.jndi.toolkit.url.Uri;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import org.springframework.web.util.UriBuilder;
 
 import java.net.URI;
 import java.util.List;
@@ -28,11 +24,11 @@ public class CompteController {
     }
 
     @GetMapping("/comptes")
-    public List<SanitaryCompte> getAllCompte() { return compteDao.findAll().stream().map(Compte::sanitize).collect(Collectors.toList()); }
+    public List<SanitaryCompte> getAllCompte() { return compteDao.findAll().stream().map(cgg.informatique.abl.webSocket.entites.Compte::sanitize).collect(Collectors.toList()); }
 
     @GetMapping("/comptes/{id}")
     public ResponseEntity<SanitaryCompte> getCompte(@PathVariable Long id) {
-        Optional<Compte> compte = compteDao.findById(id);
+        Optional<cgg.informatique.abl.webSocket.entites.Compte> compte = compteDao.findById(id);
 
 
         if (compte.isPresent()) {
@@ -44,7 +40,7 @@ public class CompteController {
     }
 
     @PostMapping("/comptes")
-    public ResponseEntity addCompte(@RequestBody Compte compte) {
+    public ResponseEntity addCompte(@RequestBody cgg.informatique.abl.webSocket.entites.Compte compte) {
         boolean compteExiste = compteDao.existsById(compte.getId());
         boolean emailExiste = compteDao.existsByCourriel(compte.getUsername());
 
@@ -52,7 +48,7 @@ public class CompteController {
             return ResponseEntity.badRequest().build();
         }
 
-        Compte compteAjoute = compteDao.save(compte);
+        cgg.informatique.abl.webSocket.entites.Compte compteAjoute = compteDao.save(compte);
 
         return ResponseEntity.created(GenerateCreatedURI(compteAjoute)).build();
     }
@@ -71,14 +67,14 @@ public class CompteController {
     @GetMapping("/monCompte")
     public ResponseEntity<SanitaryCompte> getCurrentAccount(@Autowired Authentication auth) {
         if (auth != null) {
-            UserDetailsImpl udi = (UserDetailsImpl)auth.getPrincipal();
-            SanitaryCompte compteSan = udi.getCompte().sanitize();
+            Compte compte = (Compte)auth.getPrincipal();
+            SanitaryCompte compteSan = compte.sanitize();
             return ResponseEntity.ok(compteSan);
         }
         return ResponseEntity.noContent().build();
     }
 
-    private URI GenerateCreatedURI(Compte compte) {
+    private URI GenerateCreatedURI(cgg.informatique.abl.webSocket.entites.Compte compte) {
         return ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")

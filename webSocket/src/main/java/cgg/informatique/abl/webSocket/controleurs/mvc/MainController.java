@@ -1,6 +1,5 @@
 package cgg.informatique.abl.webSocket.controleurs.mvc;
 
-import cgg.informatique.abl.webSocket.configurations.http.UserDetailsImpl;
 import cgg.informatique.abl.webSocket.dao.CompteDao;
 import cgg.informatique.abl.webSocket.entites.Compte;
 import cgg.informatique.abl.webSocket.entites.Role;
@@ -9,7 +8,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,15 +25,11 @@ public class MainController {
 
     @GetMapping("/")
     public String index(@Autowired Authentication auth, Model model) {
-        loadUserInfoIntoModel(auth, model);
-
         return "index";
     }
 
     @GetMapping("/ecole")
     public String ecole(@Autowired Authentication auth, Model model) {
-        loadUserInfoIntoModel(auth, model);
-
         List<Compte> comptes = compteDao.findAll();
         HashMap<Role, List<Compte>> roles = new HashMap<>();
 
@@ -58,28 +52,11 @@ public class MainController {
 
     @GetMapping("/kumite")
     public String kumite(@Autowired Authentication auth, Model model) {
-        loadUserInfoIntoModel(auth, model);
-
         return "kumite";
     }
 
     @GetMapping("/passage")
     public String passage(@Autowired Authentication auth, Model model) {
-        loadUserInfoIntoModel(auth, model);
-
         return "passage";
-    }
-
-    private void loadUserInfoIntoModel(Authentication auth, Model model) {
-        if (auth != null) {
-            Compte details = ((UserDetailsImpl)auth.getPrincipal()).getCompte();
-
-            model.addAttribute("username", details.getAlias());
-            model.addAttribute("profilePic", details.getAvatarId());
-            model.addAttribute("role", details.getRole().toString().toLowerCase());
-            model.addAttribute("groupe", details.getGroupe().toString().toLowerCase());
-        }
-
-        model.addAttribute("authentifie", auth != null);
     }
 }
