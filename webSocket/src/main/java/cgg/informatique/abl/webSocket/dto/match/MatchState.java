@@ -1,4 +1,4 @@
-package cgg.informatique.abl.webSocket.dto;
+package cgg.informatique.abl.webSocket.dto.match;
 
 public enum MatchState {
     WAITING(15, "Que les combattants se présentent"),

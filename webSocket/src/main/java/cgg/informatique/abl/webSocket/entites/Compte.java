@@ -25,10 +25,12 @@ public class Compte implements UserDetails, SanitaryCompte {
     @ManyToOne(targetEntity = Avatar.class)
     @JoinColumn(name="AVATAR")
     private Avatar avatar;
-    @Enumerated
-    private Role role = Role.NOUVEAU;
-    @Enumerated
-    private Groupe groupe = Groupe.BLANC;
+    @ManyToOne(targetEntity = Role.class)
+    @JoinColumn(name="ROLE")
+    private Role role;
+    @ManyToOne(targetEntity = Groupe.class)
+    @JoinColumn(name="GROUPE")
+    private Groupe groupe;
     private int points;
     private int credits;
 
@@ -94,12 +96,12 @@ public class Compte implements UserDetails, SanitaryCompte {
         return avatar;
     }
 
-    public Role getRole() {
-        return role;
+    public String getRole() {
+        return role.getAuthority();
     }
 
-    public Groupe getGroupe() {
-        return groupe;
+    public String getGroupe() {
+        return groupe.getAuthority();
     }
 
     @Override
@@ -181,6 +183,11 @@ public class Compte implements UserDetails, SanitaryCompte {
 
         public Builder avecGroupe(Groupe groupe) {
             this.groupe = groupe;
+            return this;
+        }
+
+        public Builder avecAvatar(Avatar avatar) {
+            this.avatar = avatar;
             return this;
         }
 

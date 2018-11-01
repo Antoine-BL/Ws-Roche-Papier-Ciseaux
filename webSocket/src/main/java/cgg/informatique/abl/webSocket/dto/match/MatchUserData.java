@@ -1,4 +1,7 @@
-package cgg.informatique.abl.webSocket.dto;
+package cgg.informatique.abl.webSocket.dto.match;
+
+import cgg.informatique.abl.webSocket.dto.lobby.LobbyRole;
+import cgg.informatique.abl.webSocket.dto.lobby.LobbyUserData;
 
 public class MatchUserData {
     private LobbyUserData user;
@@ -10,8 +13,8 @@ public class MatchUserData {
         this.user = user;
     }
 
-    public LobbyRole getRole(){
-        return user.getRole();
+    public LobbyRole getRoleCombat(){
+        return user.getRoleCombat();
     }
 
     public void leavePenalty() {

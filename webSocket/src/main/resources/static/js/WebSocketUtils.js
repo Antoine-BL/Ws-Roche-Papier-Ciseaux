@@ -28,16 +28,13 @@ class WebSocketClient {
         return JSON.stringify(message);
     }
 
-    static makeTimeMessage(dateTime) {
-
+    serializeCommand(commande){
+        commande.de = this.user;
+        return JSON.stringify(commande);
     }
 
-    serializeCommand(commande){
-        return JSON.stringify({
-            parametres: commande.params,
-            typeCommande: commande.name.toUpperCase(),
-            de: this.user,
-        });
+    disableDebug() {
+        this.stompClient.debug = () => {};
     }
 
     connect(ws, callback) {
@@ -53,17 +50,18 @@ class WebSocketClient {
         callback();
     }
 
-    showMessage(message, cssClass) {
+    showMessage(message, cssClass, mention) {
         if (!message.de) {
             message.de = WebSocketClient.ANONYMOUS_USER;
             message.avatarUrl = '/images/anonyme.jpg';
             message.fromSelf = this.justSent;
         } else {
             message.avatarUrl = '/api/avatars/' + message.de.avatarId;
-            message.fromSelf = message.de.courriel === this.user.courriel;
+            message.fromSelf = this.user && message.de.courriel === this.user.courriel;
         }
 
-        message.timeMessage = WebSocketClient.makeTimeMessage();
+        message.css = cssClass ? cssClass : '';
+        message.mention = mention;
 
         this.displayTo.push(message);
         this.justSent = false;
@@ -87,8 +85,8 @@ class WebSocketClient {
         const COMMAND_NAME = 0;
 
         return {
-            name: params[COMMAND_NAME],
-            params: params.slice(COMMAND_NAME + 1)
+            typeCommande: params[COMMAND_NAME].toUpperCase(),
+            parametres: params.slice(COMMAND_NAME + 1)
         };
     }
 
@@ -113,8 +111,6 @@ class WebSocketClient {
             {},
             WebSocketClient.serializeMessage(message)
         );
-
-        this.vueApp.$forceUpdate();
     }
 
     clear() {
@@ -125,13 +121,17 @@ class WebSocketClient {
         return this.readFrom.val();
     }
 
-    subscribeTo(topic, cssClass) {
-        this.stompClient.subscribe(topic, this.generateSubscribeHandler(cssClass));
+    subscribeTo(topic, cssClass, mention, callback) {
+        this.stompClient.subscribe(topic, this.generateSubscribeHandler(cssClass, mention, callback));
     }
 
-    generateSubscribeHandler(cssClass) {
+    generateSubscribeHandler(cssClass, mention, callback) {
         return (message) => {
-            this.showMessage(JSON.parse(message.body), cssClass);
+            message = JSON.parse(message.body);
+            this.showMessage(message, cssClass, mention);
+            if (callback) {
+                callback(message);
+            }
         }
     }
 }

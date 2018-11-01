@@ -67,9 +67,9 @@ $(document).ready(() => {
 
     function subscribe() {
         setConnection(true);
-        wsu.subscribeTo(outputTopics.PUBLIC, '');
-        if ($('#estAuth').val() === "true") {
-            wsu.subscribeTo(outputTopics.PRIVATE, '');
+        wsu.subscribeTo(outputTopics.PUBLIC, '', 'publique');
+        if (app.user) {
+            wsu.subscribeTo(outputTopics.PRIVATE, '', 'privé');
         }
     }
 

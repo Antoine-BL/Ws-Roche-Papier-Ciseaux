@@ -1,17 +1,16 @@
 package cgg.informatique.abl.webSocket.messaging.commands;
 
-import cgg.informatique.abl.webSocket.dto.Lobby;
-import cgg.informatique.abl.webSocket.dto.LobbyUserData;
-import cgg.informatique.abl.webSocket.dto.Match;
-import cgg.informatique.abl.webSocket.dto.MatchUserData;
-import cgg.informatique.abl.webSocket.messaging.Reponse;
+import cgg.informatique.abl.webSocket.dto.lobby.Lobby;
+import cgg.informatique.abl.webSocket.dto.lobby.LobbyUserData;
+import cgg.informatique.abl.webSocket.dto.match.Match;
+import cgg.informatique.abl.webSocket.dto.match.MatchUserData;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 @JsonDeserialize()
 public class Saluer  extends Commande{
 
     @Override
-    public Reponse execute(LobbyCommandContext context) {
+    public void execute(LobbyCommandContext context) {
         Lobby lobby = context.getLobby();
         Match match = lobby.getCurrentMatch();
         LobbyUserData lud = lobby.getLobbyUserData(getDe());
@@ -20,6 +19,6 @@ public class Saluer  extends Commande{
 
         mud.setSaluting(true);
 
-        return new Reponse(1L, lud.getUser().getAlias() + " salue son adversaire");
+        send(lud.getUser().getAlias() + " salue son adversaire", context);
     }
 }

@@ -1,6 +1,7 @@
-package cgg.informatique.abl.webSocket.dto;
+package cgg.informatique.abl.webSocket.dto.match;
 
-import com.fasterxml.jackson.databind.deser.DataFormatReaders;
+import cgg.informatique.abl.webSocket.dto.lobby.LobbyRole;
+import cgg.informatique.abl.webSocket.dto.lobby.LobbyUserData;
 
 public class Match {
     private final MatchUserData arbitre;
@@ -83,21 +84,21 @@ public class Match {
     }
 
     public void playerLeft(MatchUserData player) {
-        if (player.getRole() == LobbyRole.ARBITRE) {
+        if (player.getRoleCombat() == LobbyRole.ARBITRE) {
             refLeft();
-        } else if (player.getRole() == LobbyRole.BLANC) {
+        } else if (player.getRoleCombat() == LobbyRole.BLANC) {
             matchEnd(rouge, blanc);
-        } else if (player.getRole() == LobbyRole.ROUGE) {
+        } else if (player.getRoleCombat() == LobbyRole.ROUGE) {
             matchEnd(blanc, rouge);
         }
     }
 
     public MatchUserData getParticipant(LobbyUserData user) {
-        if (user.getRole() == LobbyRole.ARBITRE) {
+        if (user.getRoleCombat() == LobbyRole.ARBITRE) {
             return arbitre;
-        } else if (user.getRole() == LobbyRole.BLANC) {
+        } else if (user.getRoleCombat() == LobbyRole.BLANC) {
             return blanc;
-        } else if (user.getRole() == LobbyRole.ROUGE) {
+        } else if (user.getRoleCombat() == LobbyRole.ROUGE) {
             return rouge;
         } else {
             throw new IllegalArgumentException("");

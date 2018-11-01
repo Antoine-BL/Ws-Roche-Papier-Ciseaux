@@ -1,7 +1,11 @@
 package cgg.informatique.abl.webSocket.messaging.commands;
 
-import cgg.informatique.abl.webSocket.dto.*;
-import cgg.informatique.abl.webSocket.messaging.Reponse;
+import cgg.informatique.abl.webSocket.dto.lobby.Lobby;
+import cgg.informatique.abl.webSocket.dto.lobby.LobbyRole;
+import cgg.informatique.abl.webSocket.dto.lobby.LobbyUserData;
+import cgg.informatique.abl.webSocket.dto.match.Match;
+import cgg.informatique.abl.webSocket.dto.match.MatchState;
+import cgg.informatique.abl.webSocket.dto.match.Signal;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 @JsonDeserialize()
@@ -10,12 +14,10 @@ public class Signaler extends Commande{
     private static int CIBLE = 1;
 
     @Override
-    public Reponse execute(LobbyCommandContext context) {
+    public void execute(LobbyCommandContext context) {
         Lobby lobby = context.getLobby();
         Match match = lobby.getCurrentMatch();
         LobbyUserData lud = lobby.getLobbyUserData(getDe());
-
-        MatchUserData mud = match.getParticipant(lud);
 
         Signal signalDonne = Signal.valueOf(parametres.get(SIGNAL).toUpperCase());
 
@@ -40,7 +42,5 @@ public class Signaler extends Commande{
                 match.tie();
                 break;
         }
-
-        return new Reponse(1L, "");
     }
 }

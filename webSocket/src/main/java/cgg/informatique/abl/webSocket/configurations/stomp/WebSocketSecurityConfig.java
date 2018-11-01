@@ -10,7 +10,7 @@ public class WebSocketSecurityConfig extends AbstractSecurityWebSocketMessageBro
     protected void configureInbound(
             MessageSecurityMetadataSourceRegistry messages) {
         messages.simpMessageDestMatchers("/app/public/chat")
-                .hasAnyAuthority("ROLE_Venerable", "ROLE_Sensei", "ROLE_Ancien")
+                .hasAnyAuthority("Venerable", "Sensei", "Ancien")
                 .simpSubscribeDestMatchers("/topic/chat/prive", "/topic/battle**").authenticated()
                 .simpMessageDestMatchers("/topic/chat/prive", "/topic/battle**").authenticated()
                 .anyMessage().permitAll();

@@ -1,10 +1,9 @@
 package cgg.informatique.abl.webSocket.messaging.commands;
 
-import cgg.informatique.abl.webSocket.dto.Attack;
-import cgg.informatique.abl.webSocket.dto.Lobby;
-import cgg.informatique.abl.webSocket.dto.LobbyUserData;
-import cgg.informatique.abl.webSocket.dto.Match;
-import cgg.informatique.abl.webSocket.messaging.Reponse;
+import cgg.informatique.abl.webSocket.dto.match.Attack;
+import cgg.informatique.abl.webSocket.dto.lobby.Lobby;
+import cgg.informatique.abl.webSocket.dto.lobby.LobbyUserData;
+import cgg.informatique.abl.webSocket.dto.match.Match;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 @JsonDeserialize()
@@ -12,15 +11,19 @@ public class Attaquer  extends Commande{
     private static final int ATTACK = 0;
 
     @Override
-    public Reponse execute(LobbyCommandContext context) {
+    public void execute(LobbyCommandContext context) {
         Lobby lobby = context.getLobby();
         Match match = lobby.getCurrentMatch();
         LobbyUserData lud = lobby.getLobbyUserData(getDe());
 
-        Attack attack = Attack.valueOf(parametres.get(ATTACK).toUpperCase());
+        try {
+            Attack attack = Attack.valueOf(parametres.get(ATTACK).toUpperCase());
 
-        match.getParticipant(lud).setAttack(attack);
+            match.getParticipant(lud).setAttack(attack);
 
-        return new Reponse(1L, lud.getUser().getAlias() + " a choisi une attaque!");
+            send(" a choisi une attaque!", context);
+        } catch (IllegalArgumentException e) {
+            send(e.getMessage(), context);
+        }
     }
 }

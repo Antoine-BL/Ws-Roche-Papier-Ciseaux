@@ -1,4 +1,4 @@
-package cgg.informatique.abl.webSocket.dto;
+package cgg.informatique.abl.webSocket.dto.match;
 
 public enum PlayerState {
     ESTRADE,

@@ -71,6 +71,23 @@
     overflow-y: scroll;
 }
 
-.chat-text > * {
-    flex-wrap: wrap;
+.chat-message {
+    border-radius: 15px;
+    padding: 0.5rem;
+}
+
+.self-chat {
+    margin-left: 50px;
+    flex-direction: row-reverse;
+    background-color: var(--primary);
+    color: var(--light);
+}
+
+.other-chat{
+    margin-right: 50px;
+    background-color: #a5aeb6;
+}
+
+.chat-robot {
+    background-color: var(--success);
 }

@@ -1,7 +1,5 @@
 <!DOCTYPE html>
-<html   xmlns="http://www.w3.org/1999/xhtml"
-        xmlns:th="http://www.thymeleaf.org"
-        xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+<html   xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <title>Projet 1: Websocket</title>
     <link href="/webjars/bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -22,26 +20,35 @@
 </head>
 <body>
 <div id="app">
-    <app-nav v-bind:user="user" current-page="kumite">
-    </app-nav>
+    <app-nav v-bind:user="user" current-page="kumite"></app-nav>
     <div class="container-fluid">
         <div class="row justify-content-center chat-col mt-4">
             <div id="divArena" class="col-8 d-flex flex-column justify-content-center align-items-center">
                 <div class="row justify-content-center">
                     Spectateurs:
                 </div>
-                <app-rangee v-bind:users="spectateurs"></app-rangee>
+                <app-rangee v-on:move-to-child="handleMove"
+                            v-bind:initial-users="spectateurs"
+                            role="spectateur"></app-rangee>
                 <div class="row justify-content-center">
                     Compétiteurs en attente:
                 </div>
-                <app-rangee v-bind:users="combattants"></app-rangee>
+                <app-rangee v-on:move-to-child="handleMove"
+                            v-bind:initial-users="combattants"
+                            role="combattant"></app-rangee>
                 <div class="row justify-content-center">
                     Surface de combat:
                 </div>
                 <div class="row justify-content-between">
-                    <app-slot v-bind:initial-user="blanc"></app-slot>
-                    <app-slot v-bind:initial-user="arbitre"></app-slot>
-                    <app-slot v-bind:initial-user="rouge"></app-slot>
+                    <app-slot v-on:move-to="handleMove"
+                              v-bind:user="blanc"
+                              role="blanc"></app-slot>
+                    <app-slot v-on:move-to="handleMove"
+                              v-bind:user="arbitre"
+                              role="arbitre"></app-slot>
+                    <app-slot v-on:move-to="handleMove"
+                              v-bind:user="rouge"
+                              role="rouge"></app-slot>
                 </div>
             </div>
             <div id="chat" class="border col-4 d-flex flex-column p-0">

@@ -29,24 +29,7 @@ public class MainController {
     }
 
     @GetMapping("/ecole")
-    public String ecole(@Autowired Authentication auth, Model model) {
-        List<Compte> comptes = compteDao.findAll();
-        HashMap<Role, List<Compte>> roles = new HashMap<>();
-
-        for(Compte compte : comptes) {
-            if (!roles.containsKey(compte.getRole())) {
-                List<Compte> comptesRole = new ArrayList<>();
-                comptesRole.add(compte);
-                roles.put(compte.getRole(), comptesRole);
-            } else {
-                roles.get(compte.getRole()).add(compte);
-            }
-        }
-
-        for (Map.Entry<Role, List<Compte>> entree : roles.entrySet()) {
-            model.addAttribute(entree.getKey().toString(), entree.getValue());
-        }
-
+    public String ecole(@Autowired Authentication auth) {
         return "ecole";
     }
 

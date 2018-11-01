@@ -17,6 +17,10 @@ public class Avatar {
         this.image = imageB64;
     }
 
+    public Avatar(Long id) {
+        this.id = id;
+    }
+
     public Long getId() {
         return id;
     }

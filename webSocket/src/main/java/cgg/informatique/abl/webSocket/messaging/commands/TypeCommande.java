@@ -2,10 +2,9 @@ package cgg.informatique.abl.webSocket.messaging.commands;
 
 public enum TypeCommande {
     QUITTER(Quitter.class),
-    LOBBYMESSAGE(LobbyMessage.class),
     CREER(Creer.class),
     JOINDRE(Joindre.class),
-    ROLE(Role.class),
+    ROLE(ChangerRole.class),
     COMBATTRE(Combattre.class),
     ATTAQUER(Attaquer.class),
     SALUER(Saluer.class),

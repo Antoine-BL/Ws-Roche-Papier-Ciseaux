@@ -8,20 +8,20 @@ import java.util.List;
 
 @JsonDeserialize()
 public class Creer extends Commande{
-    public Creer() {
-
-    }
+    public Creer() {}
 
     public Creer(List<String> args) {
         super(args);
     }
 
     @Override
-    public Reponse execute(LobbyCommandContext context) {
-        context.createLobby();
-        Thread thread = new Thread(context.getLobby());
-        thread.start();
-
-        return new Reponse(1L, "Lobby en création...");
+    public void execute(LobbyCommandContext context) {
+        try {
+            context.createLobby();
+            Thread thread = new Thread(context.getLobby());
+            thread.start();
+        } catch (IllegalStateException e) {
+            send(e.getMessage(), context);
+        }
     }
 }

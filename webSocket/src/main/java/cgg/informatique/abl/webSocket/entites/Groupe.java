@@ -2,23 +2,24 @@ package cgg.informatique.abl.webSocket.entites;
 
 import org.springframework.security.core.GrantedAuthority;
 
-public enum Groupe implements GrantedAuthority {
-    BLANC("Blanc"),
-    JAUNE("Jaune"),
-    ORANGE("Orange"),
-    VERT("Vert"),
-    BLEU("Bleu"),
-    MARRON("Marro"),
-    NOIR("Noir");
+import javax.persistence.*;
 
-    private String authority;
+@Entity
+@Table(name = "GROUPES")
+public class Groupe implements GrantedAuthority {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private String groupe;
 
-    Groupe(String authority) {
-        this.authority = authority;
+    public Groupe() {}
+
+    public Groupe(String groupe) {
+        this.groupe = groupe;
     }
 
     @Override
     public String getAuthority() {
-        return "ROLE_" + authority;
+        return groupe;
     }
 }

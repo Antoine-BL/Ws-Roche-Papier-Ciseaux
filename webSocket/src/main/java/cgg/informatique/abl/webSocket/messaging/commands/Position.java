@@ -1,7 +1,10 @@
 package cgg.informatique.abl.webSocket.messaging.commands;
 
-import cgg.informatique.abl.webSocket.dto.*;
-import cgg.informatique.abl.webSocket.messaging.Reponse;
+import cgg.informatique.abl.webSocket.dto.lobby.Lobby;
+import cgg.informatique.abl.webSocket.dto.lobby.LobbyUserData;
+import cgg.informatique.abl.webSocket.dto.match.Match;
+import cgg.informatique.abl.webSocket.dto.match.MatchUserData;
+import cgg.informatique.abl.webSocket.dto.match.PlayerState;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 @JsonDeserialize
@@ -9,7 +12,7 @@ public class Position extends Commande{
     private static int POSITION = 0;
 
     @Override
-    public Reponse execute(LobbyCommandContext context) {
+    public void execute(LobbyCommandContext context) {
         Lobby lobby = context.getLobby();
         Match match = lobby.getCurrentMatch();
         LobbyUserData lud = lobby.getLobbyUserData(getDe());
@@ -22,14 +25,13 @@ public class Position extends Commande{
 
                 mud.setState(state);
 
-                return new Reponse(1L, lud.getUser().getAlias() + " s'est déplacé vers: " + state);
+                send(lud.getUser().getAlias() + " s'est déplacé vers: " + state, context);
             } catch (Exception e) {
                 e.printStackTrace();
-                return new Reponse(1L, e.getMessage());
+                send(e.getMessage(), context);
             }
-
         }
 
-        return new Reponse(1L, lud.getUser().getAlias() + " est dans la position: " + mud.getState());
+        send(lud.getUser().getAlias() + " est dans la position: " + mud.getState(), context);
     }
 }

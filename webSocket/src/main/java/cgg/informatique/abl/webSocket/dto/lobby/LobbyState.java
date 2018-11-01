@@ -1,4 +1,4 @@
-package cgg.informatique.abl.webSocket.dto;
+package cgg.informatique.abl.webSocket.dto.lobby;
 
 public enum LobbyState {
     STANDBY,

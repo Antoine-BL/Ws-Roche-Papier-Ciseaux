@@ -20,7 +20,7 @@ public class Error extends Commande {
     }
 
     @Override
-    public Reponse execute(LobbyCommandContext context) {
-        return new Reponse(1L, "Erreur, commande " + className + " est inconnue");
+    public void execute(LobbyCommandContext context) {
+        send("Erreur, commande " + className + " est inconnue", context);
     }
 }

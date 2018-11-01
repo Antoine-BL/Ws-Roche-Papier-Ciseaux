@@ -10,7 +10,7 @@ Vue.component('app-nav', {
         '            <app-nav-item v-if="currentPage != \'dojo\'" text="Dojo" destination="/"></app-nav-item>' +
         '            <app-nav-item v-if="currentPage != \'ecole\'" text="Notre École" destination="/ecole"></app-nav-item>' +
         '            <app-nav-item v-if="currentPage != \'kumite\' && user" text="Kumite" destination="/kumite"></app-nav-item>' +
-        '            <app-nav-item v-if="currentPage != \'passage\' && user && (user.role == \'VENERABLE\' || user.role == \'SENSEI\')" text="Passage de Grades" destination="/passage"></app-nav-item>' +
+        '            <app-nav-item v-if="currentPage != \'passage\' && user && (user.role == \'Venerable\' || user.role == \'Sensei\')" text="Passage de Grades" destination="/passage"></app-nav-item>' +
         '            <a v-if="user == null" class="nav-item active btn btn-success mr-auto" id="connexion" href="/connexion" role="button">Se connecter</a>' +
         '            <app-profile v-if="user" v-bind:user="user"></app-profile>' +
         '        </ul>\n' +
@@ -56,10 +56,10 @@ Vue.component('app-chat-message', {
             }
         }
     },
-   template: '<div v-bind:class="[\'chat-message\', message.fromSelf ? \'self-chat\' : \'other-chat\', \'d-flex\', \'m-2\', \'border-bottom\']">' +
-       '<img v-bind:src="message.avatarUrl" class="profile profile-petit d-inline-block"/>' +
+   template: '<div v-bind:class="[\'chat-message\', message.fromSelf ? \'self-chat\' : \'other-chat\', \'d-flex\', \'border-bottom\', message.css]">' +
+       '<img v-bind:src="message.avatarUrl" class="profile profile-petit"/>' +
        '<div class="d-inline-block chat-message-content flex-grow-1 p-1">' +
-       '<div class="chat-message-header d-flex flex-grow-1"><strong class="flex-grow-1">{{message.de.alias}} {{message.de.role}} {{message.de.groupe}}</strong><small><img class="icon m-2 d-inline-block" src="/open-iconic/svg/clock.svg">{{timeMessage}}</small></div>'+
+       '<div class="chat-message-header d-flex flex-grow-1"><strong class="flex-grow-1">{{message.de.alias}} {{message.de.role}} {{message.de.groupe}} <span v-if="message.mention">[{{message.mention}}]</span></strong><small><img class="icon m-2 d-inline-block" src="/open-iconic/svg/clock.svg">{{timeMessage}}</small></div>'+
        '<div class="chat-message-text">{{message.texte}}</div>' +
        '</div>' +
        '</div>'
@@ -86,13 +86,36 @@ Vue.component('app-profile', {
 });
 
 Vue.component('app-rangee', {
-    props: ['users'],
+    props: ['initialUsers', 'role'],
     template: '<div class="row justify-content-center">' +
-        '<app-slot v-for="u in users" v-bind:initial-user="u"></app-slot>' +
-        '</div>'
+        '<app-slot v-on:move-to="moveTo"' +
+        ' v-for="(u, i) in users"' +
+        ' v-bind:user="u"' +
+        ' v-bind:index="i"' +
+        ' v-bind:role="role">' +
+        '</app-slot>' +
+        '</div>',
+    data : function () { return {
+            users: this.initialUsers,
+        };
+    },
+    methods: {
+        moveTo: function (e) {
+            if (!this.user) {
+                this.$emit('move-to-child', e);
+            }
+        }
+    }
 });
 
 Vue.component('app-slot', {
-    props: ['user'],
-   template: '<div class="col-2 col-xl-1 slot"><img v-bind:src="user == null ? \'/images/anonyme.jpg\' : \'/api/avatars/\' + user.avatarId"></div>'
+    props: ['user', 'index', 'role'],
+    template: '<div v-on:click="click" class="col-2 col-xl-1 slot"><img v-bind:src="user == null ? \'/images/anonyme.jpg\' : \'/api/avatars/\' + user.avatarId"></div>',
+    methods: {
+        click: function (e) {
+            if (!this.user) {
+                this.$emit('move-to', this);
+            }
+        }
+    }
 });

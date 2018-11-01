@@ -1,31 +1,24 @@
 package cgg.informatique.abl.webSocket.messaging.commands;
 
-import cgg.informatique.abl.webSocket.controleurs.webSocket.FightController;
-import cgg.informatique.abl.webSocket.dto.Lobby;
-import cgg.informatique.abl.webSocket.dto.LobbyRole;
-import cgg.informatique.abl.webSocket.dto.LobbyUserData;
-import cgg.informatique.abl.webSocket.entites.Compte;
-import cgg.informatique.abl.webSocket.messaging.Reponse;
+import cgg.informatique.abl.webSocket.dto.lobby.Lobby;
+import cgg.informatique.abl.webSocket.dto.lobby.LobbyRole;
+import cgg.informatique.abl.webSocket.dto.lobby.LobbyUserData;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-
-import java.util.List;
 
 @JsonDeserialize
 public class Combattre extends Commande{
     public Combattre() {}
 
     @Override
-    public Reponse execute(LobbyCommandContext context) {
+    public void execute(LobbyCommandContext context) {
         Lobby lobby = context.getLobby();
         try {
             LobbyUserData lud = lobby.getLobbyUserData(getDe());
 
-            if (lud.getRole() != LobbyRole.ARBITRE) throw new IllegalArgumentException("Doit être l'arbitre");
+            if (lud.getRoleCombat() != LobbyRole.ARBITRE) throw new IllegalArgumentException("Doit être l'arbitre");
             lobby.startMatch();
         } catch (IllegalArgumentException e) {
-            return new Reponse(1L, "Échec du combat. Raison: " + e.getMessage());
+            send("Échec du combat. Raison: " + e.getMessage(), context);
         }
-
-        return null;
     }
 }

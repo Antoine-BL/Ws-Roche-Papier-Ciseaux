@@ -17,8 +17,8 @@ public interface SanitaryCompte {
     String getAlias();
     Long getAvatarId();
     void setAvatarId(Long id);
-    Role getRole();
-    Groupe getGroupe();
+    String getRole();
+    String getGroupe();
     int getPoints();
     int getCredits();
 }

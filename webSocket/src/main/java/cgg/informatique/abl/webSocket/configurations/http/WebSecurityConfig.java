@@ -32,7 +32,7 @@ class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private void mainConfig(HttpSecurity http) throws Exception {
         http.authorizeRequests()
             .antMatchers("/", "/connexion", "/compte/creer").permitAll()
-            .antMatchers("/passage").hasAnyAuthority("ROLE_Sensei", "ROLE_Venerable")
+            .antMatchers("/passage").hasAnyAuthority("Sensei", "Venerable")
             .antMatchers("/kumite").authenticated()
             .anyRequest().permitAll();
     }

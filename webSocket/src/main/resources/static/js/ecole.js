@@ -25,10 +25,11 @@ $(document).ready(() => {
 
     $.ajax("/api/comptes", {
         success: (data) => {
-            app.venerables = data.filter(e => e.role === "VENERABLE");
-            app.senseis = data.filter(e => e.role === "SENSEI");
-            app.anciens = data.filter(e => e.role === "ANCIEN");
-            app.nouveaux = data.filter(e => e.role === "NOUVEAU");
+            console.log(data);
+            app.venerables = data.filter(e => e.role === "Venerable");
+            app.senseis = data.filter(e => e.role === "Sensei");
+            app.anciens = data.filter(e => e.role === "Ancien");
+            app.nouveaux = data.filter(e => e.role === "Nouveau");
         }
     });
 });

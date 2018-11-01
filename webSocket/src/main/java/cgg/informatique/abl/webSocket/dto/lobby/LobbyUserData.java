@@ -1,8 +1,6 @@
-package cgg.informatique.abl.webSocket.dto;
+package cgg.informatique.abl.webSocket.dto.lobby;
 
-import cgg.informatique.abl.webSocket.entites.Compte;
-import cgg.informatique.abl.webSocket.entites.Groupe;
-import cgg.informatique.abl.webSocket.entites.Role;
+import cgg.informatique.abl.webSocket.dto.SanitaryCompte;
 
 import java.util.Objects;
 
@@ -12,6 +10,7 @@ public class LobbyUserData {
     private static int ACTIVE_TIMEOUT = 60 * MINUTES;
     private static int PASSIVE_TIMEOUT = 1 * MINUTES;
     private static int INACTIVE_THRESHOLD = 15 * SECONDS;
+    private int position = 0;
     private LobbyRole role;
     private SanitaryCompte user;
     private boolean warned = false;
@@ -19,6 +18,7 @@ public class LobbyUserData {
     public LobbyUserData(SanitaryCompte user, LobbyRole role) {
         this.user = user;
         this.role = role;
+        this.position = position;
         lastPassive = System.currentTimeMillis();
         lastActive = System.currentTimeMillis();
     }
@@ -64,7 +64,7 @@ public class LobbyUserData {
         return Objects.hash(user, lastActive, lastPassive);
     }
 
-    public LobbyRole getRole() {
+    public LobbyRole getRoleCombat() {
         return role;
     }
 
@@ -72,28 +72,24 @@ public class LobbyUserData {
         this.role = role;
     }
 
-    public Role userRole() {
+    public String getRole() {
         return user.getRole();
     }
 
-    public Groupe userGroup() {
+    public String getGroupe() {
         return user.getGroupe();
     }
 
-    public long getLastActive() {
-        return lastActive;
+    public String getAlias() {return user.getAlias(); }
+
+    public Long getAvatarId() {return user.getAvatarId(); }
+
+    public int getPosition() {
+        return position;
     }
 
-    public void setLastActive(long lastActive) {
-        this.lastActive = lastActive;
-    }
-
-    public long getLastPassive() {
-        return lastPassive;
-    }
-
-    public void setLastPassive(long lastPassive) {
-        this.lastPassive = lastPassive;
+    public void setPosition(int position) {
+        this.position = position;
     }
 
     public boolean isInactive() {
