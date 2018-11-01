@@ -3,7 +3,7 @@ package cgg.informatique.abl.webSocket.dto.lobby;
 import cgg.informatique.abl.webSocket.dto.match.Attack;
 import cgg.informatique.abl.webSocket.dto.match.Match;
 import cgg.informatique.abl.webSocket.dto.match.MatchHandler;
-import cgg.informatique.abl.webSocket.dto.SanitaryCompte;
+import cgg.informatique.abl.webSocket.dto.SanitizedCompte;
 import cgg.informatique.abl.webSocket.messaging.DonneesReponse;
 import cgg.informatique.abl.webSocket.messaging.Reponse;
 import cgg.informatique.abl.webSocket.messaging.ReponseCommande;
@@ -12,7 +12,6 @@ import cgg.informatique.abl.webSocket.messaging.commands.TypeCommande;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
@@ -80,12 +79,6 @@ public class Lobby implements Runnable, MatchHandler {
         }
     }
 
-    private void becomeInactive() {
-        send("Lobby inactif");
-        lobbyState = LobbyState.STANDBY;
-        waitForPlayers();
-    }
-
     private void purgeInactiveUsers() {
         for (int i = 0; i < users.size(); i++) {
             LobbyUserData user = users.get(i);
@@ -101,27 +94,6 @@ public class Lobby implements Runnable, MatchHandler {
                 send(user.getUser().getAlias() + " est inactif. Il sera bientôt sorti du lobby.");
                 System.out.println(user.getUser().getAlias() + " inactive");
             }
-        }
-    }
-
-    private void send(String message) {
-        Reponse reponse = new Reponse(1L, Commande.COMPTE_SERVEUR, message);
-        synchronized (messaging) {
-            messaging.convertAndSend(OUTPUT_TOPIC, reponse);
-        }
-    }
-
-    private void sendData(String message, DonneesReponse donnees) {
-        ReponseCommande reponse = new ReponseCommande(message, donnees);
-        synchronized (messaging) {
-            messaging.convertAndSend(OUTPUT_TOPIC, reponse);
-        }
-    }
-
-    private void sendData(DonneesReponse donnees) {
-        ReponseCommande reponse = new ReponseCommande(donnees);
-        synchronized (messaging) {
-            messaging.convertAndSend(OUTPUT_TOPIC, reponse);
         }
     }
 
@@ -145,23 +117,70 @@ public class Lobby implements Runnable, MatchHandler {
         }
     }
 
-    private boolean isEmpty() {
-        return users.isEmpty();
+    private void becomeInactive() {
+        send("Lobby inactif");
+        lobbyState = LobbyState.STANDBY;
+        waitForPlayers();
     }
 
-    public void connect(SanitaryCompte u) {
+    private void send(String message) {
+        Reponse reponse = new Reponse(1L, Commande.COMPTE_SERVEUR, message);
+        synchronized (messaging) {
+            messaging.convertAndSend(OUTPUT_TOPIC, reponse);
+        }
+    }
+
+    private void sendData(String message, DonneesReponse donnees) {
+        ReponseCommande reponse = new ReponseCommande(message, donnees);
+        synchronized (messaging) {
+            messaging.convertAndSend(OUTPUT_TOPIC, reponse);
+        }
+    }
+
+    private void sendData(DonneesReponse donnees) {
+        ReponseCommande reponse = new ReponseCommande(donnees);
+        synchronized (messaging) {
+            messaging.convertAndSend(OUTPUT_TOPIC, reponse);
+        }
+    }
+
+
+    public void connect(SanitizedCompte u) {
         if (lobbyState == LobbyState.STANDBY) this.lobbyThread.interrupt();
         if (users.stream().anyMatch(isPresent(u))) throw  new IllegalArgumentException("utilisateur déjà présent");
 
         LobbyUserData userData = new LobbyUserData(u, LobbyRole.SPECTATEUR);
 
         this.users.add(userData);
-        int position = addTo(spectateurs, userData);
+        LobbyPosition position = addPlayer(userData, new LobbyPosition(LobbyRole.SPECTATEUR), spectateurs);
 
-        sendData("Bienvenue au lobby " + u.getAlias(), new DonneesReponse(TypeCommande.ROLE, userData,
-                new LobbyPosition(LobbyRole.SPECTATEUR, position)));
+        sendData("Bienvenue au lobby " + u.getAlias(), new DonneesReponse(TypeCommande.ROLE, userData, position));
     }
 
+    private int addTo(LobbyUserData[] arr, LobbyUserData u) {
+        for (int i = 0;; i++) {
+            if (arr[i] == null) {
+                arr[i] = u;
+                return i;
+            }
+        }
+    }
+
+
+    private LobbyPosition addPlayer(LobbyUserData u, LobbyPosition destination, LobbyUserData[] arr) {
+        try {
+            if (destination.getPosition() == null) {
+                destination.setPosition(addTo(arr, u));
+            } else {
+                addTo(arr, u, destination.getPosition());
+            }
+
+            return destination;
+        } catch (IndexOutOfBoundsException e) {
+            e.printStackTrace();
+            throw new IllegalArgumentException("Nombre maximal de spectateurs déjà atteint");
+        }
+    }
 
     private synchronized LobbyPosition removeFromCurrentRole(LobbyUserData u) {
         switch (u.getRoleCombat()) {
@@ -209,28 +228,6 @@ public class Lobby implements Runnable, MatchHandler {
         return destination;
     }
 
-    private void addPlayer(LobbyUserData u, LobbyPosition destination, LobbyUserData[] arr) {
-        try {
-            if (destination.getPosition() == null) {
-                destination.setPosition(addTo(arr, u));
-            } else {
-                addTo(arr, u, destination.getPosition());
-            }
-        } catch (IndexOutOfBoundsException e) {
-            e.printStackTrace();
-            throw new IllegalArgumentException("Nombre maximal de spectateurs déjà atteint");
-        }
-    }
-
-    private int addTo(LobbyUserData[] arr, LobbyUserData u) {
-        for (int i = 0;; i++) {
-            if (arr[i] == null) {
-                arr[i] = u;
-                return i;
-            }
-        }
-    }
-
     private int addTo(LobbyUserData[] arr, LobbyUserData u, int index) {
         if (arr[index] != null &&
                 !u.getUser().getCourriel().equals(arr[index].getUser().getCourriel())
@@ -258,7 +255,7 @@ public class Lobby implements Runnable, MatchHandler {
         return (cpt) -> cpt.equals(utilisateur);
     }
 
-    private Predicate<LobbyUserData> isPresent(SanitaryCompte cpt) {
+    private Predicate<LobbyUserData> isPresent(SanitizedCompte cpt) {
         return (lud) -> cpt.getCourriel().equals(lud.getUser().getCourriel());
     }
 
@@ -291,7 +288,7 @@ public class Lobby implements Runnable, MatchHandler {
         return pos;
     }
 
-    public LobbyUserData getLobbyUserData(SanitaryCompte compte) throws IllegalArgumentException {
+    public LobbyUserData getLobbyUserData(SanitizedCompte compte) throws IllegalArgumentException {
         return users.stream()
                 .filter((LobbyUserData lud) -> lud.getUser().getCourriel().equals(compte.getCourriel()))
                 .findFirst()
@@ -333,5 +330,9 @@ public class Lobby implements Runnable, MatchHandler {
     public void sendRound(Attack blancAttack, Attack rougeAttack) {
         sendData("Attaque du participant en blanc: " + blancAttack, new DonneesReponse(TypeCommande.ATTAQUER, "blanc", blancAttack) );
         sendData("Attaque du participant en rouge: " + rougeAttack, new DonneesReponse(TypeCommande.ATTAQUER, "rouge", rougeAttack));
+    }
+
+    private boolean isEmpty() {
+        return users.isEmpty();
     }
 }

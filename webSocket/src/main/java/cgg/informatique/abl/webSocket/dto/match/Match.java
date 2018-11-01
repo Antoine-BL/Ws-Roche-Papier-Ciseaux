@@ -3,7 +3,7 @@ package cgg.informatique.abl.webSocket.dto.match;
 import cgg.informatique.abl.webSocket.dto.lobby.LobbyRole;
 import cgg.informatique.abl.webSocket.dto.lobby.LobbyUserData;
 
-public class Match {
+public class Match implements SerializableMatch{
     private final MatchUserData arbitre;
     private final MatchUserData blanc;
     private final MatchUserData rouge;
@@ -111,6 +111,21 @@ public class Match {
 
     public MatchUserData getRouge() {
         return rouge;
+    }
+
+    @Override
+    public MatchState getMatchState() {
+        return this.state;
+    }
+
+    @Override
+    public Long getChrono() {
+        return this.state.getDuration() - lastStateChange;
+    }
+
+    @Override
+    public MatchUserData getArbitre() {
+        return this.arbitre;
     }
 
     public MatchUserData getBlanc() {

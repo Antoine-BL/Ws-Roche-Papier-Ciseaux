@@ -3,7 +3,7 @@ package cgg.informatique.abl.webSocket.dto.match;
 import cgg.informatique.abl.webSocket.dto.lobby.LobbyRole;
 import cgg.informatique.abl.webSocket.dto.lobby.LobbyUserData;
 
-public class MatchUserData {
+public class MatchUserData{
     private LobbyUserData user;
     private PlayerState state = PlayerState.ESTRADE;
     private boolean saluting;

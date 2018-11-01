@@ -1,6 +1,6 @@
 package cgg.informatique.abl.webSocket.messaging.commands;
 
-import cgg.informatique.abl.webSocket.dto.SanitaryCompte;
+import cgg.informatique.abl.webSocket.dto.SanitizedCompte;
 import cgg.informatique.abl.webSocket.entites.Avatar;
 import cgg.informatique.abl.webSocket.entites.Compte;
 import cgg.informatique.abl.webSocket.entites.Groupe;
@@ -8,7 +8,6 @@ import cgg.informatique.abl.webSocket.entites.Role;
 import cgg.informatique.abl.webSocket.messaging.Message;
 import cgg.informatique.abl.webSocket.messaging.Reponse;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import java.util.List;
 
@@ -28,7 +27,7 @@ public abstract class Commande extends Message {
 
     public Commande(){}
 
-    public Commande(SanitaryCompte de, List<String> parametres) {
+    public Commande(SanitizedCompte de, List<String> parametres) {
         super(de);
         this.parametres = parametres;
     }

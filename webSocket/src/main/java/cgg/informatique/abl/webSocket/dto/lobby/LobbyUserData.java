@@ -1,10 +1,10 @@
 package cgg.informatique.abl.webSocket.dto.lobby;
 
-import cgg.informatique.abl.webSocket.dto.SanitaryCompte;
+import cgg.informatique.abl.webSocket.dto.SanitizedCompte;
 
 import java.util.Objects;
 
-public class LobbyUserData {
+public class LobbyUserData implements SanitizedCompte{
     private static int SECONDS = 1000;
     private static int MINUTES = 60 * SECONDS;
     private static int ACTIVE_TIMEOUT = 60 * MINUTES;
@@ -12,10 +12,10 @@ public class LobbyUserData {
     private static int INACTIVE_THRESHOLD = 15 * SECONDS;
     private int position = 0;
     private LobbyRole role;
-    private SanitaryCompte user;
+    private SanitizedCompte user;
     private boolean warned = false;
 
-    public LobbyUserData(SanitaryCompte user, LobbyRole role) {
+    public LobbyUserData(SanitizedCompte user, LobbyRole role) {
         this.user = user;
         this.role = role;
         this.position = position;
@@ -41,11 +41,11 @@ public class LobbyUserData {
         this.warned = false;
     }
 
-    public SanitaryCompte getUser() {
+    public SanitizedCompte getUser() {
         return user;
     }
 
-    public void setUser(SanitaryCompte user) {
+    public void setUser(SanitizedCompte user) {
         this.user = user;
     }
 
@@ -78,6 +78,11 @@ public class LobbyUserData {
 
     public String getGroupe() {
         return user.getGroupe();
+    }
+
+    @Override
+    public String getCourriel() {
+        return null;
     }
 
     public String getAlias() {return user.getAlias(); }

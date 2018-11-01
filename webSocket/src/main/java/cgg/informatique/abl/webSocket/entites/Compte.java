@@ -1,8 +1,7 @@
 package cgg.informatique.abl.webSocket.entites;
 
 import cgg.informatique.abl.webSocket.dto.CompteDto;
-import cgg.informatique.abl.webSocket.dto.SanitaryCompte;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import cgg.informatique.abl.webSocket.dto.SanitizedCompte;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -15,7 +14,7 @@ import java.util.Objects;
 
 @Entity
 @Table(name="COMPTES")
-public class Compte implements UserDetails, SanitaryCompte {
+public class Compte implements UserDetails, SanitizedCompte {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -31,8 +30,6 @@ public class Compte implements UserDetails, SanitaryCompte {
     @ManyToOne(targetEntity = Groupe.class)
     @JoinColumn(name="GROUPE")
     private Groupe groupe;
-    private int points;
-    private int credits;
 
     protected Compte() { }
 
@@ -54,7 +51,7 @@ public class Compte implements UserDetails, SanitaryCompte {
             this.groupe = groupe;
     }
 
-    public SanitaryCompte sanitize() {
+    public SanitizedCompte sanitize() {
         return this;
     }
 
@@ -82,14 +79,6 @@ public class Compte implements UserDetails, SanitaryCompte {
     @Override
     public Long getAvatarId() {
         return this.avatar.getId();
-    }
-
-    @Override
-    public void setAvatarId(Long id) {
-        if (avatar == null){
-            avatar = new Avatar();
-        }
-        avatar.setId(id);
     }
 
     public Avatar getAvatar() {
@@ -214,9 +203,7 @@ public class Compte implements UserDetails, SanitaryCompte {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Compte compte = (Compte) o;
-        return points == compte.points &&
-                credits == compte.credits &&
-                Objects.equals(id, compte.id) &&
+        return  Objects.equals(id, compte.id) &&
                 Objects.equals(courriel, compte.courriel) &&
                 Objects.equals(motPasse, compte.motPasse) &&
                 Objects.equals(alias, compte.alias) &&
@@ -227,15 +214,7 @@ public class Compte implements UserDetails, SanitaryCompte {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, courriel, motPasse, alias, avatar, role, groupe, points, credits);
-    }
-
-    public int getPoints() {
-        return points;
-    }
-
-    public int getCredits() {
-        return credits;
+        return Objects.hash(id, courriel, motPasse, alias, avatar, role, groupe);
     }
 }
 

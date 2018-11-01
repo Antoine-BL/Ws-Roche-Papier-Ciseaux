@@ -1,23 +1,23 @@
 package cgg.informatique.abl.webSocket.messaging;
 
-import cgg.informatique.abl.webSocket.dto.SanitaryCompte;
+import cgg.informatique.abl.webSocket.dto.SanitizedCompte;
 
 public abstract class Message {
 
-    private SanitaryCompte de;
+    private SanitizedCompte de;
 
     public Message() {
     }
 
-    public Message(SanitaryCompte de) {
+    public Message(SanitizedCompte de) {
         this.de = de;
     }
 
-    public SanitaryCompte getDe() {
+    public SanitizedCompte getDe() {
         return de;
     }
 
-    public void setDe(SanitaryCompte de) {
+    public void setDe(SanitizedCompte de) {
         this.de = de;
     }
 }

@@ -1,7 +1,7 @@
 package cgg.informatique.abl.webSocket.controleurs.rest;
 
 import cgg.informatique.abl.webSocket.dao.CompteDao;
-import cgg.informatique.abl.webSocket.dto.SanitaryCompte;
+import cgg.informatique.abl.webSocket.dto.SanitizedCompte;
 import cgg.informatique.abl.webSocket.entites.Compte;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -24,15 +24,15 @@ public class CompteController {
     }
 
     @GetMapping("/comptes")
-    public List<SanitaryCompte> getAllCompte() { return compteDao.findAll().stream().map(cgg.informatique.abl.webSocket.entites.Compte::sanitize).collect(Collectors.toList()); }
+    public List<SanitizedCompte> getAllCompte() { return compteDao.findAll().stream().map(cgg.informatique.abl.webSocket.entites.Compte::sanitize).collect(Collectors.toList()); }
 
     @GetMapping("/comptes/{id}")
-    public ResponseEntity<SanitaryCompte> getCompte(@PathVariable Long id) {
+    public ResponseEntity<SanitizedCompte> getCompte(@PathVariable Long id) {
         Optional<cgg.informatique.abl.webSocket.entites.Compte> compte = compteDao.findById(id);
 
 
         if (compte.isPresent()) {
-            SanitaryCompte compteSan = compte.get().sanitize();
+            SanitizedCompte compteSan = compte.get().sanitize();
             return ResponseEntity.ok(compteSan);
         } else {
             return ResponseEntity.badRequest().build();
@@ -65,10 +65,10 @@ public class CompteController {
     }
 
     @GetMapping("/monCompte")
-    public ResponseEntity<SanitaryCompte> getCurrentAccount(@Autowired Authentication auth) {
+    public ResponseEntity<SanitizedCompte> getCurrentAccount(@Autowired Authentication auth) {
         if (auth != null) {
             Compte compte = (Compte)auth.getPrincipal();
-            SanitaryCompte compteSan = compte.sanitize();
+            SanitizedCompte compteSan = compte.sanitize();
             return ResponseEntity.ok(compteSan);
         }
         return ResponseEntity.noContent().build();
