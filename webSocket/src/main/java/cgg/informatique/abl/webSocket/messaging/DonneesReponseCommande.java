@@ -3,17 +3,17 @@ package cgg.informatique.abl.webSocket.messaging;
 import cgg.informatique.abl.webSocket.dto.lobby.LobbyUserData;
 import cgg.informatique.abl.webSocket.messaging.commands.TypeCommande;
 
-public class DonneesReponse {
+public class DonneesReponseCommande {
     private Object[] parametres;
     private TypeCommande typeCommande;
     private Object de;
 
-    public DonneesReponse(TypeCommande typeCommande, Object ...parametres) {
+    public DonneesReponseCommande(TypeCommande typeCommande, Object ...parametres) {
         this.parametres = parametres;
         this.typeCommande = typeCommande;
     }
 
-    public DonneesReponse(TypeCommande typeCommande, LobbyUserData de, Object ...parametres) {
+    public DonneesReponseCommande(TypeCommande typeCommande, LobbyUserData de, Object ...parametres) {
         this.parametres = parametres;
         this.typeCommande = typeCommande;
         this.de = de;

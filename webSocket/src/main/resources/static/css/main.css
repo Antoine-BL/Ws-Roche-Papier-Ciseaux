@@ -91,3 +91,7 @@
 .chat-robot {
     background-color: var(--success);
 }
+
+.chat-lobby {
+    background-color: var(--info);
+}

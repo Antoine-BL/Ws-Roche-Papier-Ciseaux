@@ -4,10 +4,14 @@ import cgg.informatique.abl.webSocket.dto.match.Attack;
 import cgg.informatique.abl.webSocket.dto.match.Match;
 import cgg.informatique.abl.webSocket.dto.match.MatchHandler;
 import cgg.informatique.abl.webSocket.dto.SanitizedCompte;
-import cgg.informatique.abl.webSocket.messaging.DonneesReponse;
+import cgg.informatique.abl.webSocket.dto.match.SerializableMatch;
+import cgg.informatique.abl.webSocket.entites.Avatar;
+import cgg.informatique.abl.webSocket.entites.Compte;
+import cgg.informatique.abl.webSocket.entites.Groupe;
+import cgg.informatique.abl.webSocket.entites.Role;
+import cgg.informatique.abl.webSocket.messaging.DonneesReponseCommande;
 import cgg.informatique.abl.webSocket.messaging.Reponse;
 import cgg.informatique.abl.webSocket.messaging.ReponseCommande;
-import cgg.informatique.abl.webSocket.messaging.commands.Commande;
 import cgg.informatique.abl.webSocket.messaging.commands.TypeCommande;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
@@ -16,16 +20,24 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
 
-public class Lobby implements Runnable, MatchHandler {
+public class Lobby implements Runnable, MatchHandler, SerializableLobby {
     private static final String URL = "ws://localhost:8100/webSocket";
-    private static final String OUTPUT_TOPIC = "/topic/battle/command";
+    private static final String OUTPUT_TOPIC = "/topic/battle/lobby";
+    public static final Compte COMPTE_LOBBY = Compte.Builder()
+            .avecCourriel("lobby@server.ca")
+            .avecMotDePasse("")
+            .avecAlias("LobbyBot")
+            .avecRole(new Role(""))
+            .avecGroupe(new Groupe(""))
+            .avecAvatar(new Avatar(3L))
+            .build();
 
     private static final int ONE_SECOND = 1000;
 
     private static final int TICK_RATE_HZ = 1;
     private static final int TICK_DURATION = ONE_SECOND / TICK_RATE_HZ;
 
-    private static final int LOBBY_TIMEOUT = 5 * ONE_SECOND;
+    private static final int LOBBY_TIMEOUT = 90 * ONE_SECOND;
     private static final int WAIT_MESSAGE_INTERVAL = 10* ONE_SECOND;
     private static final String WAIT_MESSAGE_TMP = "En attente de joueurs (%ds restantes)";
 
@@ -124,20 +136,20 @@ public class Lobby implements Runnable, MatchHandler {
     }
 
     private void send(String message) {
-        Reponse reponse = new Reponse(1L, Commande.COMPTE_SERVEUR, message);
+        Reponse reponse = new Reponse(1L, COMPTE_LOBBY, message);
         synchronized (messaging) {
             messaging.convertAndSend(OUTPUT_TOPIC, reponse);
         }
     }
 
-    private void sendData(String message, DonneesReponse donnees) {
-        ReponseCommande reponse = new ReponseCommande(message, donnees);
+    private void sendData(String message, DonneesReponseCommande donnees) {
+        ReponseCommande reponse = new ReponseCommande(COMPTE_LOBBY, message, donnees);
         synchronized (messaging) {
             messaging.convertAndSend(OUTPUT_TOPIC, reponse);
         }
     }
 
-    private void sendData(DonneesReponse donnees) {
+    private void sendData(DonneesReponseCommande donnees) {
         ReponseCommande reponse = new ReponseCommande(donnees);
         synchronized (messaging) {
             messaging.convertAndSend(OUTPUT_TOPIC, reponse);
@@ -154,7 +166,7 @@ public class Lobby implements Runnable, MatchHandler {
         this.users.add(userData);
         LobbyPosition position = addPlayer(userData, new LobbyPosition(LobbyRole.SPECTATEUR), spectateurs);
 
-        sendData("Bienvenue au lobby " + u.getAlias(), new DonneesReponse(TypeCommande.ROLE, userData, position));
+        sendData("Bienvenue au lobby " + u.getAlias(), new DonneesReponseCommande(TypeCommande.JOINDRE, this.asSerializable()));
     }
 
     private int addTo(LobbyUserData[] arr, LobbyUserData u) {
@@ -221,9 +233,13 @@ public class Lobby implements Runnable, MatchHandler {
                 break;
             case SPECTATEUR:
                 addPlayer(u, destination, spectateurs);
+                break;
             case COMBATTANT:
                 addPlayer(u, destination, combattants);
+                break;
         }
+
+        u.setRole(destination.getRole());
 
         return destination;
     }
@@ -240,15 +256,16 @@ public class Lobby implements Runnable, MatchHandler {
     public void devenirRole(LobbyUserData u, LobbyPosition position) {
         LobbyPosition oldPos = removeFromCurrentRole(u);
         LobbyPosition newPos = switchToRole(u, position);
-        u.setRole(position.getRole());
         sendData(u.getUser().getAlias() + " a maintenant le role de: " + position.getRole(),
-                new DonneesReponse(TypeCommande.ROLE, u, newPos, oldPos));
+                new DonneesReponseCommande(TypeCommande.ROLE, u, newPos, oldPos));
     }
 
     public void quitter(LobbyUserData u) {
         LobbyPosition pos = removeFromLobby(u);
-        sendData(u.getUser().getAlias() + " a quitté",
-                new DonneesReponse(TypeCommande.QUITTER, pos));
+        if (pos != null) {
+            sendData(u.getUser().getAlias() + " a quitté",
+                    new DonneesReponseCommande(TypeCommande.QUITTER, pos));
+        }
     }
 
     private Predicate<LobbyUserData> isPresent(LobbyUserData utilisateur) {
@@ -328,11 +345,46 @@ public class Lobby implements Runnable, MatchHandler {
 
     @Override
     public void sendRound(Attack blancAttack, Attack rougeAttack) {
-        sendData("Attaque du participant en blanc: " + blancAttack, new DonneesReponse(TypeCommande.ATTAQUER, "blanc", blancAttack) );
-        sendData("Attaque du participant en rouge: " + rougeAttack, new DonneesReponse(TypeCommande.ATTAQUER, "rouge", rougeAttack));
+        sendData("Attaque du participant en blanc: " + blancAttack, new DonneesReponseCommande(TypeCommande.ATTAQUER, "blanc", blancAttack) );
+        sendData("Attaque du participant en rouge: " + rougeAttack, new DonneesReponseCommande(TypeCommande.ATTAQUER, "rouge", rougeAttack));
     }
 
     private boolean isEmpty() {
         return users.isEmpty();
+    }
+
+    @Override
+    public LobbyUserData[] getSpectateurs() {
+        return this.spectateurs;
+    }
+
+    @Override
+    public LobbyUserData[] getCombattants() {
+        return this.combattants;
+    }
+
+    @Override
+    public LobbyUserData getBlanc() {
+        return blanc;
+    }
+
+    @Override
+    public LobbyUserData getRouge() {
+        return rouge;
+    }
+
+    @Override
+    public LobbyUserData getArbitre() {
+        return arbitre;
+    }
+
+    @Override
+    public SerializableMatch getMatch() {
+        return matchInProgress;
+    }
+
+    @Override
+    public SerializableLobby asSerializable() {
+        return this;
     }
 }

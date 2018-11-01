@@ -8,7 +8,7 @@ public class LobbyUserData implements SanitizedCompte{
     private static int SECONDS = 1000;
     private static int MINUTES = 60 * SECONDS;
     private static int ACTIVE_TIMEOUT = 60 * MINUTES;
-    private static int PASSIVE_TIMEOUT = 1 * MINUTES;
+    private static int PASSIVE_TIMEOUT = 90 * SECONDS;
     private static int INACTIVE_THRESHOLD = 15 * SECONDS;
     private int position = 0;
     private LobbyRole role;
@@ -88,6 +88,11 @@ public class LobbyUserData implements SanitizedCompte{
     public String getAlias() {return user.getAlias(); }
 
     public Long getAvatarId() {return user.getAvatarId(); }
+
+    @Override
+    public void setAvatarId(Long id) {
+        user.setAvatarId(id);
+    }
 
     public int getPosition() {
         return position;

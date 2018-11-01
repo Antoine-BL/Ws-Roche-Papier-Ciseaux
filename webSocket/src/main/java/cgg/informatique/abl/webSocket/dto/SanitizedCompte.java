@@ -10,6 +10,7 @@ public interface SanitizedCompte {
     String getCourriel();
     String getAlias();
     Long getAvatarId();
+    void setAvatarId(Long id);
     String getRole();
     String getGroupe();
 }

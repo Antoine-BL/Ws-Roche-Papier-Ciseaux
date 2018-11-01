@@ -14,7 +14,7 @@ import java.util.List;
 @JsonDeserialize(using = CommandDeserializer.class)
 public abstract class Commande extends Message {
     private static final String OUTPUT_TOPIC = "/topic/battle/command";
-    public static final Compte COMPTE_SERVEUR = Compte.Builder()
+    static final Compte COMPTE_SERVEUR = Compte.Builder()
             .avecCourriel("server@server.ca")
             .avecMotDePasse("")
             .avecAlias("CutieBot")

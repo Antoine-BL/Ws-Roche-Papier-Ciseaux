@@ -1,30 +1,30 @@
 package cgg.informatique.abl.webSocket.messaging;
 
-import cgg.informatique.abl.webSocket.messaging.commands.Commande;
+import cgg.informatique.abl.webSocket.entites.Compte;
+import cgg.informatique.abl.webSocket.messaging.DonneesReponseCommande;
+import cgg.informatique.abl.webSocket.messaging.Reponse;
 
-import static cgg.informatique.abl.webSocket.messaging.commands.Commande.COMPTE_SERVEUR;
-
-public class ReponseCommande extends Reponse{
-    private DonneesReponse donnees;
+public class ReponseCommande extends Reponse {
+    private DonneesReponseCommande donnees;
 
     public ReponseCommande(Long id, String texte) {
         super(id, texte);
     }
 
-    public ReponseCommande(String texte, DonneesReponse donnees) {
-        super(1L, COMPTE_SERVEUR, texte);
+    public ReponseCommande(Compte de, String texte, DonneesReponseCommande donnees) {
+        super(1L, de, texte);
         this.donnees = donnees;
     }
 
-    public ReponseCommande(DonneesReponse donnees) {
+    public ReponseCommande(DonneesReponseCommande donnees) {
         this.donnees = donnees;
     }
 
-    public DonneesReponse getDonnees() {
+    public DonneesReponseCommande getDonnees() {
         return donnees;
     }
 
-    public void setDonnees(DonneesReponse donnees) {
+    public void setDonnees(DonneesReponseCommande donnees) {
         this.donnees = donnees;
     }
 }

@@ -81,6 +81,12 @@ public class Compte implements UserDetails, SanitizedCompte {
         return this.avatar.getId();
     }
 
+    @Override
+    public void setAvatarId(Long id) {
+        if (this.avatar == null) avatar = new Avatar(id);
+        else avatar.setId(id);
+    }
+
     public Avatar getAvatar() {
         return avatar;
     }

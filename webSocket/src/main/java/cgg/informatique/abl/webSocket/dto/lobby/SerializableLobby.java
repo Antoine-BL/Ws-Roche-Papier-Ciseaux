@@ -12,4 +12,5 @@ public interface SerializableLobby {
     LobbyUserData getRouge();
     LobbyUserData getArbitre();
     SerializableMatch getMatch();
+    SerializableLobby asSerializable();
 }

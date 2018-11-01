@@ -5,7 +5,7 @@ class WebSocketClient {
         this.stompClient = null;
         this.user = user;
         this.justSent = false;
-        this.vueApp = vueApp;
+        this.subscriptions = new Map();
     }
 
     static get ANONYMOUS_USER() {
@@ -122,7 +122,12 @@ class WebSocketClient {
     }
 
     subscribeTo(topic, cssClass, mention, callback) {
-        this.stompClient.subscribe(topic, this.generateSubscribeHandler(cssClass, mention, callback));
+        const subscription = this.stompClient.subscribe(topic, this.generateSubscribeHandler(cssClass, mention, callback));
+        this.subscriptions.set(topic, subscription);
+    }
+
+    unsubscribeFrom(topic) {
+        this.subscriptions.get(topic).unsubscribe();
     }
 
     generateSubscribeHandler(cssClass, mention, callback) {

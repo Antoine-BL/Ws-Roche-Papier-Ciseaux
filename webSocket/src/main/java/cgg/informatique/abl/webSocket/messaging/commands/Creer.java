@@ -20,6 +20,7 @@ public class Creer extends Commande{
             context.createLobby();
             Thread thread = new Thread(context.getLobby());
             thread.start();
+            send("Lobby créé", context);
         } catch (IllegalStateException e) {
             send(e.getMessage(), context);
         }
