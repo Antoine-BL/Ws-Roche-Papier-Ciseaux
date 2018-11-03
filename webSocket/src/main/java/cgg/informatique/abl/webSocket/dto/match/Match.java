@@ -2,6 +2,8 @@ package cgg.informatique.abl.webSocket.dto.match;
 
 import cgg.informatique.abl.webSocket.dto.lobby.LobbyRole;
 import cgg.informatique.abl.webSocket.dto.lobby.LobbyUserData;
+import cgg.informatique.abl.webSocket.messaging.DonneesReponseCommande;
+import cgg.informatique.abl.webSocket.messaging.commands.TypeCommande;
 
 public class Match implements SerializableMatch{
     private final MatchUserData arbitre;
@@ -12,23 +14,11 @@ public class Match implements SerializableMatch{
     private long lastStateChange;
 
     public Match(LobbyUserData arbitre, LobbyUserData blanc, LobbyUserData rouge, MatchHandler matchHandler) {
-        this.arbitre = new MatchUserData(arbitre);
-        this.blanc = new MatchUserData(blanc);
-        this.rouge = new MatchUserData(rouge);
+        this.arbitre = new MatchUserData(arbitre, this);
+        this.blanc = new MatchUserData(blanc, this);
+        this.rouge = new MatchUserData(rouge, this);
         this.matchHandler = matchHandler;
         setMatchState(MatchState.WAITING);
-    }
-
-    public void join(MatchUserData player) {
-        player.setState(PlayerState.PLATEFORME);
-    }
-
-    public void ready(MatchUserData player) {
-        player.setState(PlayerState.TATAMI);
-    }
-
-    public void leave(MatchUserData player) {
-        player.setState(PlayerState.ESTRADE);
     }
 
     public void tick() {
@@ -72,7 +62,7 @@ public class Match implements SerializableMatch{
     }
 
     private void handleRound() {
-        matchHandler.sendMessage(String.format("rouge: %s, blanc: %s", rouge.getAttack(), blanc.getAttack()));
+        matchHandler.send(String.format("rouge: %s, blanc: %s", rouge.getAttack(), blanc.getAttack()));
         setMatchState(MatchState.DECIDE);
     }
 
@@ -135,7 +125,11 @@ public class Match implements SerializableMatch{
     public void setMatchState(MatchState state) {
         this.state = state;
         this.lastStateChange = System.currentTimeMillis();
-        matchHandler.sendMessage(state.getTransitionMessage());
+        matchHandler.sendData(state.getTransitionMessage(), new DonneesReponseCommande(TypeCommande.MATCH_STATE, this.state));
+    }
+
+    public void sendData(String message, DonneesReponseCommande donnees) {
+        matchHandler.sendData(message, donnees);
     }
 
     private void refLeft() {
@@ -146,15 +140,13 @@ public class Match implements SerializableMatch{
     public void tie() {
         blanc.tieAgainst(rouge);
         rouge.tieAgainst(blanc);
-        matchHandler.sendMessage(String.format("Match nul entre %s et %s", rouge.getNom(), blanc.getNom()));
-        setMatchState(MatchState.OVER);
+        matchHandler.send(String.format("Match nul entre %s et %s", rouge.getNom(), blanc.getNom()));
     }
 
     private void matchEnd(MatchUserData victor, MatchUserData loser) {
         victor.winAgainst(loser);
         loser.loseAgainst(victor);
-        matchHandler.sendMessage(String.format("%s a remporté son combat contre %s", victor.getNom(), loser.getNom()));
-        setMatchState(MatchState.OVER);
+        matchHandler.send(String.format("%s a remporté son combat contre %s", victor.getNom(), loser.getNom()));
     }
 
     private long timeSinceLastChange() {

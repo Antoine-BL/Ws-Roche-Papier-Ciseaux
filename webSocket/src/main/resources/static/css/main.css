@@ -29,22 +29,42 @@
 }
 
 .slot {
+    max-height: 45%;
     flex-grow: 1;
+    border: 5px solid var(--dark);
+    border-radius: 15%;
+    padding: 0;
+}
+
+.slot-disabled {
+    max-height: 45%;
+    flex-grow: 1;
+    padding: 0;
+    border: 5px solid var(--secondary);
+    border-radius: 15%;
 }
 
 .slot img {
-    margin: 15px 0;
     width:100%;
     height: auto;
+    max-height: 100%;
     object-fit: cover;
-    border-radius: 15%;
-    border-style: solid !important;
-    border-width: 5px !important;
 }
 
 .slot img:hover,
 .slot img:focus{
     border-color: var(--success) !important;
+}
+
+.slot-disabled img{
+    display: none;
+}
+
+
+@media (min-width: 1200px) {
+    .slot img {
+
+    }
 }
 
 .chat-col {

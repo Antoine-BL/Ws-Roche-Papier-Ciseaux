@@ -1,10 +1,11 @@
 package cgg.informatique.abl.webSocket.dto.lobby;
 
 import cgg.informatique.abl.webSocket.dto.SanitizedCompte;
+import cgg.informatique.abl.webSocket.dto.UserBase;
+import cgg.informatique.abl.webSocket.entites.Compte;
+import cgg.informatique.abl.webSocket.entites.Groupe;
 
-import java.util.Objects;
-
-public class LobbyUserData implements SanitizedCompte{
+public class LobbyUserData extends UserBase implements SanitizedCompte{
     private static int SECONDS = 1000;
     private static int MINUTES = 60 * SECONDS;
     private static int ACTIVE_TIMEOUT = 60 * MINUTES;
@@ -12,13 +13,13 @@ public class LobbyUserData implements SanitizedCompte{
     private static int INACTIVE_THRESHOLD = 15 * SECONDS;
     private int position = 0;
     private LobbyRole role;
-    private SanitizedCompte user;
+    private Lobby lobby;
+    private Compte user;
     private boolean warned = false;
 
-    public LobbyUserData(SanitizedCompte user, LobbyRole role) {
+    public LobbyUserData(Compte user, Lobby lobby) {
         this.user = user;
-        this.role = role;
-        this.position = position;
+        this.lobby = lobby;
         lastPassive = System.currentTimeMillis();
         lastActive = System.currentTimeMillis();
     }
@@ -41,27 +42,35 @@ public class LobbyUserData implements SanitizedCompte{
         this.warned = false;
     }
 
-    public SanitizedCompte getUser() {
+    public LobbyPosition leaveCurrentRole() {
+        LobbyPosition pos = role.leaveRole(this);
+
+        role = null;
+
+        return pos;
+    }
+
+    public void becomeRole(LobbyPosition position) {
+        LobbyPosition oldPos = null;
+        if (role != null) {
+            oldPos = leaveCurrentRole();
+        }
+        LobbyPosition newPos =  position.getRole().becomeRole(this, position);
+
+        this.role = newPos.getRole();
+        if (newPos.getPosition() != null) {
+            this.position = newPos.getPosition();
+        }
+
+        lobby.posChanged(this, newPos, oldPos);
+    }
+
+    public Compte getUser() {
         return user;
     }
 
-    public void setUser(SanitizedCompte user) {
+    public void setUser(Compte user) {
         this.user = user;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        LobbyUserData that = (LobbyUserData) o;
-        return lastActive == that.lastActive &&
-                lastPassive == that.lastPassive &&
-                Objects.equals(user, that.user);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(user, lastActive, lastPassive);
     }
 
     public LobbyRole getRoleCombat() {
@@ -69,6 +78,7 @@ public class LobbyUserData implements SanitizedCompte{
     }
 
     public void setRole(LobbyRole role) {
+        if (this.role != null) throw new IllegalStateException("Must leaveCurrentRole current role first");
         this.role = role;
     }
 
@@ -80,9 +90,13 @@ public class LobbyUserData implements SanitizedCompte{
         return user.getGroupe();
     }
 
+    public Groupe getGroupeObj() {
+        return user.getGroupeObj();
+    }
+
     @Override
     public String getCourriel() {
-        return null;
+        return this.user.getCourriel();
     }
 
     public String getAlias() {return user.getAlias(); }
@@ -113,5 +127,15 @@ public class LobbyUserData implements SanitizedCompte{
 
     public boolean isWarned() {
         return warned;
+    }
+
+    public Lobby getLobby() {
+        return lobby;
+    }
+
+    public void checkCanGoTo(LobbyPosition position) {
+        position
+                .getRole()
+                .checkAvailable(this, position.getPosition());
     }
 }

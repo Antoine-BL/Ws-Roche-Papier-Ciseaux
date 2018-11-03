@@ -1,19 +1,11 @@
 class WebSocketClient {
-    constructor(readFrom, displayTo, user, vueApp){
+    constructor(readFrom, displayTo, user){
         this.readFrom = readFrom;
         this.displayTo = displayTo;
         this.stompClient = null;
-        this.user = user;
         this.justSent = false;
+        this.user = user;
         this.subscriptions = new Map();
-    }
-
-    static get ANONYMOUS_USER() {
-        return {
-            alias: 'Anonyme',
-            role: '',
-            groupe: '',
-        };
     }
 
     static get COMMAND_PREFIX() {
@@ -93,6 +85,13 @@ class WebSocketClient {
     sendCommandTo(topic, message) {
         message = message ? message : this.readCommand();
 
+        if (this.user.roleCombat) {
+            delete this.user.roleCombat;
+        }
+        if (this.user.position) {
+            delete this.user.position;
+        }
+
         this.stompClient.send(
             topic,
             {},
@@ -127,7 +126,8 @@ class WebSocketClient {
     }
 
     unsubscribeFrom(topic) {
-        this.subscriptions.get(topic).unsubscribe();
+        if (this.subscriptions.has(topic))
+            this.subscriptions.get(topic).unsubscribe();
     }
 
     generateSubscribeHandler(cssClass, mention, callback) {

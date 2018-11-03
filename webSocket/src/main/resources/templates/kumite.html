@@ -3,6 +3,7 @@
 <head>
     <title>Projet 1: Websocket</title>
     <link href="/webjars/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link type="text/css" rel="stylesheet" href="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.css"/>
     <link href="/css/main.css" rel="stylesheet">
 
     <script src="/webjars/jquery/jquery.min.js"></script>
@@ -13,6 +14,8 @@
     <script src="/webjars/stomp-websocket/stomp.min.js"></script>
 
     <script src="/webjars/vue/vue.js"></script>
+    <script src="//unpkg.com/babel-polyfill@latest/dist/polyfill.min.js"></script>
+    <script src="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.js"></script>
 
     <script src="/js/VueComponents.js"></script>
     <script src="/js/kumite.js"></script>
@@ -24,30 +27,45 @@
     <div class="container-fluid">
         <div class="row justify-content-center chat-col mt-4">
             <div id="divArena" class="col-8 d-flex flex-column justify-content-center align-items-center">
+                <app-controls class="row border"
+                              v-on:debuter-match="debuterMatch"
+                              v-on:attaque="attaque"
+                              v-on:position="position"
+                              v-on:saluer="saluer"
+                              v-on:signaler="signaler"
+                              v-if="user && user.roleCombat && user.roleCombat != 'SPECTATEUR' && user.roleCombat != 'COMBATTANT'"
+                              v-bind:role="user.roleCombat"
+                              v-bind:match="match">
+                </app-controls>
                 <div class="row justify-content-center">
                     Spectateurs:
                 </div>
-                <app-rangee v-on:move-to-child="handleMove"
+                <app-rangee v-on:move-to-child="role"
                             v-bind:initial-users="spectateurs"
+                            v-bind:disabled="!dansLobby"
                             role="spectateur"></app-rangee>
                 <div class="row justify-content-center">
                     Compétiteurs en attente:
                 </div>
-                <app-rangee v-on:move-to-child="handleMove"
+                <app-rangee v-on:move-to-child="role"
                             v-bind:initial-users="combattants"
+                            v-bind:disabled="!dansLobby"
                             role="combattant"></app-rangee>
                 <div class="row justify-content-center">
                     Surface de combat:
                 </div>
                 <div class="row justify-content-between">
-                    <app-slot v-on:move-to="handleMove"
+                    <app-slot v-on:move-to="role"
                               v-bind:user="blanc"
+                              v-bind:disabled="match == null"
                               role="blanc"></app-slot>
-                    <app-slot v-on:move-to="handleMove"
+                    <app-slot v-on:move-to="role"
                               v-bind:user="arbitre"
+                              v-bind:disabled="!dansLobby"
                               role="arbitre"></app-slot>
-                    <app-slot v-on:move-to="handleMove"
+                    <app-slot v-on:move-to="role"
                               v-bind:user="rouge"
+                              v-bind:disabled="match == null"
                               role="rouge"></app-slot>
                 </div>
             </div>

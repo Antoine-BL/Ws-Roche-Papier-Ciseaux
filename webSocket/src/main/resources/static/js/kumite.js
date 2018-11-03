@@ -6,7 +6,7 @@ class Commande{
     }
 }
 const debugDisabled = true;
-
+let app;
 $(document).ready(() => {
     let heartbeatIntervalId;
     const subscribeTopics = Object.freeze({
@@ -19,18 +19,68 @@ $(document).ready(() => {
         COMMAND: '/app/battle/command',
         HEARTBEAT: '/app/battle/heartbeat',
     });
-    const commandes = Object.freeze({
-        ROLE: 'ROLE',
-        JOINDRE: 'JOINDRE',
-        QUITTER: 'QUITTER',
+    const Commands = Object.freeze({
+        ROLE: {
+            handle: (donnees) => changerRole(donnees.de, donnees.parametres[0], donnees.parametres[1]),
+        },
+        JOINDRE: {
+            handle: (donnees) => app.initLobby(donnees.parametres[0]),
+        },
+        COMBATTRE: {
+            handle: (donnees) => changerPosition(donnees.de, donnees.parametres[0]),
+        },
+        SIGNALER: {
+            handle: (donnees) => signal(donnees.parametres[0], donnees.parametres[1]),
+        },
+        MATCH_STATE: {
+            handle: (donnees) => {
+                if (!app.match) {
+                    app.match = {state: undefined};
+                }
+                app.match.state = donnees[0];
+            },
+        },
+        SALUER:{
+            handle: (donnees) => joueurSalue(donnees.de),
+        },
+        ATTAQUER: {
+            handle: () => {},
+        },
+        QUITTER: {
+            handle: (donnees) => {
+                app.removeFrom(donnees[0]);
+                app.dansLobby = false;
+            },
+        },
     });
     const Roles = Object.freeze({
-        SPECTATEUR: 'SPECTATEUR',
-        COMBATTANT: 'COMBATTANT',
-        ROUGE: 'ROUGE',
-        ARBITRE: 'ARBITRE',
-        BLANC: 'BLANC',
+        SPECTATEUR: {
+            val: 'SPECTATEUR',
+            remove: (lobbyPos) => app.spectateurs.splice(lobbyPos.position, 1, null),
+            set: (utilisateur, lobbyPos) => Vue.set(app.spectateurs, lobbyPos.position, utilisateur),
+        },
+        COMBATTANT: {
+            val: 'COMBATTANT',
+            remove: (lobbyPos) => app.combattants.splice(lobbyPos.position, 1, null),
+            set: (utilisateur, lobbyPos) => Vue.set(app.combattants, lobbyPos.position, utilisateur),
+        },
+        ROUGE: {
+            val: 'ROUGE',
+            remove: () => app.rouge = null,
+            set: (utilisateur) => app.rouge = utilisateur,
+        },
+        ARBITRE: {
+            val: 'ARBITRE',
+            remove: () => app.arbitre = null,
+            set: (utilisateur) => app.arbitre = utilisateur,
+        },
+        BLANC:  {
+            val: 'BLANC',
+            remove: () => app.blanc = null,
+            set: (utilisateur) => app.blanc = utilisateur,
+        },
     });
+    let websocket;
 
     app = new Vue({
         el: '#app',
@@ -43,11 +93,9 @@ $(document).ready(() => {
             arbitre: null,
             blanc: null,
             match: null,
+            dansLobby: false,
         },
         methods: {
-            handleMove: function(e) {
-                moveTo(e);
-            },
             initLobby: function(lobby){
                 for (let i = 0; i < lobby.spectateurs.length; i++) {
                     app.spectateurs.splice(i, 1, lobby.spectateurs[i]);
@@ -61,41 +109,49 @@ $(document).ready(() => {
                 app.arbitre = lobby.arbitre;
                 app.blanc = lobby.blanc;
                 app.match = lobby.match;
+                app.dansLobby = true;
             },
             removeFrom: function(lobbyPos) {
-                if (lobbyPos.role === Roles.SPECTATEUR) {
-                    app.spectateurs.splice(lobbyPos.position, 1, null);
-                } else if (lobbyPos.role === Roles.COMBATTANT) {
-                    app.combattants.splice(lobbyPos.position, 1, null);
-                } else if (lobbyPos.role === Roles.ARBITRE) {
-                    app.arbitre = null;
-                } else if (lobbyPos.role === Roles.ROUGE) {
-                    app.rouge = null;
-                } else if (lobbyPos.role === Roles.BLANC) {
-                    app.blanc = null;
-                }
+                Roles[lobbyPos.role].remove(lobbyPos);
             },
             setUser: function (utilisateur, lobbyPos) {
-                if (lobbyPos.role === Roles.SPECTATEUR) {
-                    Vue.set(app.spectateurs, lobbyPos.position, utilisateur);
-                } else if (lobbyPos.role === Roles.COMBATTANT) {
-                    Vue.set(app.combattants, lobbyPos.position, utilisateur);
-                } else if (lobbyPos.role === Roles.ARBITRE) {
-                    app.arbitre = utilisateur;
-                } else if (lobbyPos.role === Roles.ROUGE) {
-                    app.rouge = utilisateur;
-                } else if (lobbyPos.role === Roles.BLANC) {
-                    app.blanc = utilisateur;
+                Roles[lobbyPos.role].set(utilisateur, lobbyPos)
+
+                if (this.user.courriel === utilisateur.courriel) {
+                    this.user.roleCombat = lobbyPos.role;
                 }
-            }
+            },
+            debuterMatch: function() {
+                websocket.sendCommandTo(sendTopics.COMMAND, new Commande('COMBATTRE', [], app.user))
+            },
+            attaque: function(attaque) {
+                websocket.sendCommandTo(sendTopics.COMMAND, new Commande('ATTAQUER', [attaque], app.user))
+            },
+            position: function(position) {
+                websocket.sendCommandTo(sendTopics.COMMAND, new Commande('POSITION', [position], app.user))
+            },
+            saluer: function () {
+                websocket.sendCommandTo(sendTopics.COMMAND, new Commande('SALUER', [], app.user))
+            },
+            signaler : function (signal, cible) {
+                params = [signal];
+                if (cible) {
+                    params.push(cible);
+                }
+
+                websocket.sendCommandTo(sendTopics.COMMAND, new Commande('SIGNALER', params, app.user))
+            },
+            role: function(e) {
+                websocket.sendCommandTo(sendTopics.COMMAND, new Commande('ROLE', [e.role, e.index], app.user))
+            },
         }
     });
 
-    let websocket;
-
-    function moveTo(e) {
-        console.log(e);
-        websocket.sendCommandTo(sendTopics.COMMAND, new Commande(commandes.ROLE, [e.role, e.index], app.user))
+    function changerRole(utilisateur, newPos, oldPos) {
+        if (oldPos) {
+            app.removeFrom(oldPos);
+        }
+        app.setUser(utilisateur, newPos);
     }
 
     $.ajax("/api/monCompte", {
@@ -127,24 +183,7 @@ $(document).ready(() => {
             if (!command.donnees) return;
 
             const donnees = command.donnees;
-            switch(donnees.typeCommande) {
-                case commandes.JOINDRE:
-                    app.initLobby(donnees.parametres[0]);
-                    break;
-                case commandes.ROLE:
-                    changerRole(donnees.de, donnees.parametres[0], donnees.parametres[1], donnees.parametres[2]);
-                    break;
-                case commandes.QUITTER:
-                    app.removeFrom(donnees[0]);
-                    break;
-            }
-        }
-
-        function changerRole(utilisateur, newPos, oldPos) {
-            if (oldPos) {
-                app.removeFrom(oldPos);
-            }
-            app.setUser(utilisateur, newPos);
+            Commands[donnees.typeCommande].handle(donnees);
         }
 
         function heartbeat() {

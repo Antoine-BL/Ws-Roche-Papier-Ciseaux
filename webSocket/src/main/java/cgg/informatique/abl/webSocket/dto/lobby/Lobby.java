@@ -1,9 +1,7 @@
 package cgg.informatique.abl.webSocket.dto.lobby;
 
-import cgg.informatique.abl.webSocket.dto.match.Attack;
 import cgg.informatique.abl.webSocket.dto.match.Match;
 import cgg.informatique.abl.webSocket.dto.match.MatchHandler;
-import cgg.informatique.abl.webSocket.dto.SanitizedCompte;
 import cgg.informatique.abl.webSocket.dto.match.SerializableMatch;
 import cgg.informatique.abl.webSocket.entites.Avatar;
 import cgg.informatique.abl.webSocket.entites.Compte;
@@ -15,13 +13,12 @@ import cgg.informatique.abl.webSocket.messaging.ReponseCommande;
 import cgg.informatique.abl.webSocket.messaging.commands.TypeCommande;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.function.Predicate;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class Lobby implements Runnable, MatchHandler, SerializableLobby {
-    private static final String URL = "ws://localhost:8100/webSocket";
+    private static final int INDEX_ROUGE = 0;
+    private static final int INDEX_BLANC = 1;
     private static final String OUTPUT_TOPIC = "/topic/battle/lobby";
     public static final Compte COMPTE_LOBBY = Compte.Builder()
             .avecCourriel("lobby@server.ca")
@@ -44,8 +41,8 @@ public class Lobby implements Runnable, MatchHandler, SerializableLobby {
     private Thread lobbyThread;
 
     private List<LobbyUserData> users;
-    private LobbyUserData[] spectateurs;
-    private LobbyUserData[] combattants;
+    private RoleColl spectateurs;
+    private RoleColl combattants;
     private LobbyUserData rouge;
     private LobbyUserData blanc;
     private LobbyUserData arbitre;
@@ -53,14 +50,16 @@ public class Lobby implements Runnable, MatchHandler, SerializableLobby {
     private volatile LobbyState lobbyState;
     private Match matchInProgress;
     private final SimpMessagingTemplate messaging;
+    private LobbyContext lobbyContext;
 
     public Lobby(SimpMessagingTemplate messaging, LobbyContext ctxt) {
         this.messaging = messaging;
-        lobbyState = LobbyState.CLOSED;
+        this.lobbyContext = ctxt;
 
+        lobbyState = LobbyState.CLOSED;
         users = Collections.synchronizedList(new ArrayList<>(27));
-        spectateurs = new LobbyUserData[12];
-        combattants = new LobbyUserData[12];
+        spectateurs = new RoleColl(LobbyRole.SPECTATEUR);
+        combattants = new RoleColl(LobbyRole.COMBATTANT);
     }
 
     @Override
@@ -73,6 +72,7 @@ public class Lobby implements Runnable, MatchHandler, SerializableLobby {
             waitForPlayers();
             mainLoop();
             send("Lobby closed");
+            lobbyContext.lobbyClosed();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -135,14 +135,14 @@ public class Lobby implements Runnable, MatchHandler, SerializableLobby {
         waitForPlayers();
     }
 
-    private void send(String message) {
+    public void send(String message) {
         Reponse reponse = new Reponse(1L, COMPTE_LOBBY, message);
         synchronized (messaging) {
             messaging.convertAndSend(OUTPUT_TOPIC, reponse);
         }
     }
 
-    private void sendData(String message, DonneesReponseCommande donnees) {
+    public void sendData(String message, DonneesReponseCommande donnees) {
         ReponseCommande reponse = new ReponseCommande(COMPTE_LOBBY, message, donnees);
         synchronized (messaging) {
             messaging.convertAndSend(OUTPUT_TOPIC, reponse);
@@ -150,114 +150,24 @@ public class Lobby implements Runnable, MatchHandler, SerializableLobby {
     }
 
     private void sendData(DonneesReponseCommande donnees) {
-        ReponseCommande reponse = new ReponseCommande(donnees);
-        synchronized (messaging) {
-            messaging.convertAndSend(OUTPUT_TOPIC, reponse);
-        }
+        sendData(null, donnees);
     }
 
-
-    public void connect(SanitizedCompte u) {
+    public void connect(Compte u) {
         if (lobbyState == LobbyState.STANDBY) this.lobbyThread.interrupt();
-        if (users.stream().anyMatch(isPresent(u))) throw  new IllegalArgumentException("utilisateur déjà présent");
+        if (users.stream().anyMatch(u::equals)) throw  new IllegalArgumentException("utilisateur déjà présent");
 
-        LobbyUserData userData = new LobbyUserData(u, LobbyRole.SPECTATEUR);
+        LobbyUserData userData = new LobbyUserData(u, this);
 
         this.users.add(userData);
-        LobbyPosition position = addPlayer(userData, new LobbyPosition(LobbyRole.SPECTATEUR), spectateurs);
+        userData.becomeRole(new LobbyPosition(LobbyRole.SPECTATEUR));
 
         sendData("Bienvenue au lobby " + u.getAlias(), new DonneesReponseCommande(TypeCommande.JOINDRE, this.asSerializable()));
     }
 
-    private int addTo(LobbyUserData[] arr, LobbyUserData u) {
-        for (int i = 0;; i++) {
-            if (arr[i] == null) {
-                arr[i] = u;
-                return i;
-            }
-        }
-    }
-
-
-    private LobbyPosition addPlayer(LobbyUserData u, LobbyPosition destination, LobbyUserData[] arr) {
-        try {
-            if (destination.getPosition() == null) {
-                destination.setPosition(addTo(arr, u));
-            } else {
-                addTo(arr, u, destination.getPosition());
-            }
-
-            return destination;
-        } catch (IndexOutOfBoundsException e) {
-            e.printStackTrace();
-            throw new IllegalArgumentException("Nombre maximal de spectateurs déjà atteint");
-        }
-    }
-
-    private synchronized LobbyPosition removeFromCurrentRole(LobbyUserData u) {
-        switch (u.getRoleCombat()) {
-            case BLANC:
-                blanc = null;
-                return new LobbyPosition(LobbyRole.BLANC);
-            case ROUGE:
-                rouge = null;
-                return new LobbyPosition(LobbyRole.ROUGE);
-            case ARBITRE:
-                arbitre = null;
-                return new LobbyPosition(LobbyRole.ARBITRE);
-            case SPECTATEUR:
-                return removeFromList(u, spectateurs);
-            case COMBATTANT:
-                return removeFromList(u, combattants);
-            default:
-                return null;
-        }
-    }
-
-    private synchronized LobbyPosition switchToRole(LobbyUserData u, LobbyPosition destination) {
-        switch (destination.getRole()) {
-            case BLANC:
-                if (blanc != null)
-                    throw new IllegalArgumentException("il y a déjà un combattant blanc");
-                blanc = u;
-                break;
-            case ROUGE:
-                if (rouge != null)
-                    throw new IllegalArgumentException("Il y a déjà un combattant rouge");
-                rouge = u;
-                break;
-            case ARBITRE:
-                if (arbitre != null)
-                    throw new IllegalArgumentException("Il y a déjà un arbitre");
-                arbitre = u;
-                break;
-            case SPECTATEUR:
-                addPlayer(u, destination, spectateurs);
-                break;
-            case COMBATTANT:
-                addPlayer(u, destination, combattants);
-                break;
-        }
-
-        u.setRole(destination.getRole());
-
-        return destination;
-    }
-
-    private int addTo(LobbyUserData[] arr, LobbyUserData u, int index) {
-        if (arr[index] != null &&
-                !u.getUser().getCourriel().equals(arr[index].getUser().getCourriel())
-        ) throw new IllegalArgumentException("Un joueur occupe déjà cette position");
-
-        arr[index] = u;
-        return index;
-    }
-
-    public void devenirRole(LobbyUserData u, LobbyPosition position) {
-        LobbyPosition oldPos = removeFromCurrentRole(u);
-        LobbyPosition newPos = switchToRole(u, position);
-        sendData(u.getUser().getAlias() + " a maintenant le role de: " + position.getRole(),
-                new DonneesReponseCommande(TypeCommande.ROLE, u, newPos, oldPos));
+    public void posChanged(LobbyUserData user, LobbyPosition newPos, LobbyPosition oldPos) {
+        sendData(String.format("%s a maintenant le role de %s", user.getAlias(), user.getRoleCombat()),
+                new DonneesReponseCommande(TypeCommande.ROLE, user, newPos, oldPos));
     }
 
     public void quitter(LobbyUserData u) {
@@ -268,46 +178,17 @@ public class Lobby implements Runnable, MatchHandler, SerializableLobby {
         }
     }
 
-    private Predicate<LobbyUserData> isPresent(LobbyUserData utilisateur) {
-        return (cpt) -> cpt.equals(utilisateur);
-    }
-
-    private Predicate<LobbyUserData> isPresent(SanitizedCompte cpt) {
-        return (lud) -> cpt.getCourriel().equals(lud.getUser().getCourriel());
-    }
-
-
-    private synchronized LobbyPosition removeFromList(LobbyUserData utilisateur, List<LobbyUserData> liste) {
-        Predicate<LobbyUserData> cond = isPresent(utilisateur);
-        for (int i = 0; i < liste.size(); i++) {
-            if (cond.test(liste.get(i))) {
-                liste.remove(i);
-                return new LobbyPosition(utilisateur.getRoleCombat(), i);
-            }
-        }
-        return null;
-    }
-
-    private synchronized LobbyPosition removeFromList(LobbyUserData utilisateur, LobbyUserData[] liste) {
-        Predicate<LobbyUserData> cond = isPresent(utilisateur);
-        for (int i = 0; i < liste.length; i++) {
-            if (liste[i] != null && cond.test(liste[i])) {
-                liste[i] = null;
-                return new LobbyPosition(utilisateur.getRoleCombat(), i);
-            }
-        }
-        return null;
-    }
-
     private synchronized LobbyPosition removeFromLobby(LobbyUserData utilisateur) {
-        LobbyPosition pos = removeFromCurrentRole(utilisateur);
-        removeFromList(utilisateur, users);
+        LobbyPosition pos = utilisateur.leaveCurrentRole();
+
+        users.remove(utilisateur);
+
         return pos;
     }
 
-    public LobbyUserData getLobbyUserData(SanitizedCompte compte) throws IllegalArgumentException {
+    public LobbyUserData getLobbyUserData(Compte compte) throws IllegalArgumentException {
         return users.stream()
-                .filter((LobbyUserData lud) -> lud.getUser().getCourriel().equals(compte.getCourriel()))
+                .filter((LobbyUserData lud) -> lud.getUser().equals(compte))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Utilisateur " + compte.getAlias() + " n'existe pas dans ce lobby"));
     }
@@ -315,38 +196,65 @@ public class Lobby implements Runnable, MatchHandler, SerializableLobby {
     public void startMatch() {
         ensureReadyForMatch();
 
-        matchInProgress = new Match(arbitre, rouge, blanc, this);
+        LobbyUserData[] combattantsChoisis = choisirCombattants();
+
+        send(String.format("Combattants choisis: %s en blanc vs %s en rouge", combattantsChoisis[INDEX_BLANC].getCourriel(), combattantsChoisis[INDEX_ROUGE].getCourriel()));
+        matchInProgress = new Match(arbitre, combattantsChoisis[INDEX_ROUGE], combattantsChoisis[INDEX_BLANC], this);
     }
 
     private void ensureReadyForMatch() {
         if (matchInProgress != null) throw new IllegalStateException("Un match est déjà en cours.");
 
-        if (rouge == null) throw new IllegalStateException("Le combattant en rouge doit être présent");
-        if (blanc == null) throw new IllegalStateException("Le combattant en blanc doit être présent");
+        if (combattants.size() < 2) throw new IllegalStateException("Il faut un minimum de 2 combattants avant de débuter un combat");
         if (arbitre == null) throw new IllegalStateException("L'arbitre doit être présent");
+    }
+
+    private LobbyUserData[] choisirCombattants() {
+        List<LobbyUserData> combattantsNonNuls = Arrays.stream(this.combattants.getNonNull()).collect(Collectors.toList());
+        LobbyUserData rouge = retirerAleatoirement(combattantsNonNuls);
+
+        List<LobbyUserData> combattantsPossibles = trouverAdversairesPossibles(rouge, combattantsNonNuls);
+        LobbyUserData blanc = retirerAleatoirement(combattantsPossibles);
+
+        return new LobbyUserData[] {rouge, blanc};
+    }
+
+    private LobbyUserData retirerAleatoirement(List<LobbyUserData> elements){
+        Random random = new Random();
+
+        int indexChoisi = random.nextInt(elements.size());
+
+        return elements.remove(indexChoisi);
+    }
+
+    private List<LobbyUserData> trouverAdversairesPossibles(LobbyUserData rouge, List<LobbyUserData> combattantsAConsiderer) {
+        List<LobbyUserData> combattantsEgaux = new ArrayList<>();
+        int idCeinture = rouge.getGroupeObj().getId();
+        int ppDelta = Integer.MAX_VALUE;
+
+        for (LobbyUserData comb : combattantsAConsiderer) {
+            int delta = Math.abs(idCeinture - comb.getGroupeObj().getId());
+
+            if (delta <= ppDelta) {
+                ppDelta = delta;
+                combattantsEgaux.clear();
+                combattantsEgaux.add(comb);
+            } else if (delta == ppDelta) {
+                combattantsEgaux.add(comb);
+            }
+        }
+
+        return combattantsEgaux;
     }
 
     @Override
     public void matchEnded() {
         send("fin du match");
         matchInProgress = null;
-        blanc.setRole(LobbyRole.COMBATTANT);
-        rouge.setRole(LobbyRole.COMBATTANT);
     }
 
     public Match getCurrentMatch() {
         return matchInProgress;
-    }
-
-    @Override
-    public void sendMessage(String transitionMessage) {
-        send(transitionMessage);
-    }
-
-    @Override
-    public void sendRound(Attack blancAttack, Attack rougeAttack) {
-        sendData("Attaque du participant en blanc: " + blancAttack, new DonneesReponseCommande(TypeCommande.ATTAQUER, "blanc", blancAttack) );
-        sendData("Attaque du participant en rouge: " + rougeAttack, new DonneesReponseCommande(TypeCommande.ATTAQUER, "rouge", rougeAttack));
     }
 
     private boolean isEmpty() {
@@ -355,12 +263,20 @@ public class Lobby implements Runnable, MatchHandler, SerializableLobby {
 
     @Override
     public LobbyUserData[] getSpectateurs() {
-        return this.spectateurs;
+        return this.spectateurs.getContents();
     }
 
     @Override
     public LobbyUserData[] getCombattants() {
+        return this.combattants.getContents();
+    }
+
+    public RoleColl getCombattantsColl() {
         return this.combattants;
+    }
+
+    public RoleColl getSpectateursColl() {
+        return this.spectateurs;
     }
 
     @Override
@@ -386,5 +302,17 @@ public class Lobby implements Runnable, MatchHandler, SerializableLobby {
     @Override
     public SerializableLobby asSerializable() {
         return this;
+    }
+
+    public void setBlanc(LobbyUserData o) {
+        blanc = o;
+    }
+
+    public void setRouge(LobbyUserData rouge) {
+        this.rouge = rouge;
+    }
+
+    public void setArbitre(LobbyUserData arbitre) {
+        this.arbitre = arbitre;
     }
 }

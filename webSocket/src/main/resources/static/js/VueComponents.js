@@ -75,8 +75,6 @@ Vue.component('app-profile', {
         '                    <h5 class="dropdown-header font-weight-bold  text-light">Connecté en tant que: {{user.alias}}</h5>\n' +
         '                    <div class="dropdown-item-text text-light" >Rôle: {{user.role}}</div>\n' +
         '                    <div class="dropdown-item-text  text-light" >Groupe: {{user.groupe}}</div>\n' +
-        '                    <div class="dropdown-item-text  text-light" >Crédits: {{user.credits}}</div>\n' +
-        '                    <div class="dropdown-item-text  text-light" >Points: {{user.points}}</div>\n' +
         '                    <div class="dropdown-divider text-light"></div>\n' +
         '                    <form action="/deconnexion" method="GET">\n' +
         '                        <button class="dropdown-item text-light deconnexion" type="submit">Déconnexion</button>\n' +
@@ -86,13 +84,14 @@ Vue.component('app-profile', {
 });
 
 Vue.component('app-rangee', {
-    props: ['initialUsers', 'role'],
+    props: ['initialUsers', 'role', 'disabled'],
     template: '<div class="row justify-content-center">' +
         '<app-slot v-on:move-to="moveTo"' +
         ' v-for="(u, i) in users"' +
         ' v-bind:user="u"' +
         ' v-bind:index="i"' +
-        ' v-bind:role="role">' +
+        ' v-bind:role="role"' +
+        ' v-bind:disabled="disabled">' +
         '</app-slot>' +
         '</div>',
     data : function () { return {
@@ -109,13 +108,104 @@ Vue.component('app-rangee', {
 });
 
 Vue.component('app-slot', {
-    props: ['user', 'index', 'role'],
-    template: '<div v-on:click="click" class="col-2 col-xl-1 slot"><img v-bind:src="user == null ? \'/images/anonyme.jpg\' : \'/api/avatars/\' + user.avatarId"></div>',
+    props: ['user', 'index', 'role', 'disabled'],
+    template: '<div v-on:click="click" v-bind:class="[\'col-2\',\'col-xl-1\', disabled ? \'slot-disabled\' : \'slot\']"><img v-bind:src="user == null ? \'/images/anonyme.jpg\' : \'/api/avatars/\' + user.avatarId"></div>',
     methods: {
         click: function (e) {
-            if (!this.user) {
+            if (!this.user && !this.disabled) {
                 this.$emit('move-to', this);
             }
         }
+    }
+});
+
+Vue.component('app-controls', {
+    props: ['role', 'match'],
+    template:
+        '<div class="w-100 align-items-center row flex-column border p-1">' +
+            '<h4>Controles pour {{role}}</h4>' +
+            '<div>' +
+                '<div v-if="role == \'ARBITRE\' && !match" class="inline-form"></div>' +
+                    '<button v-if="!match" v-on:click="debuterMatch " class="btn btn-primary">Débuter match</button>' +
+                '</div>' +
+                '<div v-if="role == \'ARBITRE\' && match" class="inline-form">' +
+                    '<div v-if="match.state == \'WAITING\'" class="btn-group">' +
+                        '<button v-on:click="signaler(\'REI\')" class="btn btn-primary">REI!</button>' +
+                    '</div>' +
+                    '<div v-if="match.state == \'READY\'" class="btn-group">' +
+                        '<button v-on:click="signaler(\'HAJIME\')" class="btn btn-primary">HAJIME!</button>' +
+                    '</div>' +
+                    '<div v-if="match.state == \'DECIDE\'" class="form-group">' +
+                        '<b-form-radio-group ' +
+                            'buttons ' +
+                            'v-model="decision" ' +
+                            'buttons-variant="primary" ' +
+                            ':options="attaques"> ' +
+                        '</b-form-radio-group>' +
+                        '<button class="btn btn-primary">IPPON!</button>' +
+                    '</div>' +
+                    '<div v-if="match.state == \'EXIT\'" class="form-group">' +
+                        '<button class="btn btn-primary">Rester?</button>' +
+                    '</div>' +
+                '</div>' +
+                '<div v-if="role == \'ROUGE\' || role == \'BLANC\'" class="inline-form">' +
+                    '<h4 v-if="match.state == \'DECIDE\'">Attente de la décision de l\'arbitre...</h4>' +
+                    '<h4 v-if="match.state == \'EXIT\'">Vous pouvez maintenant saluer votre adversaire et regagner l\'aire d\'attente</h4>' +
+                    '<div v-if="match.state == \'READY\' || match.state == \'EXIT\'" class="btn-group">' +
+                        '<button class="btn btn-primary" v-on:click="saluer">Saluer</button>' +
+                        '<button v-if="match.state == \'READY\'" v-on:click="position(\'TATAMI\')" class="btn btn-primary">Entrer sur le tatami</button>' +
+                    '</div>' +
+                    '<div v-if="match.state == \'START\'" class="btn-group">' +
+                        '<b-form-radio-group ' +
+                                'buttons ' +
+                                'v-model="attaque" ' +
+                                'buttons-variant="primary" ' +
+                                ':options="attaques">' +
+                        '</b-form-radio-group>' +
+                        '<button class="btn btn-primary" v-on:click="attaque">Attaquer</button>' +
+                    '</div>' +
+                '</div>' +
+            '</div>' +
+        '</div>',
+    data: function() {
+        return {
+            attaque: "PAPIER",
+            decision: "NUL",
+            attaques: [
+                { text: 'Roche', value: 'ROCHE' },
+                { text: 'Papier', value: 'PAPIER' },
+                { text: 'Ciseaux', value: 'CISEAUX' },
+            ],
+            decisions: [
+                { text: 'Rouge', value: 'ROUGE' },
+                { text: 'Nul', value: 'NUL' },
+                { text: 'Blanc', value: 'BLANC' },
+            ],
+        }
+    },
+    computed: {
+        btnStates () {
+            return this.buttons.map(btn => btn.state)
+        }
+    },
+    methods: {
+        debuterMatch: function() {
+            this.$emit('debuter-match');
+        },
+        decision: function() {
+            this.$emit('signal', 'IPPON', this.decision);
+        },
+        attaque: function() {
+            this.$emit('attaque', this.attaque);
+        },
+        position: function(position) {
+            this.$emit('position', position);
+        },
+        saluer: function () {
+            this.$emit('saluer');
+        },
+        signaler : function (signal) {
+            this.$emit('signaler', signal);
+        },
     }
 });
