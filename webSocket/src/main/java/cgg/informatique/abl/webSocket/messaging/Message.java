@@ -1,23 +1,24 @@
 package cgg.informatique.abl.webSocket.messaging;
 
-import cgg.informatique.abl.webSocket.dto.SanitizedCompte;
+import cgg.informatique.abl.webSocket.entites.Compte;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public abstract class Message {
-
-    private SanitizedCompte de;
+    @JsonIgnore
+    private Compte de;
 
     public Message() {
     }
 
-    public Message(SanitizedCompte de) {
+    public Message(Compte de) {
         this.de = de;
     }
 
-    public SanitizedCompte getDe() {
+    public Compte getDe() {
         return de;
     }
 
-    public void setDe(SanitizedCompte de) {
+    public void setDe(Compte de) {
         this.de = de;
     }
 }

@@ -1,6 +1,5 @@
 package cgg.informatique.abl.webSocket.messaging.commands;
 
-import cgg.informatique.abl.webSocket.dto.SanitizedCompte;
 import cgg.informatique.abl.webSocket.entites.Avatar;
 import cgg.informatique.abl.webSocket.entites.Compte;
 import cgg.informatique.abl.webSocket.entites.Groupe;
@@ -27,7 +26,7 @@ public abstract class Commande extends Message {
 
     public Commande(){}
 
-    public Commande(SanitizedCompte de, List<String> parametres) {
+    public Commande(Compte de, List<String> parametres) {
         super(de);
         this.parametres = parametres;
     }

@@ -1,6 +1,7 @@
 package cgg.informatique.abl.webSocket.messaging.commands;
 
 import cgg.informatique.abl.webSocket.dto.lobby.Lobby;
+import cgg.informatique.abl.webSocket.dto.lobby.LobbyPosition;
 import cgg.informatique.abl.webSocket.dto.lobby.LobbyRole;
 import cgg.informatique.abl.webSocket.dto.lobby.LobbyUserData;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -19,12 +20,17 @@ public class ChangerRole extends Commande{
             if (parametres.size() >= 1) {
                 LobbyRole role = LobbyRole.valueOf(parametres.get(ROLE_INDEX).toUpperCase());
                 Lobby lobby = context.getLobby();
+                LobbyUserData user = lobby.getLobbyUserData(getDe());
 
+                LobbyPosition position = new LobbyPosition(role);
                 if (parametres.size() >= 2 && parametres.get(POSITION) != null) {
-                    role.changeRole(lobby, getDe(), Integer.parseInt(parametres.get(POSITION)));
-                } else {
-                    role.changeRole(lobby, getDe());
+                    int index = Integer.parseInt(parametres.get(POSITION));
+                    position.setPosition(index);
                 }
+
+                user.checkCanGoTo(position);
+                user.becomeRole(position);
+
                 lobby.getLobbyUserData(getDe()).sentCommand();
             } else {
                 Lobby lobby = context.getLobby();

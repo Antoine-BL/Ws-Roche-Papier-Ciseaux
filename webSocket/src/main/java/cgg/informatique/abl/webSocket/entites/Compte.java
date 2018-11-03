@@ -2,6 +2,7 @@ package cgg.informatique.abl.webSocket.entites;
 
 import cgg.informatique.abl.webSocket.dto.CompteDto;
 import cgg.informatique.abl.webSocket.dto.SanitizedCompte;
+import cgg.informatique.abl.webSocket.dto.UserBase;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -14,7 +15,7 @@ import java.util.Objects;
 
 @Entity
 @Table(name="COMPTES")
-public class Compte implements UserDetails, SanitizedCompte {
+public class Compte extends UserBase implements UserDetails, SanitizedCompte {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -138,6 +139,10 @@ public class Compte implements UserDetails, SanitizedCompte {
         return true;
     }
 
+    public Groupe getGroupeObj() {
+        return this.groupe;
+    }
+
     public static class Builder implements CourrielBuilder, MotPasseBuilder{
         private String courriel;
         private String motPasse;
@@ -202,25 +207,6 @@ public class Compte implements UserDetails, SanitizedCompte {
 
     public interface MotPasseBuilder {
         Builder avecMotDePasse(String motPasse);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Compte compte = (Compte) o;
-        return  Objects.equals(id, compte.id) &&
-                Objects.equals(courriel, compte.courriel) &&
-                Objects.equals(motPasse, compte.motPasse) &&
-                Objects.equals(alias, compte.alias) &&
-                Objects.equals(avatar, compte.avatar) &&
-                role == compte.role &&
-                groupe == compte.groupe;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, courriel, motPasse, alias, avatar, role, groupe);
     }
 }
 

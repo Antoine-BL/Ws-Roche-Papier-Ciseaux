@@ -17,7 +17,7 @@ public class Combattre extends Commande{
 
             if (lud.getRoleCombat() != LobbyRole.ARBITRE) throw new IllegalArgumentException("Doit être l'arbitre");
             lobby.startMatch();
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException | IllegalStateException e) {
             send("Échec du combat. Raison: " + e.getMessage(), context);
         }
     }
