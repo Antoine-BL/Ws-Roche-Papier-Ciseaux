@@ -120,22 +120,22 @@ Vue.component('app-slot', {
 });
 
 Vue.component('app-controls', {
-    props: ['role', 'match'],
+    props: ['role', 'state'],
     template:
         '<div class="w-100 align-items-center row flex-column border p-1">' +
             '<h4>Controles pour {{role}}</h4>' +
             '<div>' +
-                '<div v-if="role == \'ARBITRE\' && !match" class="inline-form"></div>' +
-                    '<button v-if="!match" v-on:click="debuterMatch " class="btn btn-primary">Débuter match</button>' +
+                '<div v-if="role == \'ARBITRE\' && state == \'OVER\'" class="inline-form"></div>' +
+                    '<button v-if="state == \'OVER\'" v-on:click="debuterMatch " class="btn btn-primary">Débuter match</button>' +
                 '</div>' +
-                '<div v-if="role == \'ARBITRE\' && match" class="inline-form">' +
-                    '<div v-if="match.state == \'WAITING\'" class="btn-group">' +
+                '<div v-if="role == \'ARBITRE\' && state != \'OVER\'" class="inline-form">' +
+                    '<div v-if="state == \'WAITING\'" class="btn-group">' +
                         '<button v-on:click="signaler(\'REI\')" class="btn btn-primary">REI!</button>' +
                     '</div>' +
-                    '<div v-if="match.state == \'READY\'" class="btn-group">' +
+                    '<div v-if="state == \'READY\'" class="btn-group">' +
                         '<button v-on:click="signaler(\'HAJIME\')" class="btn btn-primary">HAJIME!</button>' +
                     '</div>' +
-                    '<div v-if="match.state == \'DECIDE\'" class="form-group">' +
+                    '<div v-if="state == \'DECIDE\'" class="form-group">' +
                         '<b-form-radio-group ' +
                             'buttons ' +
                             'v-model="decision" ' +
@@ -144,18 +144,18 @@ Vue.component('app-controls', {
                         '</b-form-radio-group>' +
                         '<button class="btn btn-primary">IPPON!</button>' +
                     '</div>' +
-                    '<div v-if="match.state == \'EXIT\'" class="form-group">' +
+                    '<div v-if="state == \'EXIT\'" class="form-group">' +
                         '<button class="btn btn-primary">Rester?</button>' +
                     '</div>' +
                 '</div>' +
                 '<div v-if="role == \'ROUGE\' || role == \'BLANC\'" class="inline-form">' +
-                    '<h4 v-if="match.state == \'DECIDE\'">Attente de la décision de l\'arbitre...</h4>' +
-                    '<h4 v-if="match.state == \'EXIT\'">Vous pouvez maintenant saluer votre adversaire et regagner l\'aire d\'attente</h4>' +
-                    '<div v-if="match.state == \'READY\' || match.state == \'EXIT\'" class="btn-group">' +
+                    '<h4 v-if="state == \'DECIDE\'">Attente de la décision de l\'arbitre...</h4>' +
+                    '<h4 v-if="state == \'EXIT\'">Vous pouvez maintenant saluer votre adversaire et regagner l\'aire d\'attente</h4>' +
+                    '<div v-if="state == \'READY\' || state == \'EXIT\'" class="btn-group">' +
                         '<button class="btn btn-primary" v-on:click="saluer">Saluer</button>' +
-                        '<button v-if="match.state == \'READY\'" v-on:click="position(\'TATAMI\')" class="btn btn-primary">Entrer sur le tatami</button>' +
+                        '<button v-if="state == \'READY\'" v-on:click="position(\'TATAMI\')" class="btn btn-primary">Entrer sur le tatami</button>' +
                     '</div>' +
-                    '<div v-if="match.state == \'START\'" class="btn-group">' +
+                    '<div v-if="state == \'START\'" class="btn-group">' +
                         '<b-form-radio-group ' +
                                 'buttons ' +
                                 'v-model="attaque" ' +

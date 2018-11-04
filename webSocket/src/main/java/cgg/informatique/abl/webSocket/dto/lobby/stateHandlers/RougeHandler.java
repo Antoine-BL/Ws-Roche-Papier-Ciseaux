@@ -19,7 +19,8 @@ public class RougeHandler extends LobbyRoleHandler {
 
     @Override
     public LobbyPosition addToRole(LobbyUserData user, Integer position) {
-        return null;
+        getContext().setRouge(user);
+        return new LobbyPosition(LobbyRole.ROUGE);
     }
 
     @Override
@@ -29,7 +30,7 @@ public class RougeHandler extends LobbyRoleHandler {
         if (currentMatch == null)
             throw new IllegalStateException("Aucun match en cours");
 
-        if (!user.getCourriel().equals(currentMatch.getRouge().getCourriel()))
+        if (!user.equals(currentMatch.getRouge()))
             throw new IllegalArgumentException("Ce n'est pas à votre tour de combattre");
     }
 }

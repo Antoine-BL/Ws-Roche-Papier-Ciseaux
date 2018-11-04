@@ -40,8 +40,10 @@ public class ChangerRole extends Commande{
                 send("Role est: " + role, context);
             }
         } catch (NumberFormatException e) {
+            e.printStackTrace();
             send("Echec du changement de rôle. Raison: La position donnée doit être un eniter valide", context);
         } catch (Exception e){
+            e.printStackTrace();
             send("Echec du changement de rôle. Raison: " + e.getMessage(), context);
         }
     }

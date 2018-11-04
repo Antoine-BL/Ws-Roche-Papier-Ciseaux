@@ -9,7 +9,7 @@ public class LobbyUserData extends UserBase implements SanitizedCompte{
     private static int SECONDS = 1000;
     private static int MINUTES = 60 * SECONDS;
     private static int ACTIVE_TIMEOUT = 60 * MINUTES;
-    private static int PASSIVE_TIMEOUT = 90 * SECONDS;
+    private static int PASSIVE_TIMEOUT = 10000 * SECONDS;
     private static int INACTIVE_THRESHOLD = 15 * SECONDS;
     private int position = 0;
     private LobbyRole role;

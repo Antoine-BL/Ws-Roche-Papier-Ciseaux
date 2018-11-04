@@ -85,13 +85,6 @@ class WebSocketClient {
     sendCommandTo(topic, message) {
         message = message ? message : this.readCommand();
 
-        if (this.user.roleCombat) {
-            delete this.user.roleCombat;
-        }
-        if (this.user.position) {
-            delete this.user.position;
-        }
-
         this.stompClient.send(
             topic,
             {},

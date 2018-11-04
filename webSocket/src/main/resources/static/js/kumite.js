@@ -1,8 +1,7 @@
 class Commande{
-    constructor (type, params, de) {
+    constructor (type, params) {
         this.typeCommande = type;
         this.parametres = params;
-        this.de = de;
     }
 }
 const debugDisabled = true;
@@ -33,12 +32,7 @@ $(document).ready(() => {
             handle: (donnees) => signal(donnees.parametres[0], donnees.parametres[1]),
         },
         MATCH_STATE: {
-            handle: (donnees) => {
-                if (!app.match) {
-                    app.match = {state: undefined};
-                }
-                app.match.state = donnees[0];
-            },
+            handle: (donnees) => app.state = donnees.parametres[0],
         },
         SALUER:{
             handle: (donnees) => joueurSalue(donnees.de),
@@ -92,14 +86,13 @@ $(document).ready(() => {
             rouge: null,
             arbitre: null,
             blanc: null,
-            match: null,
+            state: 'OVER',
             dansLobby: false,
         },
         methods: {
             initLobby: function(lobby){
                 for (let i = 0; i < lobby.spectateurs.length; i++) {
                     app.spectateurs.splice(i, 1, lobby.spectateurs[i]);
-
                 }
                 for (let i = 0; i < lobby.combattants.length; i++) {
                     app.combattants.splice(i, 1, lobby.combattants[i]);
@@ -108,7 +101,7 @@ $(document).ready(() => {
                 app.rouge = lobby.rouge;
                 app.arbitre = lobby.arbitre;
                 app.blanc = lobby.blanc;
-                app.match = lobby.match;
+                app.state = lobby.match ? lobby.match.state : 'OVER';
                 app.dansLobby = true;
             },
             removeFrom: function(lobbyPos) {
@@ -118,20 +111,21 @@ $(document).ready(() => {
                 Roles[lobbyPos.role].set(utilisateur, lobbyPos)
 
                 if (this.user.courriel === utilisateur.courriel) {
+                    console.log('setUser');
                     this.user.roleCombat = lobbyPos.role;
                 }
             },
             debuterMatch: function() {
-                websocket.sendCommandTo(sendTopics.COMMAND, new Commande('COMBATTRE', [], app.user))
+                websocket.sendCommandTo(sendTopics.COMMAND, new Commande('COMBATTRE', []))
             },
             attaque: function(attaque) {
-                websocket.sendCommandTo(sendTopics.COMMAND, new Commande('ATTAQUER', [attaque], app.user))
+                websocket.sendCommandTo(sendTopics.COMMAND, new Commande('ATTAQUER', [attaque]))
             },
             position: function(position) {
-                websocket.sendCommandTo(sendTopics.COMMAND, new Commande('POSITION', [position], app.user))
+                websocket.sendCommandTo(sendTopics.COMMAND, new Commande('POSITION', [position]))
             },
             saluer: function () {
-                websocket.sendCommandTo(sendTopics.COMMAND, new Commande('SALUER', [], app.user))
+                websocket.sendCommandTo(sendTopics.COMMAND, new Commande('SALUER', []))
             },
             signaler : function (signal, cible) {
                 params = [signal];
@@ -139,10 +133,10 @@ $(document).ready(() => {
                     params.push(cible);
                 }
 
-                websocket.sendCommandTo(sendTopics.COMMAND, new Commande('SIGNALER', params, app.user))
+                websocket.sendCommandTo(sendTopics.COMMAND, new Commande('SIGNALER', params))
             },
             role: function(e) {
-                websocket.sendCommandTo(sendTopics.COMMAND, new Commande('ROLE', [e.role, e.index], app.user))
+                websocket.sendCommandTo(sendTopics.COMMAND, new Commande('ROLE', [e.role, e.index]))
             },
         }
     });
@@ -181,7 +175,6 @@ $(document).ready(() => {
 
         function handleCommand(command) {
             if (!command.donnees) return;
-
             const donnees = command.donnees;
             Commands[donnees.typeCommande].handle(donnees);
         }

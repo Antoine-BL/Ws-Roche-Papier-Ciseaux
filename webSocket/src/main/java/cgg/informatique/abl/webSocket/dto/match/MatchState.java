@@ -1,7 +1,7 @@
 package cgg.informatique.abl.webSocket.dto.match;
 
 public enum MatchState {
-    WAITING(60, "Que les combattants se présentent à l'avant"),
+    WAITING(10000000, "Que les combattants se présentent à l'avant"),
     READY(60, "Rei!"),
     START(10, "Hajime!"),
     DECIDE(20, "L'arbitre doit décider d'un verdict"),

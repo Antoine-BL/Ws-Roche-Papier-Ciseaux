@@ -35,7 +35,7 @@
                               v-on:signaler="signaler"
                               v-if="user && user.roleCombat && user.roleCombat != 'SPECTATEUR' && user.roleCombat != 'COMBATTANT'"
                               v-bind:role="user.roleCombat"
-                              v-bind:match="match">
+                              v-bind:state="state">
                 </app-controls>
                 <div class="row justify-content-center">
                     Spectateurs:
@@ -57,7 +57,7 @@
                 <div class="row justify-content-between">
                     <app-slot v-on:move-to="role"
                               v-bind:user="blanc"
-                              v-bind:disabled="match == null"
+                              v-bind:disabled="state == 'OVER'"
                               role="blanc"></app-slot>
                     <app-slot v-on:move-to="role"
                               v-bind:user="arbitre"
@@ -65,7 +65,7 @@
                               role="arbitre"></app-slot>
                     <app-slot v-on:move-to="role"
                               v-bind:user="rouge"
-                              v-bind:disabled="match == null"
+                              v-bind:disabled="state == 'OVER'"
                               role="rouge"></app-slot>
                 </div>
             </div>

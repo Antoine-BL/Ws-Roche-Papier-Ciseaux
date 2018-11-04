@@ -2,16 +2,8 @@ package cgg.informatique.abl.webSocket.dto;
 
 import java.util.Objects;
 
-public class UserBase {
-    private String courriel;
-
-    public String getCourriel() {
-        return courriel;
-    }
-
-    public void setCourriel(String courriel) {
-        this.courriel = courriel;
-    }
+public abstract class UserBase {
+    public abstract String getCourriel();
 
     @Override
     public boolean equals(Object o) {
@@ -23,6 +15,6 @@ public class UserBase {
 
     @Override
     public int hashCode() {
-        return Objects.hash(courriel);
+        return Objects.hash(getCourriel());
     }
 }
