@@ -14,12 +14,12 @@ import cgg.informatique.abl.webSocket.messaging.commands.TypeCommande;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class Lobby implements Runnable, MatchHandler, SerializableLobby {
     private static final int INDEX_ROUGE = 0;
     private static final int INDEX_BLANC = 1;
     private static final String OUTPUT_TOPIC = "/topic/battle/lobby";
+    private static final String OUTPUT_TOPIC_COMMAND = "/topic/battle/command";
     public static final Compte COMPTE_LOBBY = Compte.Builder()
             .avecCourriel("lobby@server.ca")
             .avecMotDePasse("")
@@ -174,8 +174,17 @@ public class Lobby implements Runnable, MatchHandler, SerializableLobby {
         LobbyPosition pos = removeFromLobby(u);
         if (pos != null) {
             sendData(u.getUser().getAlias() + " a quitté",
-                    new DonneesReponseCommande(TypeCommande.QUITTER, pos));
+                    new DonneesReponseCommande(TypeCommande.QUITTER, u, pos));
+            sendDataTo(u.getUser().getAlias() + " a quitté",
+                    new DonneesReponseCommande(TypeCommande.QUITTER, u, pos));
         }
+    }
+
+    private void sendDataTo(String message, DonneesReponseCommande donneesReponseCommande) {
+        this.messaging.convertAndSendToUser(
+                donneesReponseCommande.getDe().getCourriel(),
+                OUTPUT_TOPIC_COMMAND,
+                new ReponseCommande(COMPTE_LOBBY, message, donneesReponseCommande));
     }
 
     private synchronized LobbyPosition removeFromLobby(LobbyUserData utilisateur) {
@@ -196,10 +205,11 @@ public class Lobby implements Runnable, MatchHandler, SerializableLobby {
     public void startMatch() {
         ensureReadyForMatch();
 
-        LobbyUserData[] combattantsChoisis = choisirCombattants();
+        Match match = new Match(this.arbitre, this);
+        match.choisirParticipantsParmi(combattants);
 
-        send(String.format("Combattants choisis: %s en blanc vs %s en rouge", combattantsChoisis[INDEX_BLANC].getCourriel(), combattantsChoisis[INDEX_ROUGE].getCourriel()));
-        matchInProgress = new Match(arbitre, combattantsChoisis[INDEX_ROUGE], combattantsChoisis[INDEX_BLANC], this);
+        send(String.format("Combattants choisis: %s en blanc vs %s en rouge", match.getBlanc().getCourriel(), match.getRouge().getCourriel()));
+        matchInProgress = match;
     }
 
     private void ensureReadyForMatch() {
@@ -207,44 +217,6 @@ public class Lobby implements Runnable, MatchHandler, SerializableLobby {
 
         if (combattants.size() < 2) throw new IllegalStateException("Il faut un minimum de 2 combattants avant de débuter un combat");
         if (arbitre == null) throw new IllegalStateException("L'arbitre doit être présent");
-    }
-
-    private LobbyUserData[] choisirCombattants() {
-        List<LobbyUserData> combattantsNonNuls = Arrays.stream(this.combattants.getNonNull()).collect(Collectors.toList());
-        LobbyUserData rouge = retirerAleatoirement(combattantsNonNuls);
-
-        List<LobbyUserData> combattantsPossibles = trouverAdversairesPossibles(rouge, combattantsNonNuls);
-        LobbyUserData blanc = retirerAleatoirement(combattantsPossibles);
-
-        return new LobbyUserData[] {rouge, blanc};
-    }
-
-    private LobbyUserData retirerAleatoirement(List<LobbyUserData> elements){
-        Random random = new Random();
-
-        int indexChoisi = random.nextInt(elements.size());
-
-        return elements.remove(indexChoisi);
-    }
-
-    private List<LobbyUserData> trouverAdversairesPossibles(LobbyUserData rouge, List<LobbyUserData> combattantsAConsiderer) {
-        List<LobbyUserData> combattantsEgaux = new ArrayList<>();
-        int idCeinture = rouge.getGroupeObj().getId();
-        int ppDelta = Integer.MAX_VALUE;
-
-        for (LobbyUserData comb : combattantsAConsiderer) {
-            int delta = Math.abs(idCeinture - comb.getGroupeObj().getId());
-
-            if (delta <= ppDelta) {
-                ppDelta = delta;
-                combattantsEgaux.clear();
-                combattantsEgaux.add(comb);
-            } else if (delta == ppDelta) {
-                combattantsEgaux.add(comb);
-            }
-        }
-
-        return combattantsEgaux;
     }
 
     @Override

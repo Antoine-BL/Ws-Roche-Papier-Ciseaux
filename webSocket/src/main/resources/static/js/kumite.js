@@ -37,13 +37,18 @@ $(document).ready(() => {
         SALUER:{
             handle: (donnees) => joueurSalue(donnees.de),
         },
+        POSITION: {
+            handle: f => f,
+        },
         ATTAQUER: {
-            handle: () => {},
+            handle: f => f,
         },
         QUITTER: {
             handle: (donnees) => {
-                app.removeFrom(donnees[0]);
-                app.dansLobby = false;
+                app.removeFrom(donnees.parametres[0]);
+                if (donnees.de.courriel === app.user.courriel) {
+                    app.dansLobby = false;
+                }
             },
         },
     });
@@ -176,6 +181,7 @@ $(document).ready(() => {
         function handleCommand(command) {
             if (!command.donnees) return;
             const donnees = command.donnees;
+            console.log(donnees);
             Commands[donnees.typeCommande].handle(donnees);
         }
 
@@ -194,6 +200,7 @@ $(document).ready(() => {
                     websocket.subscribeTo(subscribeTopics.LOBBY, 'chat-lobby', 'Lobby', handleCommand)
                 }
                 else if (commandName === "QUITTER") {
+                    app.dansLobby = false;
                     window.clearInterval(heartbeatIntervalId);
                     websocket.unsubscribeFrom(subscribeTopics.LOBBY);
                 }

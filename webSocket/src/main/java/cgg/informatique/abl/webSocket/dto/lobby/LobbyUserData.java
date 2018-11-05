@@ -2,8 +2,11 @@ package cgg.informatique.abl.webSocket.dto.lobby;
 
 import cgg.informatique.abl.webSocket.dto.SanitizedCompte;
 import cgg.informatique.abl.webSocket.dto.UserBase;
+import cgg.informatique.abl.webSocket.entites.Combat;
 import cgg.informatique.abl.webSocket.entites.Compte;
 import cgg.informatique.abl.webSocket.entites.Groupe;
+
+import java.util.List;
 
 public class LobbyUserData extends UserBase implements SanitizedCompte{
     private static int SECONDS = 1000;
@@ -65,6 +68,12 @@ public class LobbyUserData extends UserBase implements SanitizedCompte{
         lobby.posChanged(this, newPos, oldPos);
     }
 
+    public int skillDeltaWith(LobbyUserData user) {
+        int delta = user.getGroupeObj().getId() - this.getGroupeObj().getId();
+
+        return Math.abs(delta);
+    }
+
     public Compte getUser() {
         return user;
     }
@@ -92,6 +101,21 @@ public class LobbyUserData extends UserBase implements SanitizedCompte{
 
     public Groupe getGroupeObj() {
         return user.getGroupeObj();
+    }
+
+    @Override
+    public List<Combat> getCombatsRouge() {
+        return user.getCombatsRouge();
+    }
+
+    @Override
+    public List<Combat> getCombatsBlanc() {
+        return user.getCombatsBlanc();
+    }
+
+    @Override
+    public List<Combat> getCombatsArbitre() {
+        return user.getCombatsArbitre();
     }
 
     @Override

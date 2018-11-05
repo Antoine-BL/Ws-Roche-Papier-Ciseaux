@@ -1,8 +1,5 @@
 package cgg.informatique.abl.webSocket.dto.lobby;
 
-import cgg.informatique.abl.webSocket.dto.UserBase;
-import org.apache.commons.lang3.ArrayUtils;
-
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Random;
@@ -60,15 +57,13 @@ public class RoleColl{
     }
 
 
-    public int getRandomSpot() {
-        int[] freeIndices = getFreeIndices().toArray();
-
-        if (freeIndices.length == 0) throw new IllegalStateException("Il n'y a aucune place " + role + " de disponible");
+    public <T> T getRandomFrom(T[] list) {
+        if (list.length == 0) throw new IllegalArgumentException("Liste est vide!");
 
         Random rdm = ThreadLocalRandom.current();
-        int randomIndex = rdm.nextInt(freeIndices.length);
+        int randomIndex = rdm.nextInt(list.length);
 
-        return freeIndices[randomIndex];
+        return list[randomIndex];
     }
 
     public LobbyPosition removeUser(LobbyUserData user) {
@@ -101,5 +96,23 @@ public class RoleColl{
         } else {
             if (contents[position] != null) throw new IllegalStateException("Il y a déjà un " + role + " qui occupe cette position");
         }
+    }
+
+    public LobbyUserData getRandomUser() {
+        return getRandomFrom(getNonNull());
+    }
+
+    public LobbyUserData getBestOpponentFor(LobbyUserData u) {
+        int lowestDelta = Arrays.stream(getNonNull())
+            .map(u::skillDeltaWith)
+            .min((delta1, delta2) -> delta1 < delta2 ? delta1 : delta2)
+            .orElseThrow(() -> new IllegalArgumentException("Aucun adversaire"));
+
+        LobbyUserData[] participantsWithLowestDelta =
+                Arrays.stream(getNonNull())
+                .filter(user -> u.skillDeltaWith(user) == lowestDelta)
+                .toArray(LobbyUserData[]::new);
+
+        return getRandomFrom(participantsWithLowestDelta);
     }
 }

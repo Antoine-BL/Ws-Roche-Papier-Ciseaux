@@ -5,6 +5,7 @@ import cgg.informatique.abl.webSocket.dto.lobby.LobbyPosition;
 import cgg.informatique.abl.webSocket.dto.lobby.LobbyRole;
 import cgg.informatique.abl.webSocket.dto.lobby.LobbyUserData;
 import cgg.informatique.abl.webSocket.dto.match.Match;
+import cgg.informatique.abl.webSocket.dto.match.MatchState;
 
 public class RougeHandler extends LobbyRoleHandler {
     public RougeHandler(Lobby context) {
@@ -14,6 +15,13 @@ public class RougeHandler extends LobbyRoleHandler {
     @Override
     public LobbyPosition removeFromRole(LobbyUserData user) {
         getContext().setRouge(null);
+        Match match = getContext().getCurrentMatch();
+        MatchState state = match == null ? MatchState.OVER : match.getMatchState();
+
+        if (state != MatchState.OVER && state != MatchState.EXIT) {
+            match.rougeLeft();
+        }
+
         return new LobbyPosition(LobbyRole.ROUGE);
     }
 

@@ -11,3 +11,5 @@ INSERT INTO COMPTES (id, courriel, mot_passe, alias, avatar, role, groupe) VALUE
 --Password:p
 INSERT INTO COMPTES (id, courriel, mot_passe, alias, avatar, role, groupe) VALUES (2, 'p1@p.ca', '$2a$10$2Ey/Hs2ye.0FDwzY1yRcJeC0r8hJUvC1rVHiCI2XmsgIrILHGTr6i', 'player1', 1, 0, 0)
 INSERT INTO COMPTES (id, courriel, mot_passe, alias, avatar, role, groupe) VALUES (3, 'p2@p.ca', '$2a$10$2Ey/Hs2ye.0FDwzY1yRcJeC0r8hJUvC1rVHiCI2XmsgIrILHGTr6i', 'player2', 1, 0, 0)
+
+INSERT INTO COMBATS (id, ID_Rouge, ID_Blanc, ID_Arbitre, resultat) VALUES (1, 1, 2, 3, 0)

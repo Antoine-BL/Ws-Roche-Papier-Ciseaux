@@ -3,6 +3,7 @@ package cgg.informatique.abl.webSocket.entites;
 import cgg.informatique.abl.webSocket.dto.CompteDto;
 import cgg.informatique.abl.webSocket.dto.SanitizedCompte;
 import cgg.informatique.abl.webSocket.dto.UserBase;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -11,6 +12,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -31,6 +33,15 @@ public class Compte extends UserBase implements UserDetails, SanitizedCompte {
     @ManyToOne(targetEntity = Groupe.class)
     @JoinColumn(name="GROUPE")
     private Groupe groupe;
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "blanc",targetEntity = Combat.class)
+    @JsonManagedReference
+    private List<Combat> combatsBlanc;
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "rouge",targetEntity = Combat.class)
+    @JsonManagedReference
+    private List<Combat> combatsRouge;
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "arbitre",targetEntity = Combat.class)
+    @JsonManagedReference
+    private List<Combat> combatsArbitre;
 
     protected Compte() { }
 
@@ -141,6 +152,21 @@ public class Compte extends UserBase implements UserDetails, SanitizedCompte {
 
     public Groupe getGroupeObj() {
         return this.groupe;
+    }
+
+    @Override
+    public List<Combat> getCombatsBlanc() {
+        return combatsBlanc;
+    }
+
+    @Override
+    public List<Combat> getCombatsRouge() {
+        return combatsRouge;
+    }
+
+    @Override
+    public List<Combat> getCombatsArbitre() {
+        return combatsArbitre;
     }
 
     public static class Builder implements CourrielBuilder, MotPasseBuilder{

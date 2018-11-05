@@ -17,7 +17,6 @@ public class Signaler extends Commande{
     public void execute(LobbyCommandContext context) {
         Lobby lobby = context.getLobby();
         Match match = lobby.getCurrentMatch();
-        LobbyUserData lud = lobby.getLobbyUserData(getDe());
 
         Signal signalDonne = Signal.valueOf(parametres.get(SIGNAL).toUpperCase());
 
@@ -31,9 +30,9 @@ public class Signaler extends Commande{
             case IPPON:
                 LobbyRole cible = LobbyRole.valueOf(parametres.get(CIBLE).toUpperCase());
                 if (cible == LobbyRole.ROUGE) {
-                    match.deciderVerdict(match.getRouge(), match.getBlanc());
+                    match.victory(match.getRouge(), match.getBlanc());
                 } else if (cible == LobbyRole.BLANC){
-                    match.deciderVerdict(match.getBlanc(), match.getRouge());
+                    match.victory(match.getBlanc(), match.getRouge());
                 } else {
                     throw new IllegalArgumentException("Doit être rouge ou blanc");
                 }

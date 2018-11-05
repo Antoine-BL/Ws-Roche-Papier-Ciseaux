@@ -1,10 +1,13 @@
 package cgg.informatique.abl.webSocket.dto.match;
 
+import cgg.informatique.abl.webSocket.dto.SanitizedCompte;
 import cgg.informatique.abl.webSocket.dto.UserBase;
 import cgg.informatique.abl.webSocket.dto.lobby.LobbyRole;
 import cgg.informatique.abl.webSocket.dto.lobby.LobbyUserData;
+import cgg.informatique.abl.webSocket.entites.Compte;
 import cgg.informatique.abl.webSocket.messaging.DonneesReponseCommande;
 import cgg.informatique.abl.webSocket.messaging.commands.TypeCommande;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.util.Objects;
 
@@ -22,22 +25,6 @@ public class MatchUserData extends UserBase {
 
     public LobbyRole getRoleCombat(){
         return user.getRoleCombat();
-    }
-
-    public void leavePenalty() {
-
-    }
-
-    public void loseAgainst(MatchUserData opponent) {
-
-    }
-
-    public void winAgainst(MatchUserData opponent) {
-
-    }
-
-    public void tieAgainst(MatchUserData opponent) {
-
     }
 
     public void setState(PlayerState state) {
@@ -77,5 +64,14 @@ public class MatchUserData extends UserBase {
 
     public String getCourriel() {
         return user.getUser().getCourriel();
+    }
+
+    public SanitizedCompte getUser() {
+        return this.user;
+    }
+
+    @JsonIgnore
+    public Compte getCompte() {
+        return this.user.getUser();
     }
 }
