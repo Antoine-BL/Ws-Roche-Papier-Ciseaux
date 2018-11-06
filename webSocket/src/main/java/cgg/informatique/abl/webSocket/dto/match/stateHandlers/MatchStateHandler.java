@@ -10,6 +10,7 @@ public abstract class MatchStateHandler {
     }
 
     public abstract void handleTimeout();
+    public abstract void handleStateChanged();
 
     public Match getContext() {
         return context;

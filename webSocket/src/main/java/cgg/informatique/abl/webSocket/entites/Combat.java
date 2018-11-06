@@ -1,8 +1,6 @@
 package cgg.informatique.abl.webSocket.entites;
 
-import cgg.informatique.abl.webSocket.dto.lobby.LobbyRole;
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import javax.persistence.*;
 
@@ -28,16 +26,24 @@ public class Combat {
     @JsonBackReference
     private Compte arbitre;
 
-    @Enumerated
-    MatchOutcome resultat;
+    @Column(name = "POINTSROUGE")
+    private int pointsRouge;
+    @Column(name = "POINTSBLANC")
+    private int pointsBlanc;
+    @Column(name = "CREDITSARBITRE")
+    private int creditsArbitre;
+    @Column(name = "TEMPS")
+    private long temps;
 
     public Combat() {}
 
-    public Combat(Compte rouge, Compte blanc, Compte arbitre, MatchOutcome resultat) {
+    public Combat(Compte rouge, Compte blanc, Compte arbitre, int pointsRouges, int pointsBlancs, int creditsArbitres) {
         this.rouge = rouge;
         this.blanc = blanc;
         this.arbitre = arbitre;
-        this.resultat = resultat;
+        this.pointsRouge = pointsRouges;
+        this.pointsBlanc = pointsBlancs;
+        this.creditsArbitre = creditsArbitres;
     }
 
     public static RougeStep Builder() {
@@ -47,7 +53,7 @@ public class Combat {
     public interface RougeStep { BlancStep setRouge(Compte rouge); }
     public interface BlancStep { ArbitreStep setBlanc(Compte blanc); }
     public interface ArbitreStep { ResultatStep setArbitre(Compte arbitre); }
-    public interface ResultatStep { CombatBuilder setResultat(MatchOutcome resultat); }
+    public interface ResultatStep { CombatBuilder setResultat(int pointsRouge, int pointsBlanc, int creditArbitre); }
 
     public Long getId() {
         return id;
@@ -81,11 +87,36 @@ public class Combat {
         this.arbitre = arbitre;
     }
 
-    public MatchOutcome getResultat() {
-        return resultat;
+
+    public int getPointsRouge() {
+        return pointsRouge;
     }
 
-    public void setResultat(MatchOutcome resultat) {
-        this.resultat = resultat;
+    public void setPointsRouge(int pointsRouge) {
+        this.pointsRouge = pointsRouge;
+    }
+
+    public int getPointsBlanc() {
+        return pointsBlanc;
+    }
+
+    public void setPointsBlanc(int pointsBlanc) {
+        this.pointsBlanc = pointsBlanc;
+    }
+
+    public int getCreditsArbitre() {
+        return creditsArbitre;
+    }
+
+    public void setCreditsArbitre(int creditsArbitre) {
+        this.creditsArbitre = creditsArbitre;
+    }
+
+    public long getTemps() {
+        return temps;
+    }
+
+    public void setTemps(long temps) {
+        this.temps = temps;
     }
 }

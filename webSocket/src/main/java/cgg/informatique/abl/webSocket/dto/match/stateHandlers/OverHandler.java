@@ -11,4 +11,7 @@ public class OverHandler extends MatchStateHandler {
     public void handleTimeout() {
         getContext().matchEnded();
     }
+
+    @Override
+    public void handleStateChanged() { }
 }

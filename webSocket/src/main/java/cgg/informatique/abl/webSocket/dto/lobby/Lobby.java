@@ -79,8 +79,11 @@ public class Lobby implements Runnable, MatchHandler, SerializableLobby {
     }
 
     private void mainLoop() throws InterruptedException {
+        long tickStart;
+        long processingTime = 0;
         while (lobbyState == LobbyState.ACTIVE) {
-            Thread.sleep(TICK_DURATION);
+            Thread.sleep(Math.max(TICK_DURATION - processingTime, 0));
+            tickStart = System.currentTimeMillis();
 
             System.out.println("tick!");
 
@@ -88,6 +91,7 @@ public class Lobby implements Runnable, MatchHandler, SerializableLobby {
             
             if (isEmpty()) becomeInactive();
             if (matchInProgress != null) matchInProgress.tick();
+            processingTime = System.currentTimeMillis() - tickStart;
         }
     }
 

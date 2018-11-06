@@ -12,4 +12,7 @@ public class ExitHandler extends MatchStateHandler {
     public void handleTimeout() {
         getContext().setMatchState(MatchState.OVER);
     }
+
+    @Override
+    public void handleStateChanged() { }
 }

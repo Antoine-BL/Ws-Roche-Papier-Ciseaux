@@ -119,6 +119,11 @@ public class LobbyUserData extends UserBase implements SanitizedCompte{
     }
 
     @Override
+    public Long getId() {
+        return this.getUser().getId();
+    }
+
+    @Override
     public String getCourriel() {
         return this.user.getCourriel();
     }

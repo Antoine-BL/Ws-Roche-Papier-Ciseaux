@@ -74,4 +74,9 @@ public class MatchUserData extends UserBase {
     public Compte getCompte() {
         return this.user.getUser();
     }
+
+    @JsonIgnore
+    public LobbyUserData getLobbyUser() {
+        return this.user;
+    }
 }

@@ -11,4 +11,7 @@ public class DecideHandler extends MatchStateHandler {
     public void handleTimeout() {
         getContext().refAtFault();
     }
+
+    @Override
+    public void handleStateChanged() { }
 }

@@ -34,9 +34,7 @@ Vue.component('app-profile', {
 '                    <div class="dropdown-item-text" >Rôle: {{user.role}}</div>\n' +
 '                    <div class="dropdown-item-text" >Groupe: {{user.groupe}}</div>\n' +
 '                    <div class="dropdown-divider"></div>\n' +
-'                    <form action="/deconnexion" method="GET">\n' +
-'                        <b-dropdown-item-button variant="danger">Déconnexion</b-dropdown-item-button>\n' +
-'                    </form>\n' +
+'                    <b-dropdown-item href="/deconnexion" variant="danger">Déconnexion</b-dropdown-item>\n' +
 '                </b-dropdown>\n'
 });
 
@@ -116,6 +114,14 @@ Vue.component('app-slot', {
             }
         }
     }
+});
+
+Vue.component('app-membre-ecole', {
+    props: ['utilisateur'],
+    template: '<li>' +
+        '<img class="profile profile-petit d-inline-block" v-bind:src="\'/api/avatars/\' + utilisateur.avatarId"/>' +
+        '<span>{{utilisateur.alias}}, {{utilisateur.role}}, {{utilisateur.groupe}}, {{utilisateur.courriel}}</span>' +
+        '</li>'
 });
 
 Vue.component('app-controls', {

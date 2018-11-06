@@ -18,7 +18,7 @@ public class BlancHandler extends LobbyRoleHandler {
         Match match = getContext().getCurrentMatch();
         MatchState state = match == null ? MatchState.OVER : match.getMatchState();
 
-        if (state != MatchState.OVER && state != MatchState.EXIT) {
+        if (state != MatchState.OVER && (state != MatchState.EXIT && match.getBlanc().isSaluting())) {
             match.blancLeft();
         }
 

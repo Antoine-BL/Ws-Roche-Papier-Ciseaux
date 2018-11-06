@@ -3,6 +3,7 @@ package cgg.informatique.abl.webSocket.entites;
 import cgg.informatique.abl.webSocket.dto.CompteDto;
 import cgg.informatique.abl.webSocket.dto.SanitizedCompte;
 import cgg.informatique.abl.webSocket.dto.UserBase;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,7 +14,6 @@ import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 
 @Entity
 @Table(name="COMPTES")
@@ -24,24 +24,38 @@ public class Compte extends UserBase implements UserDetails, SanitizedCompte {
     private String courriel;
     private String motPasse;
     private String alias;
+
     @ManyToOne(targetEntity = Avatar.class)
     @JoinColumn(name="AVATAR")
     private Avatar avatar;
+
     @ManyToOne(targetEntity = Role.class)
     @JoinColumn(name="ROLE")
     private Role role;
+
     @ManyToOne(targetEntity = Groupe.class)
     @JoinColumn(name="GROUPE")
     private Groupe groupe;
+
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "blanc",targetEntity = Combat.class)
     @JsonManagedReference
     private List<Combat> combatsBlanc;
+
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "rouge",targetEntity = Combat.class)
     @JsonManagedReference
     private List<Combat> combatsRouge;
+
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "arbitre",targetEntity = Combat.class)
     @JsonManagedReference
     private List<Combat> combatsArbitre;
+
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "professeur",targetEntity = Examen.class)
+    @JsonManagedReference
+    private List<Examen> examensProf;
+
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "eleve",targetEntity = Examen.class)
+    @JsonManagedReference
+    private List<Examen> examensEleve;
 
     protected Compte() { }
 
@@ -167,6 +181,28 @@ public class Compte extends UserBase implements UserDetails, SanitizedCompte {
     @Override
     public List<Combat> getCombatsArbitre() {
         return combatsArbitre;
+    }
+
+    public List<Examen> getExamensProf() {
+        return this.examensProf;
+    }
+
+    public List<Examen> getExamensEleve() {
+        return this.examensEleve;
+    }
+
+    public void setGroupeObj(Groupe groupe) {
+        this.groupe = groupe;
+    }
+
+    @JsonIgnore
+    public Role getRoleObj() {
+        return this.role;
+    }
+
+    @JsonIgnore
+    public void setRoleObj(Role role) {
+        this.role = role;
     }
 
     public static class Builder implements CourrielBuilder, MotPasseBuilder{

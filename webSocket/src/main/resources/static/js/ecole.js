@@ -1,13 +1,5 @@
 var app;
 $(document).ready(() => {
-    Vue.component('app-membre-ecole', {
-        props: ['utilisateur'],
-        template: '<li>' +
-            '<img class="profile profile-petit d-inline-block" v-bind:src="\'/api/avatars/\' + utilisateur.avatarId"/>' +
-            '<span>{{utilisateur.alias}}, {{utilisateur.role}}, {{utilisateur.groupe}}, {{utilisateur.courriel}}</span>' +
-            '</li>'
-    });
-
     app = new Vue({
         el: '#app',
         data: {

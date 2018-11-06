@@ -1,10 +1,57 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:v-on="http://www.w3.org/1999/xhtml">
 <head>
-    <meta charset="UTF-8">
-    <title>Passage de grades</title>
+    <title>Projet 1: Websocket</title>
+    <link href="/webjars/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link type="text/css" rel="stylesheet" href="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.css"/>
+    <link href="/css/main.css" rel="stylesheet">
+
+    <script src="/webjars/jquery/jquery.min.js"></script>
+    <script src="/webjars/popper.js/umd/popper.min.js"></script>
+
+    <script src="/webjars/sockjs-client/sockjs.min.js"></script>
+    <script src="/webjars/stomp-websocket/stomp.min.js"></script>
+
+    <script src="/webjars/vue/vue.js"></script>
+    <script src="//unpkg.com/babel-polyfill@latest/dist/polyfill.min.js"></script>
+    <script src="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.js"></script>
+
+    <script src="/js/VueComponents.js"></script>
+    <script src="/js/passage.js"></script>
 </head>
 <body>
-
+<div id="app">
+    <app-nav v-bind:user="user" current-page="passage"></app-nav>
+    <div class="container">
+        <h4 class="text-center">Membres éligibles pour une nouvelle ceinture</h4>
+        <div v-for="(eligibles, key, index) in eligiblesCeinture">
+            <h5 class="text-center">{{key}}</h5>
+            <ul>
+                <span v-for="e in eligibles" class="form-inline">
+                    <app-membre-ecole class="d-inline-block"  v-bind:utilisateur="e"></app-membre-ecole>
+                    <button class="btn btn-success" v-on:click="reussir(index, key, e.id)">Réussir</button>
+                    <button class="btn btn-danger" v-on:click="echouer(index, key, e.id)">Échouer</button>
+                </span>
+            </ul>
+        </div>
+        <h4 class="text-center">Membres éligibles pour une promotion de grade</h4>
+        <div v-if="eligiblesRole">
+            <h5 v-if="eligiblesRole.Ancien > 0" class="text-center">Nouveau vers Ancien</h5>
+            <ul>
+                <span v-for="(e, index) in eligiblesRole.Ancien" class="form-inline">
+                    <app-membre-ecole class="d-inline-block"  v-bind:utilisateur="e"></app-membre-ecole>
+                    <button class="btn btn-success" v-on:click="reussirAncien(e.id, index)">Réussir</button>
+                </span>
+            </ul>
+            <h5 v-if="eligiblesRole.Sensei > 0" class="text-center">Ancien vers Sensei</h5>
+            <ul>
+                <span v-for="(e, index) in eligiblesRole.Sensei" class="form-inline">
+                    <app-membre-ecole class="d-inline-block"  v-bind:utilisateur="e"></app-membre-ecole>
+                    <button class="btn btn-success" v-on:click="reussirSensei(e.id, index)">Réussir</button>
+                </span>
+            </ul>
+        </div>
+    </div>
+</div>
 </body>
 </html>

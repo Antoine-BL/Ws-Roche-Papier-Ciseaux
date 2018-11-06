@@ -4,9 +4,11 @@ import cgg.informatique.abl.webSocket.dto.lobby.LobbyRole;
 import cgg.informatique.abl.webSocket.dto.lobby.LobbyUserData;
 import cgg.informatique.abl.webSocket.dto.lobby.RoleColl;
 import cgg.informatique.abl.webSocket.entites.Combat;
-import cgg.informatique.abl.webSocket.entites.MatchOutcome;
 import cgg.informatique.abl.webSocket.messaging.DonneesReponseCommande;
 import cgg.informatique.abl.webSocket.messaging.commands.TypeCommande;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class Match implements SerializableMatch{
     private final MatchUserData arbitre;
@@ -15,6 +17,25 @@ public class Match implements SerializableMatch{
     private final MatchHandler matchHandler;
     private MatchState state;
     private long lastStateChange;
+
+    static Map<Integer, Integer> recompensesSelonDelta;
+    static {
+        recompensesSelonDelta = new HashMap<>();
+
+        recompensesSelonDelta.put(6, 50);
+        recompensesSelonDelta.put(5, 30);
+        recompensesSelonDelta.put(4, 25);
+        recompensesSelonDelta.put(3, 20);
+        recompensesSelonDelta.put(2, 15);
+        recompensesSelonDelta.put(1, 12);
+        recompensesSelonDelta.put(0, 10);
+        recompensesSelonDelta.put(-1, 9);
+        recompensesSelonDelta.put(-2, 7);
+        recompensesSelonDelta.put(-3, 5);
+        recompensesSelonDelta.put(-4, 3);
+        recompensesSelonDelta.put(-5, 2);
+        recompensesSelonDelta.put(-6, 1);
+    }
 
     public Match(LobbyUserData arbitre, MatchHandler matchHandler) {
         this.arbitre = new MatchUserData(arbitre, this);
@@ -116,7 +137,11 @@ public class Match implements SerializableMatch{
     }
 
     public void refAtFault() {
-        persistMatch(MatchOutcome.ERREUR_ARBITRE);
+        int ptsBlanc = calculerPointsGagant(blanc, rouge) / 2;
+        int ptsRouge = calculerPointsGagant(rouge, blanc) / 2;
+        int ptsArbitre = -5;
+
+        persistMatch(ptsRouge, ptsBlanc, ptsArbitre);
 
         matchHandler.send(String.format("%s a commis une grave faute!", arbitre.getNom()));
         setMatchState(MatchState.EXIT);
@@ -124,7 +149,11 @@ public class Match implements SerializableMatch{
     }
 
     public void tie() {
-        persistMatch(MatchOutcome.NUL);
+        int ptsBlanc = calculerPointsGagant(blanc, rouge) / 2;
+        int ptsRouge = calculerPointsGagant(rouge, blanc) / 2;
+        int ptsArbitre = 1;
+
+        persistMatch(ptsRouge, ptsBlanc, ptsArbitre);
 
         matchHandler.send(String.format("Match nul entre %s et %s", rouge.getNom(), blanc.getNom()));
         setMatchState(MatchState.EXIT);
@@ -132,27 +161,38 @@ public class Match implements SerializableMatch{
     }
 
     public void victory(MatchUserData victor, MatchUserData loser) {
-        MatchOutcome outcome;
+        int ptsRouge;
+        int ptsBlanc;
+        int ptsArbitre = 1;
+
         if (rouge.equals(victor)) {
-            outcome = MatchOutcome.VICTOIRE_ROUGE;
+            ptsRouge = calculerPointsGagant(rouge, blanc);
+            ptsBlanc = 0;
         } else if (victor.equals(blanc)){
-            outcome = MatchOutcome.VICTORE_BLANC;
+            ptsBlanc = calculerPointsGagant(blanc, rouge);
+            ptsRouge = 0;
         } else {
             throw new IllegalArgumentException("victor invalid");
         }
 
-        persistMatch(outcome);
+        persistMatch(ptsRouge, ptsBlanc, ptsArbitre);
+
         matchHandler.send(String.format("%s a remporté son combat contre %s", victor.getNom(), loser.getNom()));
         setMatchState(MatchState.EXIT);
         matchEnded();
     }
 
-    private void persistMatch(MatchOutcome outcome) {
+    private int calculerPointsGagant(MatchUserData gagnant, MatchUserData perdant) {
+        int delta = perdant.getLobbyUser().getGroupeObj().getId() - gagnant.getLobbyUser().getGroupeObj().getId();
+        return recompensesSelonDelta.get(delta);
+    }
+
+    private void persistMatch(int pointsRouge, int pointsBlanc, int creditsArbitre) {
         Combat.Builder()
                 .setRouge(this.rouge.getCompte())
                 .setBlanc(this.blanc.getCompte())
                 .setArbitre(this.arbitre.getCompte())
-                .setResultat(outcome)
+                .setResultat(pointsRouge, pointsBlanc, creditsArbitre)
                 .persistCombat();
     }
 
@@ -161,6 +201,9 @@ public class Match implements SerializableMatch{
     }
 
     public void matchEnded() {
+        if (rouge != null) matchHandler.quitter(rouge.getLobbyUser());
+        if (blanc != null) matchHandler.quitter(blanc.getLobbyUser());
+
         this.matchHandler.matchEnded();
     }
 }

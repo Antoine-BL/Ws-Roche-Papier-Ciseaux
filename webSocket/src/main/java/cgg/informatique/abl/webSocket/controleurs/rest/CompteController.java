@@ -1,11 +1,10 @@
 package cgg.informatique.abl.webSocket.controleurs.rest;
 
-import cgg.informatique.abl.webSocket.dao.CombatDao;
-import cgg.informatique.abl.webSocket.dao.CompteDao;
+import cgg.informatique.abl.webSocket.dao.*;
 import cgg.informatique.abl.webSocket.dto.SanitizedCompte;
-import cgg.informatique.abl.webSocket.entites.Combat;
-import cgg.informatique.abl.webSocket.entites.Compte;
+import cgg.informatique.abl.webSocket.entites.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +12,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -22,12 +22,21 @@ import java.util.stream.Collectors;
 public class CompteController {
     private CompteDao compteDao;
     private CombatDao combatDao;
+    private ExamenDao examenDao;
+    private GroupeDao groupeDao;
+    private RoleDao roleDao;
 
     public CompteController(
             @Autowired CompteDao compteDao,
-            @Autowired CombatDao combatDao) {
+            @Autowired CombatDao combatDao,
+            @Autowired ExamenDao examenDao,
+            @Autowired GroupeDao groupeDao,
+            @Autowired RoleDao roleDao) {
         this.compteDao = compteDao;
         this.combatDao = combatDao;
+        this.examenDao = examenDao;
+        this.groupeDao = groupeDao;
+        this.roleDao = roleDao;
     }
 
     @GetMapping("/comptes")
@@ -47,7 +56,7 @@ public class CompteController {
     }
 
     @PostMapping("/comptes")
-    public ResponseEntity addCompte(@RequestBody cgg.informatique.abl.webSocket.entites.Compte compte) {
+    public ResponseEntity addCompte(@RequestBody Compte compte) {
         boolean compteExiste = compteDao.existsById(compte.getId());
         boolean emailExiste = compteDao.existsByCourriel(compte.getUsername());
 
@@ -58,6 +67,47 @@ public class CompteController {
         cgg.informatique.abl.webSocket.entites.Compte compteAjoute = compteDao.save(compte);
 
         return ResponseEntity.created(GenerateCreatedURI(compteAjoute)).build();
+    }
+
+    @PostMapping("/compte/ceinture/{id}")
+    public ResponseEntity promotionCeinture(@PathVariable Long id) {
+        Compte compte = compteDao.findById(id).orElseThrow(IllegalStateException::new);
+        int nouveauGroupe = compte.getGroupeObj().getId() + 1;
+        Optional<Groupe> groupe = groupeDao.findById(nouveauGroupe);
+
+        if (!groupe.isPresent()) return ResponseEntity.badRequest().build();
+
+        compte.setGroupeObj(groupe.get());
+
+        compteDao.save(compte);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/compte/role/{id}")
+    public ResponseEntity promotionRole(@PathVariable Long id) {
+        Compte compte = compteDao.findById(id).orElseThrow(IllegalStateException::new);
+        int nouveauRole = compte.getRoleObj().getId() + 1;
+        Optional<Role> role = roleDao.findById(nouveauRole);
+
+        if (!role.isPresent()) return ResponseEntity.badRequest().build();
+
+        compte.setRoleObj(role.get());
+
+        compteDao.save(compte);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/compte")
+    public ResponseEntity modifierCompte(@RequestBody Compte compte){
+        if (!compteDao.exists(Example.of(compte))) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        compteDao.save(compte);
+
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/comptes")
@@ -83,12 +133,12 @@ public class CompteController {
 
     @GetMapping("/monCompte/credits")
     public ResponseEntity<Integer> getMesCredits(@Autowired Authentication auth) {
-        return getCreditsPour((Compte)auth.getPrincipal());
+        return ResponseEntity.ok(getCreditsPour((Compte)auth.getPrincipal()));
     }
 
     @GetMapping("/monCompte/points")
     public ResponseEntity<Integer> getMesPoints(@Autowired Authentication auth) {
-        return getPointsPour((Compte)auth.getPrincipal());
+        return ResponseEntity.ok(getPointsPour((Compte)auth.getPrincipal()));
     }
 
     @GetMapping("/comptes/{id}/credits")
@@ -97,7 +147,7 @@ public class CompteController {
 
         if (!compte.isPresent()) return ResponseEntity.notFound().build();
 
-        return getCreditsPour(compte.get());
+        return ResponseEntity.ok(getCreditsPour(compte.get()));
     }
 
     @GetMapping("/comptes/{id}/points")
@@ -106,31 +156,51 @@ public class CompteController {
 
         if (!compte.isPresent()) return ResponseEntity.notFound().build();
 
-        return getPointsPour(compte.get());
+        return ResponseEntity.ok(getPointsPour(compte.get()));
     }
 
-    private ResponseEntity<Integer> getCreditsPour(Compte compte) {
+    public static Integer getCreditsPour(Compte compte) {
         int credits = 0;
+        long tempsMax = (long) compte
+                .getExamensEleve()
+                .stream()
+                .map(Examen::getTemps)
+                .max(Comparator.comparing(Long::valueOf))
+                .orElseGet(() -> -1L);
 
         for (Combat combat : compte.getCombatsArbitre()) {
-            credits += combat.getResultat().calculerRecompensePour(compte, combat);
+            credits += combat.getCreditsArbitre();
         }
 
-        return ResponseEntity.ok(credits);
+        for (Examen examen : compte.getExamensEleve()) {
+            credits -= 10;
+        }
+
+        return credits;
     }
 
-    private ResponseEntity<Integer> getPointsPour(Compte compte) {
+    public static Integer getPointsPour(Compte compte) {
         int points = 0;
+        long tempsMax = (long) compte
+                .getExamensEleve()
+                .stream()
+                .map(Examen::getTemps)
+                .max(Comparator.comparing(Long::valueOf))
+                .orElseGet(() -> -1L);
 
-        List<Combat> combatsParticipe = new ArrayList<>();
-        combatsParticipe.addAll(compte.getCombatsBlanc());
-        combatsParticipe.addAll(compte.getCombatsRouge());
-
-        for (Combat combat : combatsParticipe) {
-            points += combat.getResultat().calculerRecompensePour(compte, combat);
+        for (Combat combat : compte.getCombatsRouge()) {
+            if (combat.getTemps() > tempsMax) {
+                points += combat.getPointsRouge();
+            }
         }
 
-        return ResponseEntity.ok(points);
+        for (Combat combat : compte.getCombatsBlanc()) {
+            if (combat.getTemps() > tempsMax) {
+                points += combat.getPointsBlanc();
+            }
+        }
+
+        return points;
     }
 
     private URI GenerateCreatedURI(cgg.informatique.abl.webSocket.entites.Compte compte) {
