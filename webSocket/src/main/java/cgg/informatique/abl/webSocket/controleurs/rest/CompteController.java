@@ -99,6 +99,21 @@ public class CompteController {
         return ResponseEntity.ok().build();
     }
 
+    @PostMapping("/compte/demotion/{id}")
+    public ResponseEntity demotionRole(@PathVariable Long id) {
+        Compte compte = compteDao.findById(id).orElseThrow(IllegalStateException::new);
+        int nouveauRole = compte.getRoleObj().getId() - 1;
+        Optional<Role> role = roleDao.findById(nouveauRole);
+
+        if (!role.isPresent()) return ResponseEntity.badRequest().build();
+
+        compte.setRoleObj(role.get());
+
+        compteDao.save(compte);
+
+        return ResponseEntity.ok().build();
+    }
+
     @PutMapping("/compte")
     public ResponseEntity modifierCompte(@RequestBody Compte compte){
         if (!compteDao.exists(Example.of(compte))) {

@@ -75,25 +75,32 @@ public class ExamenController {
 
         List<Compte> eligiblesAncien = new ArrayList<>();
         List<Compte> eligiblesSensei = new ArrayList<>();
+        List<Compte> senseis = new ArrayList<>();
 
        compteDao.findAll()
                 .stream()
+                .filter(c -> c.getRole().equals("Nouveau"))
                 .filter(c -> c.getCombatsArbitre().size() >= 30)
                 .filter(c -> CompteController.getCreditsPour(c) >= 10)
-                .forEach(c -> eligiblesAncien.add(c));
+                .forEach(eligiblesAncien::add);
 
        compteDao.findAll()
                .stream()
                .filter(c -> c.getRole().equals("Ancien"))
                .filter(c -> c.getGroupe().equals("Noir"))
-               .forEach(c -> eligiblesSensei.add(c));
+               .forEach(eligiblesSensei::add);
+
+        compteDao.findAll()
+                .stream()
+                .filter(c -> c.getRole().equals("Sensei"))
+                .forEach(senseis::add);
 
         eligiblesParNiveau.put("Ancien", eligiblesAncien);
         eligiblesParNiveau.put("Sensei", eligiblesSensei);
+        eligiblesParNiveau.put("Demotion", senseis);
 
         return ResponseEntity.ok(eligiblesParNiveau);
     }
-
 
     @GetMapping(value = "/eligibles/groupe")
     public ResponseEntity<Map<String, List<Compte>>> trouverEligiblesExamGroupe() {

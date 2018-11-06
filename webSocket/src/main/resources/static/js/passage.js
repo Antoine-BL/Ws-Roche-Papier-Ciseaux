@@ -31,7 +31,11 @@ $(document).ready(function (){
             reussirSensei: function(id, index) {
                 app.eligiblesRole.Sensei.splice(index, 1);
                 promotionRole({id: id});
-            }
+            },
+            echouerSensei: function(id, index) {
+                app.eligiblesRole.Demotion.splice(index, 1);
+                demotionRole(id);
+            },
         }
     });
 
@@ -45,6 +49,15 @@ $(document).ready(function (){
                 reussi: reussi,
                 temps: new Date().getTime(),
             }),
+            'contentType': 'application/json; charset=utf-8',
+            'dataType': 'json',
+        });
+    }
+
+    function demotionRole(id) {
+        $.ajax({
+            url: "/api/compte/demotion/" + id,
+            'type': 'POST',
             'contentType': 'application/json; charset=utf-8',
             'dataType': 'json',
         });
