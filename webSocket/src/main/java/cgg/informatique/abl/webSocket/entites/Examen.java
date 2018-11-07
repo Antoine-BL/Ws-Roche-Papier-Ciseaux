@@ -1,6 +1,7 @@
 package cgg.informatique.abl.webSocket.entites;
 
 import cgg.informatique.abl.webSocket.dto.SanitizedCompte;
+import cgg.informatique.abl.webSocket.dto.SanitizedUser;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
@@ -34,7 +35,7 @@ public class Examen {
         this.eleve = eleve;
     }
 
-    public SanitizedCompte getProfesseur() {
+    public SanitizedUser getProfesseur() {
         return professeur;
     }
 
@@ -42,7 +43,7 @@ public class Examen {
         this.professeur = professeur;
     }
 
-    public SanitizedCompte getEleve() {
+    public SanitizedUser getEleve() {
         return eleve;
     }
 

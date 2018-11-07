@@ -22,21 +22,33 @@
 <body>
 <div id="app">
     <app-nav v-bind:user="user" current-page="passage"></app-nav>
-    <div v-if="Object.keys(eligiblesCeinture).length > 0" class="container">
+    <div class="container jumbotron">
+        <h4 v-if="eligiblesRole && eligiblesRole.Deshonorables.length > 0" class="text-center">Section de la honte</h4>
+        <ul v-if="eligiblesRole && eligiblesRole.Deshonorables.length > 0">
+        <span v-for="(e, index) in eligiblesRole.Deshonorables" class="form-inline">
+            <app-membre-ecole class="d-inline-block"  v-bind:utilisateur="e"></app-membre-ecole>
+        </span>
+        <hr/>
+        </ul>
         <h4 class="text-center">Membres admissibles à une nouvelle ceinture</h4>
-        <div v-for="(eligibles, key, index) in eligiblesCeinture" v-if="eligibles.length > 0">
-            <h5 class="text-center">{{key}}</h5>
-            <ul>
+        <div v-if="(eligiblesCeinture && Object.keys(eligiblesCeinture).length > 0)">
+            <div v-for="(eligibles, key, index) in eligiblesCeinture" v-if="eligibles.length > 0">
+                <h5 class="text-center">{{key}}</h5>
+                <ul>
                 <span v-for="e in eligibles" class="form-inline">
                     <app-membre-ecole class="d-inline-block"  v-bind:utilisateur="e"></app-membre-ecole>
                     <button class="btn btn-success" v-on:click="reussir(index, key, e.id)">Réussir Examen</button>
                     <button class="btn btn-danger" v-on:click="echouer(index, key, e.id)">Échouer Examen</button>
                 </span>
-            </ul>
-            <hr/>
+                </ul>
+                <hr/>
+            </div>
         </div>
+        <div v-else>
+            Il n'y aucun membre admissible en ce moment.
+        </div>
+        <h4 class="text-center">Membres admissibles à une promotion de grade</h4>
         <div v-if="eligiblesRole">
-            <h4 class="text-center">Membres admissibles à une promotion de grade</h4>
             <h5 v-if="eligiblesRole.Ancien.length > 0" class="text-center">Nouveau vers Ancien</h5>
             <ul>
                 <span v-for="(e, index) in eligiblesRole.Ancien" class="form-inline">
@@ -45,7 +57,7 @@
                 </span>
             </ul>
             <hr/>
-            <div v-if="user.role == 'Venerable'">
+            <div v-if="user.role.role == 'Venerable'">
                 <h5 v-if="eligiblesRole.Sensei.length > 0" class="text-center">Ancien vers Sensei</h5>
                 <ul>
                 <span v-for="(e, index) in eligiblesRole.Sensei" class="form-inline">
@@ -62,9 +74,9 @@
                 </ul>
             </div>
         </div>
-    </div>
-    <div v-else>
-        Il n'y aucun membre admissible en ce moment.
+        <div v-else>
+            Il n'y aucun membre admissible en ce moment.
+        </div>
     </div>
 </div>
 </body>

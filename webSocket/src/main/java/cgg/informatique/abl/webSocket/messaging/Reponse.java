@@ -1,10 +1,10 @@
 package cgg.informatique.abl.webSocket.messaging;
 
-import cgg.informatique.abl.webSocket.dto.SanitizedCompte;
+import cgg.informatique.abl.webSocket.dto.SanitizedUser;
 
 public class Reponse {
     private Long id;
-    private SanitizedCompte de;
+    private SanitizedUser de;
     private String texte;
     private Long creation;
 
@@ -30,7 +30,7 @@ public class Reponse {
         this.creation = System.currentTimeMillis();
     }
 
-    public Reponse(Long id, SanitizedCompte de, String texte) {
+    public Reponse(Long id, SanitizedUser de, String texte) {
         this.id = id;
         this.de = de;
         this.texte = texte;
@@ -46,11 +46,11 @@ public class Reponse {
         this.texte = texte;
     }
 
-    public SanitizedCompte getDe() {
+    public SanitizedUser getDe() {
         return de;
     }
 
-    public void setDe(SanitizedCompte de) {
+    public void setDe(SanitizedUser de) {
         this.de = de;
     }
 

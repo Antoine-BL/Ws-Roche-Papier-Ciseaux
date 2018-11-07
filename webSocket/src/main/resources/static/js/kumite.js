@@ -23,7 +23,9 @@ $(document).ready(() => {
             handle: (donnees) => changerRole(donnees.de, donnees.parametres[0], donnees.parametres[1]),
         },
         JOINDRE: {
-            handle: (donnees) => app.initLobby(donnees.parametres[0]),
+            handle: (donnees) => {
+                app.initLobby(donnees.parametres[0]);
+            },
         },
         COMBATTRE: {
             handle: (donnees) => changerPosition(donnees.de, donnees.parametres[0]),
@@ -32,22 +34,49 @@ $(document).ready(() => {
             handle: (donnees) => signal(donnees.parametres[0], donnees.parametres[1]),
         },
         MATCH_STATE: {
-            handle: (donnees) => app.state = donnees.parametres[0],
+            handle: (donnees) => {
+                app.chrono = donnees.parametres[0];
+                if (donnees.parametres.length >= 2) {
+                    app.state = donnees.parametres[1];
+                    app.message = donnees.parametres.length >= 3 ? app.message : donnees.parametres[2];
+                }
+                if (app.state !== 'DECIDE' && app.state !== 'START') {
+                    app.$refs.blanc.attack = null;
+                    app.$refs.rouge.attack = null
+                }
+            },
         },
         SALUER:{
-            handle: (donnees) => joueurSalue(donnees.de),
+            handle: (donnees) => {
+                console.log(donnees);
+                joueurSalue(donnees.de);
+            }
         },
         POSITION: {
-            handle: f => f,
+            handle: (donnees) => {
+                console.log(donnees);
+                joueurApproche(donnees.de);
+            }
         },
         ATTAQUER: {
-            handle: f => f,
+            handle: donnees => {
+                const params = donnees.parametres;
+                const objCible = donnees.de.roleCombat === "ROUGE" ? app.$refs.rouge : app.$refs.blanc;
+
+                if (params.length >= 1) {
+                    objCible.attack = params[0].toLowerCase();
+                } else {
+                    objCible.attack = 'rien';
+                }
+            },
         },
         QUITTER: {
             handle: (donnees) => {
                 app.removeFrom(donnees.parametres[0]);
                 if (donnees.de.courriel === app.user.courriel) {
                     app.dansLobby = false;
+                    window.clearInterval(heartbeatIntervalId);
+                    websocket.unsubscribeFrom(subscribeTopics.LOBBY);
                 }
             },
         },
@@ -93,6 +122,8 @@ $(document).ready(() => {
             blanc: null,
             state: 'OVER',
             dansLobby: false,
+            message: '',
+            chrono: 0,
         },
         methods: {
             initLobby: function(lobby){
@@ -143,8 +174,33 @@ $(document).ready(() => {
             role: function(e) {
                 websocket.sendCommandTo(sendTopics.COMMAND, new Commande('ROLE', [e.role, e.index]))
             },
+            rester: function() {
+                websocket.sendCommandTo(sendTopics.COMMAND, new Commande('SIGNALER', 'RESTER'));
+            }
         }
     });
+
+    function signal(signal, cible) {
+        if (signal === "IPPON"){
+            app.$refs.arbitre.ippon(cible.roleCombat.toLowerCase());
+        }
+    }
+
+    function joueurApproche(joueur) {
+        if (joueur.roleCombat === 'ROUGE') {
+            app.$refs.rouge.classApproche = 'approche-r';
+        } else if (joueur.roleCombat === 'BLANC') {
+            app.$refs.blanc.classApproche = 'approche-l';
+        }
+    }
+
+    function joueurSalue(joueur) {
+        if (joueur.roleCombat === 'ROUGE') {
+            app.$refs.rouge.saluer();
+        } else if (joueur.roleCombat === 'BLANC') {
+            app.$refs.blanc.saluer();
+        }
+    }
 
     function changerRole(utilisateur, newPos, oldPos) {
         if (oldPos) {
@@ -181,7 +237,6 @@ $(document).ready(() => {
         function handleCommand(command) {
             if (!command.donnees) return;
             const donnees = command.donnees;
-            console.log(donnees);
             Commands[donnees.typeCommande].handle(donnees);
         }
 
@@ -197,13 +252,9 @@ $(document).ready(() => {
                 const commandName = websocket.readCommand().typeCommande.toUpperCase();
                 if (commandName === "JOINDRE") {
                     heartbeatIntervalId = window.setInterval(heartbeat, 500);
-                    websocket.subscribeTo(subscribeTopics.LOBBY, 'chat-lobby', 'Lobby', handleCommand)
+                    websocket.subscribeTo(subscribeTopics.LOBBY, 'chat-lobby', 'Lobby', handleCommand);
                 }
-                else if (commandName === "QUITTER") {
-                    app.dansLobby = false;
-                    window.clearInterval(heartbeatIntervalId);
-                    websocket.unsubscribeFrom(subscribeTopics.LOBBY);
-                }
+
                 websocket.sendCommandTo(sendTopics.COMMAND);
             } else {
                 websocket.sendTo(sendTopics.CHAT);

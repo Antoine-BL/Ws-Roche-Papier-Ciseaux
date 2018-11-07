@@ -115,3 +115,39 @@
 .chat-lobby {
     background-color: var(--info);
 }
+
+.transitions {
+    transition: transform 0.5s, margin-right 0.5s, margin-left 0.5s;
+}
+
+.bow-r {
+    transform: rotate(20deg);
+}
+
+.unbow-r {
+    transform: rotate(0deg);
+}
+
+.bow-l {
+    transform: rotate(-20deg);
+}
+
+.unbow-l {
+    transform: rotate(0deg);
+}
+
+.approche-r {
+    margin-right: 10%;
+}
+
+.leave-r {
+    margin-right: 0;
+}
+
+.approche-l {
+    margin-left: 10%;
+}
+
+.leave-l {
+    margin-left: 0;
+}

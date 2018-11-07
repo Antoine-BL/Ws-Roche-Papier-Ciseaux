@@ -51,18 +51,22 @@
                             v-bind:disabled="!dansLobby"
                             role="combattant"></app-rangee>
                 <div class="row justify-content-center">
-                    Surface de combat:
+                    <span v-if="state == 'OVER'">Surface de combat:</span>
+                    <span v-else>{{message}}: {{chrono}}</span>
                 </div>
                 <div class="row justify-content-between">
-                    <app-slot v-on:move-to="role"
+                    <app-slot ref="blanc"
+                              v-on:move-to="role"
                               v-bind:user="blanc"
                               v-bind:disabled="state == 'OVER'"
                               role="blanc"></app-slot>
-                    <app-slot v-on:move-to="role"
+                    <app-slot ref="arbitre"
+                              v-on:move-to="role"
                               v-bind:user="arbitre"
                               v-bind:disabled="!dansLobby"
                               role="arbitre"></app-slot>
-                    <app-slot v-on:move-to="role"
+                    <app-slot ref="rouge"
+                              v-on:move-to="role"
                               v-bind:user="rouge"
                               v-bind:disabled="state == 'OVER'"
                               role="rouge"></app-slot>

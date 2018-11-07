@@ -1,14 +1,15 @@
 package cgg.informatique.abl.webSocket.dto.lobby;
 
-import cgg.informatique.abl.webSocket.dto.SanitizedCompte;
+import cgg.informatique.abl.webSocket.dto.SanitizedUser;
 import cgg.informatique.abl.webSocket.dto.UserBase;
 import cgg.informatique.abl.webSocket.entites.Combat;
 import cgg.informatique.abl.webSocket.entites.Compte;
 import cgg.informatique.abl.webSocket.entites.Groupe;
+import cgg.informatique.abl.webSocket.entites.Role;
 
 import java.util.List;
 
-public class LobbyUserData extends UserBase implements SanitizedCompte{
+public class LobbyUserData extends UserBase implements SanitizedLobbyUser {
     private static int SECONDS = 1000;
     private static int MINUTES = 60 * SECONDS;
     private static int ACTIVE_TIMEOUT = 60 * MINUTES;
@@ -69,7 +70,7 @@ public class LobbyUserData extends UserBase implements SanitizedCompte{
     }
 
     public int skillDeltaWith(LobbyUserData user) {
-        int delta = user.getGroupeObj().getId() - this.getGroupeObj().getId();
+        int delta = user.getGroupe().getId() - this.getGroupe().getId();
 
         return Math.abs(delta);
     }
@@ -91,33 +92,6 @@ public class LobbyUserData extends UserBase implements SanitizedCompte{
         this.role = role;
     }
 
-    public String getRole() {
-        return user.getRole();
-    }
-
-    public String getGroupe() {
-        return user.getGroupe();
-    }
-
-    public Groupe getGroupeObj() {
-        return user.getGroupeObj();
-    }
-
-    @Override
-    public List<Combat> getCombatsRouge() {
-        return user.getCombatsRouge();
-    }
-
-    @Override
-    public List<Combat> getCombatsBlanc() {
-        return user.getCombatsBlanc();
-    }
-
-    @Override
-    public List<Combat> getCombatsArbitre() {
-        return user.getCombatsArbitre();
-    }
-
     @Override
     public Long getId() {
         return this.getUser().getId();
@@ -135,6 +109,16 @@ public class LobbyUserData extends UserBase implements SanitizedCompte{
     @Override
     public void setAvatarId(Long id) {
         user.setAvatarId(id);
+    }
+
+    @Override
+    public Role getRole() {
+        return this.user.getRole();
+    }
+
+    @Override
+    public Groupe getGroupe() {
+        return this.user.getGroupe();
     }
 
     public int getPosition() {

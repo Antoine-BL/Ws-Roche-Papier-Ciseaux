@@ -9,16 +9,16 @@ $(document).ready(function (){
         },
         methods: {
             reussir: function (index, key, id) {
-                eleve = app.eligiblesCeinture[key].splice(index, 1)[0];
+                const eleve = app.eligiblesCeinture[key].splice(index, 1)[0];
                 enregistrerExam(eleve, true);
                 promotionCeinture(eleve);
             },
             echouer: function(index, key, id) {
-                app.eligiblesCeinture[key].splice(index, 1);
-                enregistrerExam(id, false);
+                const eleve = app.eligiblesCeinture[key].splice(index, 1)[0];
+                enregistrerExam(eleve, false);
             },
             reussirRole: function (index, key, id) {
-                eleve = app.eligiblesCeinture[key].splice(index, 1)[0];
+                const eleve = app.eligiblesCeinture[key].splice(index, 1)[0];
                 promotionRole(eleve);
             },
             echouerRole: function(index, key, id) {
@@ -49,41 +49,57 @@ $(document).ready(function (){
                 reussi: reussi,
                 temps: new Date().getTime(),
             }),
+            complete: initialiserListes,
             'contentType': 'application/json; charset=utf-8',
             'dataType': 'json',
         });
     }
 
     function demotionRole(id) {
+        console.log('demotionRole');
         $.ajax({
             url: "/api/compte/demotion/" + id,
             'type': 'POST',
-            'contentType': 'application/json; charset=utf-8',
-            'dataType': 'json',
+            complete: initialiserListes,
         });
     }
 
     function promotionCeinture(data) {
-        $.post("/api/compte/ceinture/" + data.id)
+        $.ajax({
+            url: "/api/compte/ceinture/" + data.id,
+            'type': 'POST',
+            complete: initialiserListes,
+        });
     }
 
     function promotionRole(data) {
-        $.post("/api/compte/role/" +  data.id)
+        $.ajax({
+            url: "/api/compte/role/" +  data.id,
+            'type': 'POST',
+            complete: initialiserListes,
+        });
     }
 
     $.ajax("/api/monCompte", {
         success: (data) => app.user = data,
     });
+    initialiserListes();
 
-    $.ajax("/api/examens/eligibles/groupe", {
-        success: (data) => {
-            app.eligiblesCeinture = data;
-        }
-    });
+    function initialiserListes() {
+        console.log('initaliserListes');
 
-    $.ajax("/api/examens/eligibles/role", {
-        success: (data) => {
-            app.eligiblesRole = data;
-        }
-    });
+        $.ajax("/api/examens/eligibles/groupe", {
+            success: (data) => {
+                app.eligiblesCeinture = data;
+            }
+        });
+
+        $.ajax("/api/examens/eligibles/role", {
+            success: (data) => {
+                app.eligiblesRole = data;
+            }
+        });
+
+        app.$forceUpdate();
+    }
 });

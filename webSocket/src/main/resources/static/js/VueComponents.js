@@ -11,7 +11,7 @@ Vue.component('app-nav', {
         '            <app-nav-item v-if="currentPage != \'dojo\'" text="Dojo" destination="/"></app-nav-item>' +
         '            <app-nav-item v-if="currentPage != \'ecole\'" text="Notre École" destination="/ecole"></app-nav-item>' +
         '            <app-nav-item v-if="currentPage != \'kumite\' && user" text="Kumite" destination="/kumite"></app-nav-item>' +
-        '            <app-nav-item v-if="currentPage != \'passage\' && user && (user.role == \'Venerable\' || user.role == \'Sensei\')" text="Passage de Grades" destination="/passage"></app-nav-item>' +
+        '            <app-nav-item v-if="currentPage != \'passage\' && user && (user.role.role == \'Venerable\' || user.role.role == \'Sensei\')" text="Passage de Grades" destination="/passage"></app-nav-item>' +
         '            <a v-if="user == null" class="nav-item active btn btn-success mr-auto" id="connexion" href="/connexion" role="button">Se connecter</a>' +
         '            <app-profile v-if="user" v-bind:user="user"></app-profile>' +
         '        </b-navbar-nav>\n' +
@@ -31,8 +31,8 @@ Vue.component('app-profile', {
 '                <b-dropdown class="bg-dark text-light" menu-class="bg-dark, text-light" variant="dark" type="dark">\n' +
 '                    <img slot="button-content" v-bind:src="\'/api/avatars/\' + user.avatarId" class="profile profile-petit" width="96" height="96"/>\n' +
 '                    <b-dropdown-header>Connecté en tant que: {{user.alias}}</b-dropdown-header>\n' +
-'                    <div class="dropdown-item-text" >Rôle: {{user.role}}</div>\n' +
-'                    <div class="dropdown-item-text" >Groupe: {{user.groupe}}</div>\n' +
+'                    <div class="dropdown-item-text" >Rôle: {{user.role.role}}</div>\n' +
+'                    <div class="dropdown-item-text" >Groupe: {{user.groupe.groupe}}</div>\n' +
 '                    <div class="dropdown-divider"></div>\n' +
 '                    <b-dropdown-item href="/deconnexion" variant="danger">Déconnexion</b-dropdown-item>\n' +
 '                </b-dropdown>\n'
@@ -74,7 +74,7 @@ Vue.component('app-chat-message', {
    template: '<div v-bind:class="[\'chat-message\', message.fromSelf ? \'self-chat\' : \'other-chat\', \'d-flex\', \'border-bottom\', message.css]">' +
        '<img v-bind:src="message.avatarUrl" class="profile profile-petit"/>' +
        '<div class="d-inline-block chat-message-content flex-grow-1 p-1">' +
-       '<div class="chat-message-header d-flex flex-grow-1"><strong class="flex-grow-1">{{message.de.alias}} {{message.de.role}} {{message.de.groupe}} <span v-if="message.mention">[{{message.mention}}]</span></strong><small><img class="icon m-2 d-inline-block" src="/open-iconic/svg/clock.svg">{{timeMessage}}</small></div>'+
+       '<div class="chat-message-header d-flex flex-grow-1"><strong class="flex-grow-1">{{message.de.alias}} {{message.de.role.role}} {{message.de.groupe.groupe}} <span v-if="message.mention">[{{message.mention}}]</span></strong><small><img class="icon m-2 d-inline-block" src="/open-iconic/svg/clock.svg">{{timeMessage}}</small></div>'+
        '<div class="chat-message-text">{{message.texte}}</div>' +
        '</div>' +
        '</div>'
@@ -106,12 +106,64 @@ Vue.component('app-rangee', {
 
 Vue.component('app-slot', {
     props: ['user', 'index', 'role', 'disabled'],
-    template: '<div v-on:click="click" v-bind:class="[\'col-2\',\'col-xl-1\', disabled ? \'slot-disabled\' : \'slot\']"><img v-bind:src="user == null ? \'/images/anonyme.jpg\' : \'/api/avatars/\' + user.avatarId"></div>',
+    data: function () { return {
+        classSalue: '',
+        classApproche: '',
+        attack: null,
+        drapeau: null,
+        classDrapeau: '',
+        flagRight: false,
+        afficherAttaque: false,
+    }},
+    template:
+        '<div v-on:click="click" ' +
+        'v-bind:class="[\'col-2\',\'col-xl-1\', disabled ? \'slot-disabled\' : \'slot\',\'transitions\', classSalue, classApproche]">' +
+            '<img v-if="drapeau" v-bind:class="classDrapeau"/>' +
+           '<img v-bind:src="attack ? \'/images/\' + attack + \'.png\' : (user == null ? \'/images/anonyme.jpg\' : \'/api/avatars/\' + user.avatarId)"/>' +
+            '<img v-if="drapeau" v-bind:class="classDrapeau"/>' +
+            '<span v-if="user && (user.roleCombat === \'ROUGE\' || user.roleCombat === \'BLANC\' || user.roleCombat === \'ARBITRE\')">' +
+            '{{user.groupe.groupe}}' +
+            '</span>'+
+        '</div>',
     methods: {
         click: function (e) {
             if (!this.user && !this.disabled) {
                 this.$emit('move-to', this);
             }
+        },
+        saluer: function() {
+            let bowClass;
+            let unbowClass;
+
+            if (this.role === "blanc") {
+                bowClass = 'bow-r';
+                unbowClass = 'unbow-r';
+            } else if (this.role === "rouge") {
+                bowClass = 'bow-l';
+                unbowClass = 'unbow-l';
+            }
+
+            this.classSalue = bowClass;
+            window.setTimeout(() => this.classSalue = unbowClass, 1000)
+        },
+        ippon: function(gagnant) {
+            let flagUpClass;
+            let flagDownClass;
+
+            if (gagnant === "blanc") {
+                flagUpClass = 'flag-up-l';
+                flagDownClass = 'flag-down-l';
+                this.flagRight = false;
+            } else if (gagnant === "rouge") {
+                flagUpClass = 'flag-up-r';
+                flagDownClass = 'flag-down-r';
+                this.flagRight = true;
+            }
+
+            this.classDrapeau = flagDownClass;
+            window.setTimeout(() => {
+                this.classDrapeau = flagUpClass;
+            }, 1000);
         }
     }
 });
@@ -120,7 +172,7 @@ Vue.component('app-membre-ecole', {
     props: ['utilisateur'],
     template: '<li>' +
         '<img class="profile profile-petit d-inline-block" v-bind:src="\'/api/avatars/\' + utilisateur.avatarId"/>' +
-        '<span>{{utilisateur.alias}}, {{utilisateur.role}}, {{utilisateur.groupe}}, {{utilisateur.courriel}}</span>' +
+        '<span class="ml-2 mr-2">{{utilisateur.alias}}, {{utilisateur.role.role}}, {{utilisateur.groupe.groupe}}, {{utilisateur.courriel}}</span>' +
         '</li>'
 });
 
@@ -150,7 +202,7 @@ Vue.component('app-controls', {
                         '<button class="btn btn-primary" v-on:click="decision">IPPON!</button>' +
                     '</div>' +
                     '<div v-if="state == \'EXIT\'" class="form-group">' +
-                        '<button class="btn btn-primary">Rester?</button>' +
+                        '<button class="btn btn-primary" v-on:click="emit(\'rester\')">Rester?</button>' +
                     '</div>' +
                 '</div>' +
                 '<div v-if="role == \'ROUGE\' || role == \'BLANC\'" class="inline-form">' +

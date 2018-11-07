@@ -3,10 +3,7 @@ package cgg.informatique.abl.webSocket.dto.lobby;
 import cgg.informatique.abl.webSocket.dto.match.Match;
 import cgg.informatique.abl.webSocket.dto.match.MatchHandler;
 import cgg.informatique.abl.webSocket.dto.match.SerializableMatch;
-import cgg.informatique.abl.webSocket.entites.Avatar;
-import cgg.informatique.abl.webSocket.entites.Compte;
-import cgg.informatique.abl.webSocket.entites.Groupe;
-import cgg.informatique.abl.webSocket.entites.Role;
+import cgg.informatique.abl.webSocket.entites.*;
 import cgg.informatique.abl.webSocket.messaging.DonneesReponseCommande;
 import cgg.informatique.abl.webSocket.messaging.Reponse;
 import cgg.informatique.abl.webSocket.messaging.ReponseCommande;
@@ -224,9 +221,10 @@ public class Lobby implements Runnable, MatchHandler, SerializableLobby {
     }
 
     @Override
-    public void matchEnded() {
+    public void matchEnded(Combat combat) {
         send("fin du match");
         matchInProgress = null;
+        this.lobbyContext.persistMatch(combat);
     }
 
     public Match getCurrentMatch() {

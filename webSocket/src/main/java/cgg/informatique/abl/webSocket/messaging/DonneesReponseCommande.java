@@ -1,7 +1,8 @@
 package cgg.informatique.abl.webSocket.messaging;
 
-import cgg.informatique.abl.webSocket.dto.SanitizedCompte;
+import cgg.informatique.abl.webSocket.dto.SanitizedUser;
 import cgg.informatique.abl.webSocket.dto.lobby.LobbyUserData;
+import cgg.informatique.abl.webSocket.dto.lobby.SanitizedLobbyUser;
 import cgg.informatique.abl.webSocket.dto.match.MatchState;
 import cgg.informatique.abl.webSocket.dto.match.MatchUserData;
 import cgg.informatique.abl.webSocket.messaging.commands.TypeCommande;
@@ -9,10 +10,9 @@ import cgg.informatique.abl.webSocket.messaging.commands.TypeCommande;
 public class DonneesReponseCommande {
     private Object[] parametres;
     private String typeCommande;
-    private SanitizedCompte de;
+    private SanitizedLobbyUser de;
 
     public DonneesReponseCommande(TypeCommande typeCommande) {
-        this.parametres = parametres;
         this.typeCommande = typeCommande.toString();
     }
 
@@ -34,9 +34,7 @@ public class DonneesReponseCommande {
     }
 
     public DonneesReponseCommande(MatchState typeCommande) {
-        this.parametres = parametres;
         this.typeCommande = typeCommande.toString();
-        this.de = de;
     }
 
     public void setParametres(Object[] parametres) {
@@ -55,11 +53,11 @@ public class DonneesReponseCommande {
         this.typeCommande = typeCommande;
     }
 
-    public SanitizedCompte getDe() {
+    public SanitizedLobbyUser getDe() {
         return de;
     }
 
-    public void setDe(SanitizedCompte de) {
+    public void setDe(SanitizedLobbyUser de) {
         this.de = de;
     }
 }

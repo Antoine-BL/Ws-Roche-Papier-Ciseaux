@@ -1,15 +1,14 @@
 package cgg.informatique.abl.webSocket.dto.match;
 
-import cgg.informatique.abl.webSocket.dto.SanitizedCompte;
+import cgg.informatique.abl.webSocket.dto.SanitizedUser;
 import cgg.informatique.abl.webSocket.dto.UserBase;
 import cgg.informatique.abl.webSocket.dto.lobby.LobbyRole;
 import cgg.informatique.abl.webSocket.dto.lobby.LobbyUserData;
+import cgg.informatique.abl.webSocket.dto.lobby.SanitizedLobbyUser;
 import cgg.informatique.abl.webSocket.entites.Compte;
 import cgg.informatique.abl.webSocket.messaging.DonneesReponseCommande;
 import cgg.informatique.abl.webSocket.messaging.commands.TypeCommande;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import java.util.Objects;
 
 public class MatchUserData extends UserBase {
     private Match match;
@@ -55,7 +54,7 @@ public class MatchUserData extends UserBase {
 
     public void setAttack(Attack attack) {
         this.attack = attack;
-        match.sendData(null, new DonneesReponseCommande(TypeCommande.ATTAQUER, this));
+        match.sendData(getNom() + " a choisi son attaque", new DonneesReponseCommande(TypeCommande.ATTAQUER, this));
     }
 
     public String getNom() {
@@ -66,7 +65,7 @@ public class MatchUserData extends UserBase {
         return user.getUser().getCourriel();
     }
 
-    public SanitizedCompte getUser() {
+    public SanitizedLobbyUser getUser() {
         return this.user;
     }
 

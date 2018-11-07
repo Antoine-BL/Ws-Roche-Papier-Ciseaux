@@ -1,7 +1,9 @@
 package cgg.informatique.abl.webSocket.controleurs.webSocket;
 
+import cgg.informatique.abl.webSocket.dao.CombatDao;
 import cgg.informatique.abl.webSocket.dto.lobby.Lobby;
 import cgg.informatique.abl.webSocket.dto.lobby.LobbyContext;
+import cgg.informatique.abl.webSocket.entites.Combat;
 import cgg.informatique.abl.webSocket.entites.Compte;
 import cgg.informatique.abl.webSocket.messaging.commands.Commande;
 import cgg.informatique.abl.webSocket.messaging.Courrier;
@@ -19,9 +21,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class FightController implements LobbyCommandContext, LobbyContext {
     private static Lobby lobby;
     private SimpMessagingTemplate msg;
+    private CombatDao combatDao;
 
-    public FightController(@Autowired SimpMessagingTemplate msg) {
+    public FightController(@Autowired SimpMessagingTemplate msg,
+                           @Autowired CombatDao combatDao) {
         this.msg = msg;
+        this.combatDao = combatDao;
     }
 
     @MessageMapping("/battle/chat")
@@ -59,6 +64,11 @@ public class FightController implements LobbyCommandContext, LobbyContext {
     @Override
     public void lobbyClosed() {
         lobby = null;
+    }
+
+    @Override
+    public void persistMatch(Combat combat) {
+        combatDao.save(combat);
     }
 
     private Compte authToCompte(Authentication auth) {

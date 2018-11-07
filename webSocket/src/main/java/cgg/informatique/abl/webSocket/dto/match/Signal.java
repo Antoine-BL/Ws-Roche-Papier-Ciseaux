@@ -4,5 +4,6 @@ public enum Signal {
     REI,
     HAJIME,
     IPPON,
-    EGAL;
+    EGAL,
+    RESTER;
 }

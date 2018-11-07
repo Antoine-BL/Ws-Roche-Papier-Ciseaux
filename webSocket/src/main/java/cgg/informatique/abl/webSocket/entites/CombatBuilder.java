@@ -13,8 +13,6 @@ public class CombatBuilder implements Combat.RougeStep, Combat.BlancStep, Combat
     private int pointsBlanc;
     private int creditsArbitre;
 
-    @Autowired private CombatDao combatDao;
-
     CombatBuilder(){}
 
     public Combat.BlancStep setRouge(Compte rouge) {
@@ -41,8 +39,7 @@ public class CombatBuilder implements Combat.RougeStep, Combat.BlancStep, Combat
         return this;
     }
 
-    public void persistCombat() {
-        Combat combat = new Combat(rouge, blanc, arbitre, pointsRouge, pointsBlanc, creditsArbitre);
-        combatDao.save(combat);
+    public Combat build() {
+        return new Combat(rouge, blanc, arbitre, pointsRouge, pointsBlanc, creditsArbitre);
     }
 }

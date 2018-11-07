@@ -4,6 +4,7 @@ import cgg.informatique.abl.webSocket.dto.lobby.LobbyRole;
 import cgg.informatique.abl.webSocket.dto.lobby.LobbyUserData;
 import cgg.informatique.abl.webSocket.dto.lobby.RoleColl;
 import cgg.informatique.abl.webSocket.entites.Combat;
+import cgg.informatique.abl.webSocket.entites.Role;
 import cgg.informatique.abl.webSocket.messaging.DonneesReponseCommande;
 import cgg.informatique.abl.webSocket.messaging.commands.TypeCommande;
 
@@ -52,6 +53,7 @@ public class Match implements SerializableMatch{
     }
 
     public void tick() {
+        sendData(null, new DonneesReponseCommande(TypeCommande.MATCH_STATE, getChrono(), this.state.getMessage()));
         if (state.getDuration() < timeSinceLastChange()) {
             state.handleTimeout(this);
         }
@@ -62,21 +64,24 @@ public class Match implements SerializableMatch{
             blanc.isReadyForFight()) {
             refAtFault();
         } else if (!rouge.isReadyForFight()) {
-            victory(blanc, rouge);
-        } else if (!rouge.isReadyForFight()) {
-            victory(rouge, blanc);
+            rougeLeft();
+        } else if (!blanc.isReadyForFight()) {
+            blancLeft();
         }
     }
 
     public void handleRound() {
-        matchHandler.send(String.format("rouge: %s, blanc: %s", rouge.getAttack(), blanc.getAttack()));
+        matchHandler.sendData(String.format("Attaque Rouge: %s",rouge.getAttack()),
+                new DonneesReponseCommande(TypeCommande.ATTAQUER, rouge, rouge.getAttack()));
+        matchHandler.sendData(String.format("Attaque Blanc: %s",blanc.getAttack()),
+                new DonneesReponseCommande(TypeCommande.ATTAQUER, blanc, blanc.getAttack()));
         setMatchState(MatchState.DECIDE);
     }
 
     public void disqualify() {
-        if (blanc.getState() == PlayerState.ESTRADE && rouge.getState() == PlayerState.ESTRADE) setMatchState(MatchState.EXIT);
-        if (blanc.getState() == PlayerState.ESTRADE)  victory(rouge, blanc);
-        if (rouge.getState() == PlayerState.ESTRADE)  victory(blanc, rouge);
+        if (blanc.getRoleCombat() != LobbyRole.BLANC && rouge.getRoleCombat() != LobbyRole.ROUGE) setMatchState(MatchState.EXIT);
+        if (blanc.getRoleCombat() != LobbyRole.BLANC)  blancLeft();
+        if (rouge.getRoleCombat() == LobbyRole.ROUGE)  rougeLeft();
     }
 
     public void rougeLeft() {
@@ -114,7 +119,11 @@ public class Match implements SerializableMatch{
 
     @Override
     public Long getChrono() {
-        return this.state.getDuration() - lastStateChange;
+        try {
+            return (this.state.getDuration() - (System.currentTimeMillis() - lastStateChange)) / 1000;
+        } catch (ArithmeticException e) {
+            return 0L;
+        }
     }
 
     @Override
@@ -129,7 +138,7 @@ public class Match implements SerializableMatch{
     public void setMatchState(MatchState state) {
         this.state = state;
         this.lastStateChange = System.currentTimeMillis();
-        matchHandler.sendData(state.getTransitionMessage(), new DonneesReponseCommande(TypeCommande.MATCH_STATE, this.state));
+        matchHandler.sendData(state.getTransitionMessage(), new DonneesReponseCommande(TypeCommande.MATCH_STATE, getChrono(),this.state, this.state.getMessage()));
     }
 
     public void sendData(String message, DonneesReponseCommande donnees) {
@@ -141,11 +150,10 @@ public class Match implements SerializableMatch{
         int ptsRouge = calculerPointsGagant(rouge, blanc) / 2;
         int ptsArbitre = -5;
 
-        persistMatch(ptsRouge, ptsBlanc, ptsArbitre);
-
         matchHandler.send(String.format("%s a commis une grave faute!", arbitre.getNom()));
         setMatchState(MatchState.EXIT);
-        matchEnded();
+
+        persistMatch(ptsRouge, ptsBlanc, ptsArbitre);
     }
 
     public void tie() {
@@ -153,11 +161,11 @@ public class Match implements SerializableMatch{
         int ptsRouge = calculerPointsGagant(rouge, blanc) / 2;
         int ptsArbitre = 1;
 
-        persistMatch(ptsRouge, ptsBlanc, ptsArbitre);
-
+        sendData(null, new DonneesReponseCommande(TypeCommande.SIGNALER, "IPPON", "NUL"));
         matchHandler.send(String.format("Match nul entre %s et %s", rouge.getNom(), blanc.getNom()));
         setMatchState(MatchState.EXIT);
-        matchEnded();
+
+        persistMatch(ptsRouge, ptsBlanc, ptsArbitre);
     }
 
     public void victory(MatchUserData victor, MatchUserData loser) {
@@ -175,25 +183,25 @@ public class Match implements SerializableMatch{
             throw new IllegalArgumentException("victor invalid");
         }
 
-        persistMatch(ptsRouge, ptsBlanc, ptsArbitre);
-
+        sendData(null, new DonneesReponseCommande(TypeCommande.SIGNALER, "IPPON", victor));
         matchHandler.send(String.format("%s a remporté son combat contre %s", victor.getNom(), loser.getNom()));
         setMatchState(MatchState.EXIT);
-        matchEnded();
+
+        persistMatch(ptsRouge, ptsBlanc, ptsArbitre);
     }
 
     private int calculerPointsGagant(MatchUserData gagnant, MatchUserData perdant) {
-        int delta = perdant.getLobbyUser().getGroupeObj().getId() - gagnant.getLobbyUser().getGroupeObj().getId();
+        int delta = perdant.getLobbyUser().getGroupe().getId() - gagnant.getLobbyUser().getGroupe().getId();
         return recompensesSelonDelta.get(delta);
     }
 
     private void persistMatch(int pointsRouge, int pointsBlanc, int creditsArbitre) {
-        Combat.Builder()
-                .setRouge(this.rouge.getCompte())
+        Combat combat = Combat.Builder().setRouge(this.rouge.getCompte())
                 .setBlanc(this.blanc.getCompte())
                 .setArbitre(this.arbitre.getCompte())
                 .setResultat(pointsRouge, pointsBlanc, creditsArbitre)
-                .persistCombat();
+                .build();
+        this.matchHandler.matchEnded(combat);
     }
 
     private long timeSinceLastChange() {
@@ -203,7 +211,42 @@ public class Match implements SerializableMatch{
     public void matchEnded() {
         if (rouge != null) matchHandler.quitter(rouge.getLobbyUser());
         if (blanc != null) matchHandler.quitter(blanc.getLobbyUser());
+    }
 
-        this.matchHandler.matchEnded();
+    public boolean arbitreARaison() {
+        return arbitreARaison(LobbyRole.ARBITRE);
+    }
+
+    public boolean arbitreARaison(LobbyRole role) {
+        int bonneReponse = trouverBonneReponse(rouge, blanc);
+
+        if (arbitre.getLobbyUser().getId() == 3) return true;
+
+        if (role == LobbyRole.ARBITRE){
+            return bonneReponse == 0;
+        } else if (role == LobbyRole.ROUGE) {
+            return bonneReponse > 0;
+        } else if (role == LobbyRole.BLANC) {
+            return  bonneReponse < 0;
+        } else {
+            throw new IllegalArgumentException();
+        }
+    }
+
+    private int trouverBonneReponse(MatchUserData joueur1, MatchUserData joueur2) {
+        int roleJ1 = joueur1.getLobbyUser().getRole().getId();
+        int roleJ2 = joueur2.getLobbyUser().getRole().getId();
+        int[][] resultats = new int[][] {
+                new int[] { 0,  1, 1, 1},
+                new int[] {-1,  0, 1,-1},
+                new int[] {-1, -1, 0, 1},
+                new int[] {-1,  1,-1, 0}
+        };
+
+        if (roleJ1 == 3 || roleJ2 == 3) {
+            return  roleJ1 - roleJ2;
+        }
+
+        return resultats[joueur1.getAttack().ordinal()][joueur2.getAttack().ordinal()];
     }
 }

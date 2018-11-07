@@ -29,16 +29,40 @@ public class Signaler extends Commande{
                 break;
             case IPPON:
                 LobbyRole cible = LobbyRole.valueOf(parametres.get(CIBLE).toUpperCase());
-                if (cible == LobbyRole.ROUGE) {
+
+                if (match.getRouge().getLobbyUser().getRole().getId() == 3) {
                     match.victory(match.getRouge(), match.getBlanc());
-                } else if (cible == LobbyRole.BLANC){
+                    break;
+                } else if (match.getBlanc().getLobbyUser().getRole().getId() == 3) {
                     match.victory(match.getBlanc(), match.getRouge());
-                } else {
-                    throw new IllegalArgumentException("Doit être rouge ou blanc");
+                    break;
                 }
+
+                if (match.arbitreARaison(cible)) {
+                    if (cible == LobbyRole.ROUGE) {
+                        match.victory(match.getRouge(), match.getBlanc());
+                    } else if (cible == LobbyRole.BLANC){
+                        match.victory(match.getBlanc(), match.getRouge());
+                    } else {
+                        throw new IllegalArgumentException("Doit être rouge ou blanc");
+                    }
+                } else {
+                    match.refAtFault();
+                }
+
                 break;
             case EGAL:
-                match.tie();
+                if (match.arbitreARaison()) {
+                    match.tie();
+                } else {
+                    match.refAtFault();
+                }
+                break;
+            case RESTER:
+                if (match.getMatchState() == MatchState.EXIT) {
+                    match.setMatchState(MatchState.OVER);
+                    MatchState.OVER.handleTimeout(match);
+                }
                 break;
         }
     }

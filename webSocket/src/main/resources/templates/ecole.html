@@ -24,10 +24,17 @@
     <app-nav v-bind:user="user" current-page="ecole">
     </app-nav>
     <div>
-        <h3>Venerables</h3>
+        <h3>Venerable</h3>
         <hr/>
         <ul>
             <app-membre-ecole v-for="venerable in venerables" v-bind:utilisateur="venerable"></app-membre-ecole>
+        </ul>
+    </div>
+    <div>
+        <h3>Section de la honte</h3>
+        <hr/>
+        <ul>
+            <app-membre-ecole v-for="honteux in deshonorables" v-bind:utilisateur="honteux"></app-membre-ecole>
         </ul>
     </div>
     <div>

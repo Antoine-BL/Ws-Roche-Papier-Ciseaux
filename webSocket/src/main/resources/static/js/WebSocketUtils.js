@@ -126,7 +126,9 @@ class WebSocketClient {
     generateSubscribeHandler(cssClass, mention, callback) {
         return (message) => {
             message = JSON.parse(message.body);
-            this.showMessage(message, cssClass, mention);
+            if (message.texte && message.texte !== '') {
+                this.showMessage(message, cssClass, mention);
+            }
             if (callback) {
                 callback(message);
             }

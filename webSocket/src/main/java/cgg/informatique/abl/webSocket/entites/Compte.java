@@ -1,7 +1,8 @@
 package cgg.informatique.abl.webSocket.entites;
 
-import cgg.informatique.abl.webSocket.dto.CompteDto;
+import cgg.informatique.abl.webSocket.controleurs.rest.CompteController;
 import cgg.informatique.abl.webSocket.dto.SanitizedCompte;
+import cgg.informatique.abl.webSocket.dto.SanitizedUser;
 import cgg.informatique.abl.webSocket.dto.UserBase;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
@@ -13,6 +14,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 
 @Entity
@@ -59,7 +61,7 @@ public class Compte extends UserBase implements UserDetails, SanitizedCompte {
 
     protected Compte() { }
 
-    private Compte(
+    Compte(
             final @NotNull @NotEmpty String courriel,
             final @NotNull @NotEmpty String motPasse,
             final String alias,
@@ -82,11 +84,7 @@ public class Compte extends UserBase implements UserDetails, SanitizedCompte {
     }
 
     public static CourrielBuilder Builder() {
-        return new Builder();
-    }
-
-    public static Builder Builder(CompteDto compteDto) {
-        return new Builder(compteDto);
+        return new CompteBuilder();
     }
 
     public Long getId() {
@@ -117,12 +115,12 @@ public class Compte extends UserBase implements UserDetails, SanitizedCompte {
         return avatar;
     }
 
-    public String getRole() {
-        return role.getAuthority();
+    public Role getRole() {
+        return role;
     }
 
-    public String getGroupe() {
-        return groupe.getAuthority();
+    public Groupe getGroupe() {
+        return groupe;
     }
 
     @Override
@@ -164,10 +162,6 @@ public class Compte extends UserBase implements UserDetails, SanitizedCompte {
         return true;
     }
 
-    public Groupe getGroupeObj() {
-        return this.groupe;
-    }
-
     @Override
     public List<Combat> getCombatsBlanc() {
         return combatsBlanc;
@@ -183,6 +177,25 @@ public class Compte extends UserBase implements UserDetails, SanitizedCompte {
         return combatsArbitre;
     }
 
+    @Override
+    public boolean isDeshonore() {
+        return !this.examensEleve
+                .stream()
+                .max(Comparator.comparingLong(Examen::getTemps))
+                .map(Examen::isReussi)
+                .orElse(true);
+    }
+
+    @Override
+    public int getPoints() {
+        return CompteController.getPointsPour(this);
+    }
+
+    @Override
+    public int getCredits() {
+        return CompteController.getCreditsPour(this);
+    }
+
     public List<Examen> getExamensProf() {
         return this.examensProf;
     }
@@ -191,76 +204,12 @@ public class Compte extends UserBase implements UserDetails, SanitizedCompte {
         return this.examensEleve;
     }
 
-    public void setGroupeObj(Groupe groupe) {
-        this.groupe = groupe;
-    }
-
-    @JsonIgnore
-    public Role getRoleObj() {
-        return this.role;
-    }
-
-    @JsonIgnore
-    public void setRoleObj(Role role) {
+    public void setRole(Role role) {
         this.role = role;
     }
 
-    public static class Builder implements CourrielBuilder, MotPasseBuilder{
-        private String courriel;
-        private String motPasse;
-        private String alias;
-        private Avatar avatar;
-        private Role role;
-        private Groupe groupe;
-
-        private Builder() { }
-
-        private Builder(CompteDto compteDto) {
-            this.courriel = compteDto.getCourriel();
-            this.motPasse = compteDto.getPassword();
-            this.alias = compteDto.getAlias();
-            this.avatar = new Avatar(compteDto.getAvatar());
-        }
-
-
-        public MotPasseBuilder avecCourriel(@NotNull String courriel) {
-            this.courriel = courriel;
-            return this;
-        }
-
-        public Builder avecMotDePasse(@NotNull String motPasse) {
-            this.motPasse = motPasse;
-            return this;
-        }
-
-        public Builder avecAlias(String alias) {
-            this.alias = alias;
-            return this;
-        }
-
-        public Builder avecRole(Role role) {
-            this.role = role;
-            return this;
-        }
-
-        public Builder avecGroupe(Groupe groupe) {
-            this.groupe = groupe;
-            return this;
-        }
-
-        public Builder avecAvatar(Avatar avatar) {
-            this.avatar = avatar;
-            return this;
-        }
-
-        public Builder avecAvatar(String avatar) {
-            this.avatar = new Avatar(avatar);
-            return this;
-        }
-
-        public Compte build() {
-            return new Compte(courriel, motPasse, alias, avatar, role, groupe);
-        }
+    public void setGroupe(Groupe groupe) {
+        this.groupe = groupe;
     }
 
     public interface CourrielBuilder{
@@ -268,7 +217,7 @@ public class Compte extends UserBase implements UserDetails, SanitizedCompte {
     }
 
     public interface MotPasseBuilder {
-        Builder avecMotDePasse(String motPasse);
+        CompteBuilder avecMotDePasse(String motPasse);
     }
 }
 

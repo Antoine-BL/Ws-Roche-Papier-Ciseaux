@@ -9,7 +9,7 @@ INSERT INTO GROUPES(id, groupe) VALUES (0, 'Blanc'), (1, 'Jaune'), (2, 'Orange')
 --Password:admin
 INSERT INTO COMPTES (id, courriel, mot_passe, alias, avatar, role, groupe) VALUES (1, 'admin@admin.ca', '$2a$10$v4yvxNB3LFS2qox3hCmopeA1HlnaJm5G0iYVXk/Xq0eG2gLNpzCLS', 'admin', 1, 3, 7)
 --Password:p
-INSERT INTO COMPTES (id, courriel, mot_passe, alias, avatar, role, groupe) VALUES (2, 'p1@p.ca', '$2a$10$2Ey/Hs2ye.0FDwzY1yRcJeC0r8hJUvC1rVHiCI2XmsgIrILHGTr6i', 'player1', 1, 1, 6)
+INSERT INTO COMPTES (id, courriel, mot_passe, alias, avatar, role, groupe) VALUES (2, 'p1@p.ca', '$2a$10$2Ey/Hs2ye.0FDwzY1yRcJeC0r8hJUvC1rVHiCI2XmsgIrILHGTr6i', 'player1', 1, 1, 5)
 INSERT INTO COMPTES (id, courriel, mot_passe, alias, avatar, role, groupe) VALUES (3, 'p2@p.ca', '$2a$10$2Ey/Hs2ye.0FDwzY1yRcJeC0r8hJUvC1rVHiCI2XmsgIrILHGTr6i', 'player2', 1, 0, 0)
 
 

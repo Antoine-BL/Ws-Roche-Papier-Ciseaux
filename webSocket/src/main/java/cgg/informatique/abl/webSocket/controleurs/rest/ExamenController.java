@@ -5,19 +5,18 @@ import cgg.informatique.abl.webSocket.dao.ExamenDao;
 import cgg.informatique.abl.webSocket.dao.GroupeDao;
 import cgg.informatique.abl.webSocket.dao.RoleDao;
 import cgg.informatique.abl.webSocket.dto.ExamDto;
+import cgg.informatique.abl.webSocket.dto.SanitizedCompte;
 import cgg.informatique.abl.webSocket.entites.Compte;
 import cgg.informatique.abl.webSocket.entites.Examen;
-import cgg.informatique.abl.webSocket.entites.Groupe;
-import cgg.informatique.abl.webSocket.entites.Role;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import javax.xml.ws.Response;
 import java.net.URI;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @RestController
 @RequestMapping("/api/examens")
@@ -70,60 +69,80 @@ public class ExamenController {
     }
 
     @GetMapping(value = "/eligibles/role")
-    public ResponseEntity<Map<String, List<Compte>>> trouverEligiblesExamRole() {
-        Map<String, List<Compte>> eligiblesParNiveau = new HashMap<>();
+    public ResponseEntity<Map<String, List<SanitizedCompte>>> trouverEligiblesExamRole() {
+        Map<String, List<SanitizedCompte>> eligiblesParNiveau = new HashMap<>();
 
-        List<Compte> eligiblesAncien = new ArrayList<>();
-        List<Compte> eligiblesSensei = new ArrayList<>();
-        List<Compte> senseis = new ArrayList<>();
+        List<SanitizedCompte> eligiblesAncien = new ArrayList<>();
+        List<SanitizedCompte> eligiblesSensei = new ArrayList<>();
+        List<SanitizedCompte> senseis = new ArrayList<>();
+        List<SanitizedCompte> honteux = new ArrayList<>();
 
-       compteDao.findAll()
-                .stream()
-                .filter(c -> c.getRole().equals("Nouveau"))
-                .filter(c -> c.getCombatsArbitre().size() >= 30)
-                .filter(c -> CompteController.getCreditsPour(c) >= 10)
+        getTous()
+                .filter(ExamenController::estEligibleAncien)
+                .map(Compte::sanitize)
                 .forEach(eligiblesAncien::add);
 
-       compteDao.findAll()
-               .stream()
-               .filter(c -> c.getRole().equals("Ancien"))
-               .filter(c -> c.getGroupe().equals("Noir"))
-               .forEach(eligiblesSensei::add);
+        getTous()
+               .filter(ExamenController::estEligibleSensei)
+                .map(Compte::sanitize)
+                .forEach(eligiblesSensei::add);
+
+        getTous()
+                .filter(c -> c.getRole().getRole().equals("Sensei"))
+                .map(Compte::sanitize)
+                .forEach(senseis::add);
 
         compteDao.findAll()
                 .stream()
-                .filter(c -> c.getRole().equals("Sensei"))
-                .forEach(senseis::add);
+                .filter(Compte::isDeshonore)
+                .forEach(honteux::add);
+
 
         eligiblesParNiveau.put("Ancien", eligiblesAncien);
         eligiblesParNiveau.put("Sensei", eligiblesSensei);
         eligiblesParNiveau.put("Demotion", senseis);
+        eligiblesParNiveau.put("Deshonorables", honteux);
 
         return ResponseEntity.ok(eligiblesParNiveau);
     }
 
-    @GetMapping(value = "/eligibles/groupe")
-    public ResponseEntity<Map<String, List<Compte>>> trouverEligiblesExamGroupe() {
-        Map<String, List<Compte>> eligiblesParGroupe = new HashMap<>();
+    private static boolean estEligibleAncien(Compte c) {
+        return c.getRole().getRole().equals("Nouveau")
+                && c.getCombatsArbitre().size() >= 30
+                && c.getCredits() >= 10;
+    }
 
-        List<Compte> comptesEligibles = compteDao.findAll()
-                .stream()
-                .filter(c -> CompteController.getPointsPour(c) >= 100)
-                .filter(c -> CompteController.getCreditsPour(c) >= 10)
+    private static boolean estEligibleSensei(Compte c) {
+        return  c.getRole().getRole().equals("Ancien")
+                && c.getGroupe().getGroupe().equals("Noir");
+    }
+
+    @GetMapping(value = "/eligibles/groupe")
+    public ResponseEntity<Map<String, List<SanitizedCompte>>> trouverEligiblesExamGroupe() {
+        Map<String, List<SanitizedCompte>> eligiblesParGroupe = new HashMap<>();
+
+        List<Compte> comptesEligibles = getTous()
+                .filter(c -> c.getGroupe().getId() < 6)
+                .filter(c -> c.getPoints() >= 100)
+                .filter(c -> c.getCredits() >= 10)
                 .collect(Collectors.toList());
 
         comptesEligibles
                 .forEach(c -> {
-                    if (!eligiblesParGroupe.containsKey(c.getGroupe())) {
-                        List<Compte> comptes = new ArrayList<>();
+                    if (!eligiblesParGroupe.containsKey(c.getGroupe().getGroupe())) {
+                        List<SanitizedCompte> comptes = new ArrayList<>();
                         comptes.add(c);
 
-                        eligiblesParGroupe.put(c.getGroupe(), comptes);
+                        eligiblesParGroupe.put(c.getGroupe().getGroupe(), comptes);
                     } else {
-                        eligiblesParGroupe.get(c.getGroupe()).add(c);
+                        eligiblesParGroupe.get(c.getGroupe().getGroupe()).add(c);
                     }
                 });
 
         return ResponseEntity.ok(eligiblesParGroupe);
+    }
+
+    private Stream<Compte> getTous() {
+        return compteDao.findAll().stream();
     }
 }

@@ -20,8 +20,6 @@ public class Attaquer  extends Commande{
             Attack attack = Attack.valueOf(parametres.get(ATTACK).toUpperCase());
 
             match.getParticipant(lud).setAttack(attack);
-
-            send(" a choisi une attaque!", context);
         } catch (IllegalArgumentException e) {
             send(e.getMessage(), context);
         }
