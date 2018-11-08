@@ -9,7 +9,6 @@ import javax.persistence.*;
 
 @Entity
 @Table(name="EXAMENS")
-@JsonDeserialize(builder = Examen.class)
 public class Examen {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,12 +16,12 @@ public class Examen {
 
     @ManyToOne(fetch = FetchType.EAGER, targetEntity = Compte.class)
     @JoinColumn(name = "ID_Professeur")
-    @JsonBackReference
+    @JsonBackReference(value="exam-prof")
     private SanitizedCompte professeur;
 
     @ManyToOne(fetch = FetchType.EAGER, targetEntity = Compte.class)
     @JoinColumn(name = "ID_Eleve")
-    @JsonBackReference
+    @JsonBackReference(value="exam-eleve")
     private SanitizedCompte eleve;
 
     private boolean reussi;

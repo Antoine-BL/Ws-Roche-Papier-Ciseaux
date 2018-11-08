@@ -164,6 +164,9 @@ public class CompteController {
 
     public static Integer getCreditsPour(Compte compte) {
         int credits = 0;
+        if (compte.getExamensEleve() == null) return 0;
+        if (compte.getCombatsArbitre() == null) return 0;
+
         long tempsMax = compte
                 .getExamensEleve()
                 .stream()
@@ -188,6 +191,10 @@ public class CompteController {
 
     public static Integer getPointsPour(Compte compte) {
         int points = 0;
+        if (compte.getExamensEleve() == null) return 0;
+        if (compte.getCombatsRouge() == null) return 0;
+        if (compte.getCombatsBlanc() == null) return 0;
+
         long tempsMax = compte
                 .getExamensEleve()
                 .stream()

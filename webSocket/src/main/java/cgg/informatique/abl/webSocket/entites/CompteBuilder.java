@@ -1,6 +1,7 @@
 package cgg.informatique.abl.webSocket.entites;
 
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 
 public class CompteBuilder implements Compte.CourrielBuilder, Compte.MotPasseBuilder {
     private String courriel;
@@ -48,6 +49,11 @@ public class CompteBuilder implements Compte.CourrielBuilder, Compte.MotPasseBui
     }
 
     public Compte build() {
-        return new Compte(courriel, motPasse, alias, avatar, role, groupe);
+        Compte compte = new Compte(courriel, motPasse, alias, avatar, role, groupe);
+        compte.setCombatsArbitre(new ArrayList<>());
+        compte.setCombatsBlanc(new ArrayList<>());
+        compte.setCombatsRouge(new ArrayList<>());
+
+        return compte;
     }
 }

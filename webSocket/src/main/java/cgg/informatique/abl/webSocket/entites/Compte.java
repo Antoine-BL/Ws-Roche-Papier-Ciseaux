@@ -6,6 +6,7 @@ import cgg.informatique.abl.webSocket.dto.SanitizedUser;
 import cgg.informatique.abl.webSocket.dto.UserBase;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -19,6 +20,7 @@ import java.util.List;
 
 @Entity
 @Table(name="COMPTES")
+@JsonSerialize(as=SanitizedCompte.class)
 public class Compte extends UserBase implements UserDetails, SanitizedCompte {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,23 +42,23 @@ public class Compte extends UserBase implements UserDetails, SanitizedCompte {
     private Groupe groupe;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "blanc",targetEntity = Combat.class)
-    @JsonManagedReference
+    @JsonManagedReference(value="combat-blanc")
     private List<Combat> combatsBlanc;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "rouge",targetEntity = Combat.class)
-    @JsonManagedReference
+    @JsonManagedReference(value="combat-rouge")
     private List<Combat> combatsRouge;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "arbitre",targetEntity = Combat.class)
-    @JsonManagedReference
+    @JsonManagedReference(value="combat-arbitre")
     private List<Combat> combatsArbitre;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "professeur",targetEntity = Examen.class)
-    @JsonManagedReference
+    @JsonManagedReference(value="exam-prof")
     private List<Examen> examensProf;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "eleve",targetEntity = Examen.class)
-    @JsonManagedReference
+    @JsonManagedReference(value="exam-eleve")
     private List<Examen> examensEleve;
 
     protected Compte() { }
@@ -177,8 +179,30 @@ public class Compte extends UserBase implements UserDetails, SanitizedCompte {
         return combatsArbitre;
     }
 
+    public void setCombatsBlanc(List<Combat> combatsBlanc) {
+        this.combatsBlanc = combatsBlanc;
+    }
+
+    public void setCombatsRouge(List<Combat> combatsRouge) {
+        this.combatsRouge = combatsRouge;
+    }
+
+    public void setCombatsArbitre(List<Combat> combatsArbitre) {
+        this.combatsArbitre = combatsArbitre;
+    }
+
+    public void setExamensProf(List<Examen> examensProf) {
+        this.examensProf = examensProf;
+    }
+
+    public void setExamensEleve(List<Examen> examensEleve) {
+        this.examensEleve = examensEleve;
+    }
+
     @Override
+    @JsonIgnore
     public boolean isDeshonore() {
+        if (this.examensEleve == null) return false;
         return !this.examensEleve
                 .stream()
                 .max(Comparator.comparingLong(Examen::getTemps))
@@ -187,10 +211,12 @@ public class Compte extends UserBase implements UserDetails, SanitizedCompte {
     }
 
     @Override
+    @JsonIgnore
     public int getPoints() {
         return CompteController.getPointsPour(this);
     }
 
+    @JsonIgnore
     @Override
     public int getCredits() {
         return CompteController.getCreditsPour(this);
