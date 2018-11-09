@@ -33,7 +33,7 @@ class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.authorizeRequests()
             .antMatchers("/", "/connexion", "/compte/creer").permitAll()
             .antMatchers("/passage").hasAnyAuthority("Sensei", "Venerable")
-            .antMatchers("/kumite").authenticated()
+            .antMatchers("/kumite", "/monCompte**", "/monCompte/supprimer").authenticated()
             .anyRequest().permitAll();
     }
 

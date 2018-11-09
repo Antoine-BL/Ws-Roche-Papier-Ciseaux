@@ -5,6 +5,7 @@ import cgg.informatique.abl.webSocket.dto.SanitizedCompte;
 import cgg.informatique.abl.webSocket.dto.SanitizedUser;
 import cgg.informatique.abl.webSocket.dto.UserBase;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.springframework.security.core.GrantedAuthority;
@@ -21,6 +22,7 @@ import java.util.List;
 @Entity
 @Table(name="COMPTES")
 @JsonSerialize(as=SanitizedCompte.class)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Compte extends UserBase implements UserDetails, SanitizedCompte {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -236,6 +238,18 @@ public class Compte extends UserBase implements UserDetails, SanitizedCompte {
 
     public void setGroupe(Groupe groupe) {
         this.groupe = groupe;
+    }
+
+    public void setMotPasse(String motPasse) {
+        this.motPasse = motPasse;
+    }
+
+    public void setAlias(String alias) {
+        this.alias = alias;
+    }
+
+    public void setAvatar(Avatar avatar) {
+        this.avatar = avatar;
     }
 
     public interface CourrielBuilder{

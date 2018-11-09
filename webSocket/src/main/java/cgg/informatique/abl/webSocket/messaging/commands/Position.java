@@ -1,10 +1,10 @@
 package cgg.informatique.abl.webSocket.messaging.commands;
 
-import cgg.informatique.abl.webSocket.dto.lobby.Lobby;
-import cgg.informatique.abl.webSocket.dto.lobby.LobbyUserData;
-import cgg.informatique.abl.webSocket.dto.match.Match;
-import cgg.informatique.abl.webSocket.dto.match.MatchUserData;
-import cgg.informatique.abl.webSocket.dto.match.PlayerState;
+import cgg.informatique.abl.webSocket.game.lobby.Lobby;
+import cgg.informatique.abl.webSocket.game.lobby.LobbyUserData;
+import cgg.informatique.abl.webSocket.game.match.Match;
+import cgg.informatique.abl.webSocket.game.match.MatchUserData;
+import cgg.informatique.abl.webSocket.game.match.PlayerState;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 @JsonDeserialize

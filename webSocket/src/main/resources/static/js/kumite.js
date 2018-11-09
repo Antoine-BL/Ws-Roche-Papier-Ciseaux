@@ -48,13 +48,11 @@ $(document).ready(() => {
         },
         SALUER:{
             handle: (donnees) => {
-                console.log(donnees);
                 joueurSalue(donnees.de);
             }
         },
         POSITION: {
             handle: (donnees) => {
-                console.log(donnees);
                 joueurApproche(donnees.de);
             }
         },
@@ -147,7 +145,6 @@ $(document).ready(() => {
                 Roles[lobbyPos.role].set(utilisateur, lobbyPos)
 
                 if (this.user.courriel === utilisateur.courriel) {
-                    console.log('setUser');
                     this.user.roleCombat = lobbyPos.role;
                 }
             },
@@ -175,7 +172,12 @@ $(document).ready(() => {
                 websocket.sendCommandTo(sendTopics.COMMAND, new Commande('ROLE', [e.role, e.index]))
             },
             rester: function() {
-                websocket.sendCommandTo(sendTopics.COMMAND, new Commande('SIGNALER', 'RESTER'));
+                websocket.sendCommandTo(sendTopics.COMMAND, new Commande('SIGNALER', ['RESTER']))
+            },
+            push: function (el) {
+                this.messages.push(el);
+                const container = $('#messagerie')[0];
+                container.scrollTop = container.scrollHeight;
             }
         }
     });
@@ -217,7 +219,7 @@ $(document).ready(() => {
         const account = data;
         app.user = data;
 
-        websocket = new WebSocketClient($('#tbMessage'), app.messages, account, app);
+        websocket = new WebSocketClient($('#tbMessage'), app, account, app);
 
         $("#frmMessage").on('submit', function (e) {
             e.preventDefault();

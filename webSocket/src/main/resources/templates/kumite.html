@@ -32,6 +32,7 @@
                               v-on:position="position"
                               v-on:saluer="saluer"
                               v-on:signaler="signaler"
+                              v-on:rester="rester"
                               v-if="user && user.roleCombat && user.roleCombat != 'SPECTATEUR' && user.roleCombat != 'COMBATTANT'"
                               v-bind:role="user.roleCombat"
                               v-bind:state="state">

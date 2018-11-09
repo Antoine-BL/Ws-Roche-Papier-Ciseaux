@@ -202,7 +202,7 @@ Vue.component('app-controls', {
                         '<button class="btn btn-primary" v-on:click="decision">IPPON!</button>' +
                     '</div>' +
                     '<div v-if="state == \'EXIT\'" class="form-group">' +
-                        '<button class="btn btn-primary" v-on:click="emit(\'rester\')">Rester?</button>' +
+                        '<button class="btn btn-primary" v-on:click="$emit(\'rester\')">Rester?</button>' +
                     '</div>' +
                 '</div>' +
                 '<div v-if="role == \'ROUGE\' || role == \'BLANC\'" class="inline-form">' +
@@ -234,9 +234,9 @@ Vue.component('app-controls', {
                 { text: 'Ciseaux', value: 'CISEAUX' },
             ],
             decisions: [
-                { text: 'Rouge', value: 'ROUGE' },
-                { text: 'Nul', value: 'NUL' },
                 { text: 'Blanc', value: 'BLANC' },
+                { text: 'Nul', value: 'NUL' },
+                { text: 'Rouge', value: 'ROUGE' },
             ],
         }
     },

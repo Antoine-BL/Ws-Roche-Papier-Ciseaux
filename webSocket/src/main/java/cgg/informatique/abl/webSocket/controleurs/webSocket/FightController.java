@@ -1,8 +1,8 @@
 package cgg.informatique.abl.webSocket.controleurs.webSocket;
 
 import cgg.informatique.abl.webSocket.dao.CombatDao;
-import cgg.informatique.abl.webSocket.dto.lobby.Lobby;
-import cgg.informatique.abl.webSocket.dto.lobby.LobbyContext;
+import cgg.informatique.abl.webSocket.game.lobby.Lobby;
+import cgg.informatique.abl.webSocket.game.lobby.LobbyContext;
 import cgg.informatique.abl.webSocket.entites.Combat;
 import cgg.informatique.abl.webSocket.entites.Compte;
 import cgg.informatique.abl.webSocket.messaging.commands.Commande;

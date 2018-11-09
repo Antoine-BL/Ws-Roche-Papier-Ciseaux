@@ -1,8 +1,8 @@
 package cgg.informatique.abl.webSocket.messaging.commands;
 
-import cgg.informatique.abl.webSocket.dto.lobby.Lobby;
-import cgg.informatique.abl.webSocket.dto.lobby.LobbyRole;
-import cgg.informatique.abl.webSocket.dto.lobby.LobbyUserData;
+import cgg.informatique.abl.webSocket.game.lobby.Lobby;
+import cgg.informatique.abl.webSocket.game.lobby.LobbyRole;
+import cgg.informatique.abl.webSocket.game.lobby.LobbyUserData;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 @JsonDeserialize

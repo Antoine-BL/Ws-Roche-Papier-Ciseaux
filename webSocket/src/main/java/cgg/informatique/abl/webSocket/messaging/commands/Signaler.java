@@ -1,11 +1,10 @@
 package cgg.informatique.abl.webSocket.messaging.commands;
 
-import cgg.informatique.abl.webSocket.dto.lobby.Lobby;
-import cgg.informatique.abl.webSocket.dto.lobby.LobbyRole;
-import cgg.informatique.abl.webSocket.dto.lobby.LobbyUserData;
-import cgg.informatique.abl.webSocket.dto.match.Match;
-import cgg.informatique.abl.webSocket.dto.match.MatchState;
-import cgg.informatique.abl.webSocket.dto.match.Signal;
+import cgg.informatique.abl.webSocket.game.lobby.Lobby;
+import cgg.informatique.abl.webSocket.game.lobby.LobbyRole;
+import cgg.informatique.abl.webSocket.game.match.Match;
+import cgg.informatique.abl.webSocket.game.match.MatchState;
+import cgg.informatique.abl.webSocket.game.match.Signal;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 @JsonDeserialize()
@@ -28,7 +27,12 @@ public class Signaler extends Commande{
                 match.setMatchState(MatchState.START);
                 break;
             case IPPON:
-                LobbyRole cible = LobbyRole.valueOf(parametres.get(CIBLE).toUpperCase());
+                LobbyRole cible;
+                try {
+                    cible = LobbyRole.valueOf(parametres.get(CIBLE).toUpperCase());
+                } catch (Exception e) {
+                    cible = LobbyRole.ARBITRE;
+                }
 
                 if (match.getRouge().getLobbyUser().getRole().getId() == 3) {
                     match.victory(match.getRouge(), match.getBlanc());
@@ -43,6 +47,8 @@ public class Signaler extends Commande{
                         match.victory(match.getRouge(), match.getBlanc());
                     } else if (cible == LobbyRole.BLANC){
                         match.victory(match.getBlanc(), match.getRouge());
+                    } else if (cible == LobbyRole.ARBITRE){
+                        match.tie();
                     } else {
                         throw new IllegalArgumentException("Doit être rouge ou blanc");
                     }
@@ -60,8 +66,7 @@ public class Signaler extends Commande{
                 break;
             case RESTER:
                 if (match.getMatchState() == MatchState.EXIT) {
-                    match.setMatchState(MatchState.OVER);
-                    MatchState.OVER.handleTimeout(match);
+                    match.setArbitreReste(true);
                 }
                 break;
         }

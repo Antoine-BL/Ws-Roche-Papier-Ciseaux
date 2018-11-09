@@ -1,10 +1,9 @@
 package cgg.informatique.abl.webSocket.messaging;
 
-import cgg.informatique.abl.webSocket.dto.SanitizedUser;
-import cgg.informatique.abl.webSocket.dto.lobby.LobbyUserData;
-import cgg.informatique.abl.webSocket.dto.lobby.SanitizedLobbyUser;
-import cgg.informatique.abl.webSocket.dto.match.MatchState;
-import cgg.informatique.abl.webSocket.dto.match.MatchUserData;
+import cgg.informatique.abl.webSocket.game.lobby.LobbyUserData;
+import cgg.informatique.abl.webSocket.game.lobby.SanitizedLobbyUser;
+import cgg.informatique.abl.webSocket.game.match.MatchState;
+import cgg.informatique.abl.webSocket.game.match.MatchUserData;
 import cgg.informatique.abl.webSocket.messaging.commands.TypeCommande;
 
 public class DonneesReponseCommande {
