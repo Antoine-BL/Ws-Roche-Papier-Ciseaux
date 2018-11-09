@@ -8,7 +8,7 @@ import java.lang.reflect.InvocationTargetException;
 public enum MatchState {
     WAITING(15, "Que les combattants se présentent à l'avant", WaitingHandler.class, "Attente"),
     READY(15, "Rei!", ReadyHandler.class, "Prêt"),
-    START(10, "Hajime!", StartHandler.class, "Combat!"),
+    START(3, "Hajime!", StartHandler.class, "Combat!"),
     DECIDE(15, "L'arbitre doit décider d'un verdict", DecideHandler.class, "Décision"),
     EXIT(20, "Les combattants peuvent quitter", ExitHandler.class, "Quitter"),
     OVER(0, "Fin du match. Les joueurs sont retournés à leurs positions", OverHandler.class, "");

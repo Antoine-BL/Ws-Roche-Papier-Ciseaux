@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html   xmlns="http://www.w3.org/1999/xhtml">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:v-bind="http://www.w3.org/1999/xhtml"
+      xmlns:v-on="http://www.w3.org/1999/xhtml">
 <head>
     <title>Notre École</title>
     <link href="/webjars/bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -23,42 +24,55 @@
 <div id="app">
     <app-nav v-bind:user="user" current-page="ecole">
     </app-nav>
-    <div>
+    <div v-if="venerables && venerables.length == 0">
         <h3>Venerable</h3>
         <hr/>
         <ul>
-            <app-membre-ecole v-for="venerable in venerables" v-bind:utilisateur="venerable"></app-membre-ecole>
+            <app-membre-ecole class="d-inline-block" v-for="venerable in venerables" v-bind:utilisateur="venerable"></app-membre-ecole>
         </ul>
     </div>
-    <div>
+    <div v-if="deshonorables && deshonorables.length == 0">
         <h3>Section de la honte</h3>
         <hr/>
         <ul>
-            <app-membre-ecole v-for="honteux in deshonorables" v-bind:utilisateur="honteux"></app-membre-ecole>
+            <div v-for="honteux in deshonorables">
+                <app-membre-ecole class="d-inline-block" v-bind:utilisateur="honteux"></app-membre-ecole>
+                <button class="btn btn-danger d-inline-block" v-if="user && (user.role.role == 'Venerable' || user.role.role == 'Sensei')" v-on:click="supprimer(honteux.id)">
+                    Expulser du dojo
+                </button>
+            </div>
         </ul>
     </div>
-    <div>
-        <hr/>
-        <h3>Sensei</h3>
+    <div v-if="senseis && senseis.length == 0">
+        <h3>Senseis</h3>
         <hr/>
         <ul>
-            <app-membre-ecole v-for="sensei in senseis" v-bind:utilisateur="sensei"></app-membre-ecole>
+            <app-membre-ecole class="d-inline-block" v-for="sensei in senseis" v-bind:utilisateur="sensei"></app-membre-ecole>
         </ul>
     </div>
-    <div>
-        <hr/>
+    <div v-if="anciens && anciens.length == 0">
         <h3>Ancien</h3>
         <hr/>
         <ul>
-            <app-membre-ecole v-for="ancien in anciens" v-bind:utilisateur="ancien"></app-membre-ecole>
+            <div v-for="ancien in anciens">
+                <app-membre-ecole class="d-inline-block" v-bind:utilisateur="ancien"></app-membre-ecole>
+                <button class="btn btn-danger d-inline-block" v-if="user && (user.role.role == 'Venerable' || user.role.role == 'Sensei')" v-on:click="supprimer(ancien.id)">
+                    Expulser du dojo
+                </button>
+            </div>
         </ul>
     </div>
-    <div>
+    <div v-if="nouveaux && nouveaux.length">
         <hr/>
         <h3>Nouveau</h3>
         <hr/>
         <ul>
-            <app-membre-ecole v-for="nouveau in nouveaux" v-bind:utilisateur="nouveau"></app-membre-ecole>
+            <div v-for="nouveau in nouveaux">
+                <app-membre-ecole class="d-inline-block" v-bind:utilisateur="nouveau"></app-membre-ecole>
+                <button class="btn btn-danger d-inline-block" v-if="user && (user.role.role == 'Venerable' || user.role.role == 'Sensei')" v-on:click="supprimer(nouveau.id)">
+                    Expulser du dojo
+                </button>
+            </div>
         </ul>
     </div>
 </div>

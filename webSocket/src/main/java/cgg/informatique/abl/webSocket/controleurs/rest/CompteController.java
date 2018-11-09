@@ -130,7 +130,7 @@ public class CompteController {
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping("/compte")
+    @PutMapping("/comptes")
     public ResponseEntity modifierCompte(@RequestBody Compte compte){
         if (!compteDao.exists(Example.of(compte))) {
             return ResponseEntity.badRequest().build();
@@ -141,8 +141,8 @@ public class CompteController {
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("/comptes")
-    public ResponseEntity deleteCompte(Long id){
+    @DeleteMapping("/comptes/{id}")
+    public ResponseEntity deleteCompte(@PathVariable Long id){
         if (!compteDao.existsById(id)) {
             return ResponseEntity.badRequest().build();
         }
@@ -182,7 +182,7 @@ public class CompteController {
             credits -= examen.isReussi() ? 10 : 5;
         }
 
-        if (compte.getRole().getId() > 0) {
+        if (compte.getRole().getId() > 0 && credits > 10) {
             credits -= 10;
         }
 

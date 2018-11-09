@@ -12,7 +12,8 @@ Vue.component('app-nav', {
         '            <app-nav-item v-if="currentPage != \'ecole\'" text="Notre École" destination="/ecole"></app-nav-item>' +
         '            <app-nav-item v-if="currentPage != \'kumite\' && user" text="Kumite" destination="/kumite"></app-nav-item>' +
         '            <app-nav-item v-if="currentPage != \'passage\' && user && (user.role.role == \'Venerable\' || user.role.role == \'Sensei\')" text="Passage de Grades" destination="/passage"></app-nav-item>' +
-        '            <a v-if="user == null" class="nav-item active btn btn-success mr-auto" id="connexion" href="/connexion" role="button">Se connecter</a>' +
+        '            <app-nav-item v-if="currentPage != \'passage\' && user && (user.role.role == \'Venerable\' || user.role.role == \'Sensei\')" text="Gestion des Membres" destination="/passage"></app-nav-item>' +
+        '            <a v-if="user == null" class="nav-item active btn btn-success" id="connexion" href="/connexion" role="button">Se connecter</a>' +
         '            <app-profile v-if="user" v-bind:user="user"></app-profile>' +
         '        </b-navbar-nav>\n' +
         '    </b-collapse>\n' +
@@ -33,7 +34,10 @@ Vue.component('app-profile', {
 '                    <b-dropdown-header>Connecté en tant que: {{user.alias}}</b-dropdown-header>\n' +
 '                    <div class="dropdown-item-text" >Rôle: {{user.role.role}}</div>\n' +
 '                    <div class="dropdown-item-text" >Groupe: {{user.groupe.groupe}}</div>\n' +
+'                    <div class="dropdown-item-text" >Points: {{user.points}}</div>\n' +
+'                    <div class="dropdown-item-text" >Crédits: {{user.credits}}</div>\n' +
 '                    <div class="dropdown-divider"></div>\n' +
+'                    <b-dropdown-item href="/monCompte" variant="danger">Gérer mon compte</b-dropdown-item>\n' +
 '                    <b-dropdown-item href="/deconnexion" variant="danger">Déconnexion</b-dropdown-item>\n' +
 '                </b-dropdown>\n'
 });
