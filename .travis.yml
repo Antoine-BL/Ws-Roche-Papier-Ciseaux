@@ -3,6 +3,9 @@ jdk:
   - oraclejdk8
 script:
   - gradle build
+addons:
+  ssh_known_hosts:
+  - 424v.cgodin.qc.ca
 after_success:
  - curl --insecure --ssl-req -T ${projectRoot}/build/libs/${jarName} --url ftp://${user}:${password}@424v.cgodin.qc.ca
  - ssh ${user}@424v.cgodin.qc.ca
