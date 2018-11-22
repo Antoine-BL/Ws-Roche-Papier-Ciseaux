@@ -3,7 +3,7 @@ install: true
 jdk:
   - oraclejdk8
 script:
-  - ./websocket/gradlew build --scan -s
+  - $TRAVIS_BUILD_DIR/websocket/gradlew build --scan -s
 addons:
   ssh_known_hosts:
   - 424v.cgodin.qc.ca
