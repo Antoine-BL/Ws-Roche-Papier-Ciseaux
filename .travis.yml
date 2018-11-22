@@ -10,6 +10,6 @@ addons:
   ssh_known_hosts:
   - 424v.cgodin.qc.ca
 after_success:
- - ls -R
- - curl --insecure --ssl-req -T $TRAVIS_BUILD_DIR/${projectRoot}/build/libs/${jarName} --url ftp://${user}:${password}@424v.cgodin.qc.ca
+ - cd $TRAVIS_BUILD_DIR
+ - curl --insecure --ssl-req -T ./${projectRoot}/build/libs/${jarName} --url ftp://${user}:${password}@424v.cgodin.qc.ca
  - ssh ${user}@424v.cgodin.qc.ca "nohup java -jar webSocket-0.0.1-SNAPSHOT.jar > ./log.txt &"
