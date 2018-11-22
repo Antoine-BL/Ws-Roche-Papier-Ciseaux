@@ -12,5 +12,5 @@ addons:
 after_success:
  - cd $TRAVIS_BUILD_DIR
  - curl --insecure --ssl-req --ftp-create-dirs -T ./${projectRoot}/build/libs/${jarName} --url ftp://${user}:${password}@424v.cgodin.qc.ca
- - ssh ${user}@424v.cgodin.qc.ca "kill $(lsof -t -i:8082)kill $(lsof -t -i:8082)"
+ - ssh ${user}@424v.cgodin.qc.ca "kill $(lsof -t -i:8082)kill $(lsof -t -i:${port})"
  - ssh ${user}@424v.cgodin.qc.ca "nohup java -jar webSocket-0.0.1-SNAPSHOT.jar > ./log.txt &"
