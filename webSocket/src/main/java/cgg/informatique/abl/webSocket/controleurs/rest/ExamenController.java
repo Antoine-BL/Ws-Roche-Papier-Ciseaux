@@ -50,7 +50,7 @@ public class ExamenController {
 
     @PostMapping(value = "")
     public ResponseEntity creerExamen(@RequestBody ExamDto exam) {
-        Compte professeur = compteDao.findById(exam.getProfesseur()).orElseThrow(IllegalStateException::new);
+        Compte professeur = compteDao.findByCourriel(exam.getProfesseur()).orElseThrow(IllegalStateException::new);
         Compte eleve = compteDao.findById(exam.getEleve()).orElseThrow(IllegalStateException::new);
 
         Examen examen = new Examen(professeur, eleve);

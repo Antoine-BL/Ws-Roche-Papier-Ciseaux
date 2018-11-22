@@ -37,8 +37,8 @@
                 <ul>
                 <span v-for="e in eligibles" class="form-inline">
                     <app-membre-ecole class="d-inline-block"  v-bind:utilisateur="e"></app-membre-ecole>
-                    <button class="btn btn-success" v-on:click="reussir(index, key, e.id)">Réussir Examen</button>
-                    <button class="btn btn-danger" v-on:click="echouer(index, key, e.id)">Échouer Examen</button>
+                    <button class="btn btn-success" v-on:click="reussir(index, key, e.courriel)">Réussir Examen</button>
+                    <button class="btn btn-danger" v-on:click="echouer(index, key, e.courriel)">Échouer Examen</button>
                 </span>
                 </ul>
                 <hr/>
@@ -53,7 +53,7 @@
             <ul>
                 <span v-for="(e, index) in eligiblesRole.Ancien" class="form-inline">
                     <app-membre-ecole class="d-inline-block"  v-bind:utilisateur="e"></app-membre-ecole>
-                    <button class="btn btn-success" v-on:click="reussirAncien(e.id, index)">Promotion</button>
+                    <button class="btn btn-success" v-on:click="reussirAncien(e.courriel, index)">Promotion</button>
                 </span>
             </ul>
             <hr/>
@@ -62,14 +62,14 @@
                 <ul>
                 <span v-for="(e, index) in eligiblesRole.Sensei" class="form-inline">
                     <app-membre-ecole class="d-inline-block"  v-bind:utilisateur="e"></app-membre-ecole>
-                    <button class="btn btn-success" v-on:click="reussirSensei(e.id, index)">Promotion</button>
+                    <button class="btn btn-success" v-on:click="reussirSensei(e.courriel, index)">Promotion</button>
                 </span>
                 </ul>
                 <h5 v-if="eligiblesRole.Demotion.length > 0" class="text-center">Sensei vers Ancien</h5>
                 <ul>
                 <span v-for="(e, index) in eligiblesRole.Demotion" class="form-inline">
                     <app-membre-ecole class="d-inline-block"  v-bind:utilisateur="e"></app-membre-ecole>
-                    <button class="btn btn-danger" v-on:click="echouerSensei(e.id, index)">Demotion</button>
+                    <button class="btn btn-danger" v-on:click="echouerSensei(e.courriel, index)">Demotion</button>
                 </span>
                 </ul>
             </div>

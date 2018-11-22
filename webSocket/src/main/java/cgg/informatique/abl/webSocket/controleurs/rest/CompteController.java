@@ -1,21 +1,30 @@
 package cgg.informatique.abl.webSocket.controleurs.rest;
 
 import cgg.informatique.abl.webSocket.dao.*;
+import cgg.informatique.abl.webSocket.dto.AuthRequest;
 import cgg.informatique.abl.webSocket.dto.SanitizedCompte;
 import cgg.informatique.abl.webSocket.dto.SanitizedUser;
 import cgg.informatique.abl.webSocket.entites.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.net.URI;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static org.springframework.security.web.context.HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY;
 
 @RestController()
 @RequestMapping("/api")
@@ -25,25 +34,43 @@ public class CompteController {
     private ExamenDao examenDao;
     private GroupeDao groupeDao;
     private RoleDao roleDao;
+    private AuthenticationManager authManager;
 
     public CompteController(
             @Autowired CompteDao compteDao,
             @Autowired CombatDao combatDao,
             @Autowired ExamenDao examenDao,
             @Autowired GroupeDao groupeDao,
+            @Autowired AuthenticationManager authManager,
             @Autowired RoleDao roleDao) {
         this.compteDao = compteDao;
         this.combatDao = combatDao;
         this.examenDao = examenDao;
         this.groupeDao = groupeDao;
         this.roleDao = roleDao;
+        this.authManager = authManager;
+    }
+
+    @PostMapping("/authenticate")
+    public ResponseEntity apiAuth(@RequestBody AuthRequest usernamePass,
+                          @Autowired  HttpServletRequest req) {
+        Compte userAccount = compteDao.findById(usernamePass.getUsername()).orElseThrow(IllegalArgumentException::new);
+        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userAccount, usernamePass.getPassword());
+        Authentication auth = authManager.authenticate(authToken);
+        SecurityContext secContext = SecurityContextHolder.getContext();
+        secContext.setAuthentication(auth);
+
+        HttpSession session = req.getSession(true);
+        session.setAttribute(SPRING_SECURITY_CONTEXT_KEY, secContext);
+
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/comptes")
     public List<SanitizedCompte> getAllCompte() { return compteDao.findAll().stream().map(cgg.informatique.abl.webSocket.entites.Compte::sanitize).collect(Collectors.toList()); }
 
     @GetMapping("/comptes/{id}")
-    public ResponseEntity<SanitizedCompte> getCompte(@PathVariable Long id) {
+    public ResponseEntity<SanitizedCompte> getCompte(@PathVariable String id) {
         Optional<cgg.informatique.abl.webSocket.entites.Compte> compte = compteDao.findById(id);
 
 
@@ -57,10 +84,9 @@ public class CompteController {
 
     @PostMapping("/comptes")
     public ResponseEntity addCompte(@RequestBody Compte compte) {
-        boolean compteExiste = compteDao.existsById(compte.getId());
         boolean emailExiste = compteDao.existsByCourriel(compte.getUsername());
 
-        if (compteExiste || emailExiste) {
+        if (emailExiste) {
             return ResponseEntity.badRequest().build();
         }
 
@@ -70,8 +96,8 @@ public class CompteController {
     }
 
     @PostMapping("/compte/ceinture/{id}")
-    public ResponseEntity promotionCeinture(@PathVariable Long id) {
-        Compte compte = compteDao.findById(id).orElseThrow(IllegalStateException::new);
+    public ResponseEntity promotionCeinture(@PathVariable String courriel) {
+        Compte compte = compteDao.findByCourriel(courriel).orElseThrow(IllegalStateException::new);
         int nouveauGroupe = compte.getGroupe().getId() + 1;
         Optional<Groupe> groupe = groupeDao.findById(nouveauGroupe);
 
@@ -85,8 +111,8 @@ public class CompteController {
     }
 
     @PostMapping("/compte/pardonner/{id}")
-    public ResponseEntity pardonner(@PathVariable Long id) {
-        Compte compte = compteDao.findById(id).orElseThrow(IllegalStateException::new);
+    public ResponseEntity pardonner(@PathVariable String id) {
+        Compte compte = compteDao.findByCourriel(id).orElseThrow(IllegalStateException::new);
 
         List<Examen> examens = examenDao.findByEleve(compte);
 
@@ -101,8 +127,8 @@ public class CompteController {
     }
 
     @PostMapping("/compte/role/{id}")
-    public ResponseEntity promotionRole(@PathVariable Long id) {
-        Compte compte = compteDao.findById(id).orElseThrow(IllegalStateException::new);
+    public ResponseEntity promotionRole(@PathVariable String id) {
+        Compte compte = compteDao.findByCourriel(id).orElseThrow(IllegalStateException::new);
         int nouveauRole = compte.getRole().getId() + 1;
         Optional<Role> role = roleDao.findById(nouveauRole);
 
@@ -116,8 +142,8 @@ public class CompteController {
     }
 
     @PostMapping("/compte/demotion/{id}")
-    public ResponseEntity demotionRole(@PathVariable Long id) {
-        Compte compte = compteDao.findById(id).orElseThrow(IllegalStateException::new);
+    public ResponseEntity demotionRole(@PathVariable String id) {
+        Compte compte = compteDao.findByCourriel(id).orElseThrow(IllegalStateException::new);
         int nouveauRole = compte.getRole().getId() - 1;
         Optional<Role> role = roleDao.findById(nouveauRole);
 
@@ -142,7 +168,7 @@ public class CompteController {
     }
 
     @DeleteMapping("/comptes/{id}")
-    public ResponseEntity deleteCompte(@PathVariable Long id){
+    public ResponseEntity deleteCompte(@PathVariable String id){
         if (!compteDao.existsById(id)) {
             return ResponseEntity.badRequest().build();
         }
@@ -222,7 +248,7 @@ public class CompteController {
         return ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
-                .buildAndExpand(compte.getId())
+                .buildAndExpand(compte.getCourriel())
                 .toUri();
     }
 

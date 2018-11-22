@@ -44,8 +44,8 @@ $(document).ready(function (){
             url: "/api/examens",
             'type': 'POST',
             data: JSON.stringify({
-                professeur: app.user.id,
-                eleve: eleve.id,
+                professeur: app.user.courriel,
+                eleve: eleve.courriel,
                 reussi: reussi,
                 temps: new Date().getTime(),
             }),
@@ -66,7 +66,7 @@ $(document).ready(function (){
 
     function promotionCeinture(data) {
         $.ajax({
-            url: "/api/compte/ceinture/" + data.id,
+            url: "/api/compte/ceinture/" + data.courriel,
             'type': 'POST',
             complete: initialiserListes,
         });
@@ -74,7 +74,7 @@ $(document).ready(function (){
 
     function promotionRole(data) {
         $.ajax({
-            url: "/api/compte/role/" +  data.id,
+            url: "/api/compte/role/" +  data.courriel,
             'type': 'POST',
             complete: initialiserListes,
         });

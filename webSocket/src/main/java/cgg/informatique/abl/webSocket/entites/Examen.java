@@ -15,16 +15,18 @@ public class Examen {
     private Long id;
 
     @ManyToOne(fetch = FetchType.EAGER, targetEntity = Compte.class)
-    @JoinColumn(name = "ID_Professeur")
+    @JoinColumn(name = "EVALUATEUR_ID")
     @JsonBackReference(value="exam-prof")
     private SanitizedCompte professeur;
 
     @ManyToOne(fetch = FetchType.EAGER, targetEntity = Compte.class)
-    @JoinColumn(name = "ID_Eleve")
+    @JoinColumn(name = "EVALUE_ID")
     @JsonBackReference(value="exam-eleve")
     private SanitizedCompte eleve;
 
+    @Column(name = "A_REUSSI")
     private boolean reussi;
+    @Column(name = "DATE")
     private long temps;
 
     public Examen() {}

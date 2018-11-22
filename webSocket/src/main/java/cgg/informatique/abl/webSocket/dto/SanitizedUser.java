@@ -12,7 +12,6 @@ import java.util.List;
 @JsonSerialize(as= SanitizedUser.class)
 @JsonDeserialize(as=Compte.class)
 public interface SanitizedUser {
-    Long getId();
     String getCourriel();
     String getAlias();
     Long getAvatarId();

@@ -1,4 +1,6 @@
 var app;
+console.log('help');
+
 $(document).ready(() => {
     app = new Vue({
         el: '#app',
@@ -20,7 +22,7 @@ $(document).ready(() => {
                     'dataType': 'json',
                 });
             }
-        }
+        },
     });
 
     $.ajax("/api/monCompte", {
@@ -33,20 +35,21 @@ $(document).ready(() => {
         $.ajax("/api/comptes", {
             success: (data) => {
                 const deshonorables = [];
+                console.log(data);
 
                 for (let i = 0;i < data.length; i++){
                     compte = data[i];
                     if (compte.deshonore) {
-                        deshonorables.push(data.splice(i, 1));
+                        deshonorables.push(data.splice(i, 1)[0]);
                         i--;
                     }
                 }
-
+                console.log(data);
                 app.deshonorables = deshonorables;
-                app.venerables = data.filter(e => e.role.role === "Venerable");
-                app.senseis = data.filter(e => e.role.role === "Sensei");
-                app.anciens = data.filter(e => e.role.role === "Ancien");
-                app.nouveaux = data.filter(e => e.role.role === "Nouveau");
+                app.venerables = data.filter(e => e.role.role === "VENERABLE");
+                app.senseis = data.filter(e => e.role.role === "SENSEI");
+                app.anciens = data.filter(e => e.role.role === "ANCIEN");
+                app.nouveaux = data.filter(e => e.role.role === "NOUVEAU");
             }
         });
     }

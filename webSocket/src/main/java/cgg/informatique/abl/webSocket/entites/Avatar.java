@@ -3,12 +3,13 @@ package cgg.informatique.abl.webSocket.entites;
 import javax.persistence.*;
 
 @Entity
-@Table(name="AVATARS")
+@Table(name="AVATAR")
 public class Avatar {
     @Id
+    @Column(name="ID")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(length = Integer.MAX_VALUE)
+    @Column(length = Integer.MAX_VALUE, name = "AVATAR")
     private String image;
 
     public Avatar() {}

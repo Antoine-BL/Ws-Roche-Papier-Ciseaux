@@ -25,23 +25,32 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Compte extends UserBase implements UserDetails, SanitizedCompte {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name="USERNAME")
     private String courriel;
+    @Column(name="PASSWORD")
     private String motPasse;
+    @Column(name="FULLNAME")
     private String alias;
 
     @ManyToOne(targetEntity = Avatar.class)
-    @JoinColumn(name="AVATAR")
+    @JoinColumn(name="AVATAR_ID")
     private Avatar avatar;
 
     @ManyToOne(targetEntity = Role.class)
-    @JoinColumn(name="ROLE")
+    @JoinColumn(name="ROLE_ID")
     private Role role;
 
     @ManyToOne(targetEntity = Groupe.class)
-    @JoinColumn(name="GROUPE")
+    @JoinColumn(name="GROUPE_ID")
     private Groupe groupe;
+
+    @Column(name="CHOUCHOU")
+    private int chouchou;
+    @Column(name="ENTRAINEMENT")
+    private int entrainement;
+    @Column(name="TALENT")
+    private int talent;
+
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "blanc",targetEntity = Combat.class)
     @JsonManagedReference(value="combat-blanc")
@@ -89,10 +98,6 @@ public class Compte extends UserBase implements UserDetails, SanitizedCompte {
 
     public static CourrielBuilder Builder() {
         return new CompteBuilder();
-    }
-
-    public Long getId() {
-        return id;
     }
 
     @Override

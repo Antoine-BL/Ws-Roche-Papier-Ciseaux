@@ -89,11 +89,6 @@ public class LobbyUserData extends UserBase implements SanitizedLobbyUser {
     }
 
     @Override
-    public Long getId() {
-        return this.getUser().getId();
-    }
-
-    @Override
     public String getCourriel() {
         return this.user.getCourriel();
     }

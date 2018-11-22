@@ -9,9 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface CompteDao extends JpaRepository<Compte, Long> {
-    @Override
-    Optional<Compte> findById(Long id);
+public interface CompteDao extends JpaRepository<Compte, String> {
     Optional<Compte> findByCourriel(String courriel);
     boolean existsByCourriel(String courriel);
     boolean existsByAlias(String alias);

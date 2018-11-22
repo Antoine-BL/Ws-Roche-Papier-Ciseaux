@@ -12,27 +12,27 @@ public class Combat {
     private Long id;
 
     @ManyToOne(fetch = FetchType.EAGER, targetEntity = Compte.class)
-    @JoinColumn(name="ID_Rouge")
+    @JoinColumn(name="ROUGE_ID")
     @JsonBackReference(value="combat-rouge")
     private Compte rouge;
 
     @ManyToOne(fetch = FetchType.EAGER, targetEntity = Compte.class)
-    @JoinColumn(name="ID_Blanc")
+    @JoinColumn(name="BLANC_ID")
     @JsonBackReference(value="combat-blanc")
     private Compte blanc;
 
     @ManyToOne(fetch = FetchType.EAGER, targetEntity = Compte.class)
-    @JoinColumn(name="ID_Arbitre")
+    @JoinColumn(name="ARBITRE_ID")
     @JsonBackReference(value="combat-arbitre")
     private Compte arbitre;
 
-    @Column(name = "POINTSROUGE")
+    @Column(name = "POINTS_ROUGE")
     private int pointsRouge;
-    @Column(name = "POINTSBLANC")
+    @Column(name = "POINTS_BLANC")
     private int pointsBlanc;
-    @Column(name = "CREDITSARBITRE")
+    @Column(name = "CREDITS_ARBITRE")
     private int creditsArbitre;
-    @Column(name = "TEMPS")
+    @Column(name = "DATE")
     private long temps;
 
     public Combat() {}

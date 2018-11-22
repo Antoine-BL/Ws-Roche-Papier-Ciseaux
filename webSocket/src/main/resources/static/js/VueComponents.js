@@ -174,10 +174,10 @@ Vue.component('app-slot', {
 
 Vue.component('app-membre-ecole', {
     props: ['utilisateur'],
-    template: '<li>' +
+    template: '<div class="m-1">' +
         '<img class="profile profile-petit d-inline-block" v-bind:src="\'/api/avatars/\' + utilisateur.avatarId"/>' +
         '<span class="ml-2 mr-2">{{utilisateur.alias}}, {{utilisateur.role.role}}, {{utilisateur.groupe.groupe}}, {{utilisateur.courriel}}</span>' +
-        '</li>'
+        '</div>'
 });
 
 Vue.component('app-controls', {

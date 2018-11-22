@@ -7,8 +7,8 @@ import javax.persistence.*;
 
 public class ExamDto {
     private Long id;
-    private Long professeur;
-    private Long eleve;
+    private String professeur;
+    private String eleve;
     private boolean reussi;
     private long temps;
 
@@ -20,19 +20,19 @@ public class ExamDto {
         this.id = id;
     }
 
-    public Long getProfesseur() {
+    public String getProfesseur() {
         return professeur;
     }
 
-    public void setProfesseur(Long professeur) {
+    public void setProfesseur(String professeur) {
         this.professeur = professeur;
     }
 
-    public Long getEleve() {
+    public String getEleve() {
         return eleve;
     }
 
-    public void setEleve(Long eleve) {
+    public void setEleve(String eleve) {
         this.eleve = eleve;
     }
 
