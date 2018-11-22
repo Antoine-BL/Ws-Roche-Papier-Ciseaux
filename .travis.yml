@@ -4,7 +4,7 @@ jdk:
   - oraclejdk8
 script:
   - ls -R
-  -  chmod +x ./webSocket/gradlew build
+  - chmod +x ./webSocket/gradlew build
   - ./webSocket/gradlew build --scan -s
 addons:
   ssh_known_hosts:
