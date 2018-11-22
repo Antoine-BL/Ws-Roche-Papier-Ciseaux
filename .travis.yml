@@ -8,6 +8,4 @@ addons:
   - 424v.cgodin.qc.ca
 after_success:
  - curl --insecure --ssl-req -T ${projectRoot}/build/libs/${jarName} --url ftp://${user}:${password}@424v.cgodin.qc.ca
- - ssh ${user}@424v.cgodin.qc.ca
- - nohup java -jar webSocket-0.0.1-SNAPSHOT.jar > ./log.txt &
- - exit
+ - ssh ${user}@424v.cgodin.qc.ca "nohup java -jar webSocket-0.0.1-SNAPSHOT.jar > ./log.txt &"
