@@ -35,15 +35,25 @@ public class Combat {
     @Column(name = "DATE")
     private long temps;
 
+    @ManyToOne(targetEntity = Groupe.class)
+    @JoinColumn(name = "CEINTURE_ROUGE_ID")
+    private Groupe ceintureRouge;
+
+    @ManyToOne(targetEntity = Groupe.class)
+    @JoinColumn(name = "CEINTURE_BLANC_ID")
+    private Groupe ceintureBlanc;
+
     public Combat() {}
 
-    public Combat(Compte rouge, Compte blanc, Compte arbitre, int pointsRouges, int pointsBlancs, int creditsArbitres) {
+    public Combat(Compte rouge, Compte blanc, Compte arbitre, int pointsRouges, int pointsBlancs, int creditsArbitres, Groupe ceintureBlanc, Groupe ceintureRouge) {
         this.rouge = rouge;
         this.blanc = blanc;
         this.arbitre = arbitre;
         this.pointsRouge = pointsRouges;
         this.pointsBlanc = pointsBlancs;
         this.creditsArbitre = creditsArbitres;
+        this.ceintureBlanc = ceintureBlanc;
+        this.ceintureRouge = ceintureRouge;
     }
 
     public static RougeStep Builder() {

@@ -12,6 +12,8 @@ public class CombatBuilder implements Combat.RougeStep, Combat.BlancStep, Combat
     private int pointsRouge;
     private int pointsBlanc;
     private int creditsArbitre;
+    private Groupe ceintureRouge;
+    private Groupe ceintureBlanc;
 
     CombatBuilder(){}
 
@@ -39,7 +41,14 @@ public class CombatBuilder implements Combat.RougeStep, Combat.BlancStep, Combat
         return this;
     }
 
+    public CombatBuilder setCeintures(Groupe ceintureBlanc, Groupe ceintureRouge) {
+        this.ceintureBlanc = ceintureBlanc;
+        this.ceintureRouge = ceintureRouge;
+
+        return this;
+    }
+
     public Combat build() {
-        return new Combat(rouge, blanc, arbitre, pointsRouge, pointsBlanc, creditsArbitre);
+        return new Combat(rouge, blanc, arbitre, pointsRouge, pointsBlanc, creditsArbitre, ceintureRouge, ceintureBlanc);
     }
 }

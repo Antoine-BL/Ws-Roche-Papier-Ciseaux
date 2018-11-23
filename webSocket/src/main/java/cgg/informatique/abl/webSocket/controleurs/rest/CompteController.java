@@ -1,10 +1,11 @@
 package cgg.informatique.abl.webSocket.controleurs.rest;
 
 import cgg.informatique.abl.webSocket.dao.*;
-import cgg.informatique.abl.webSocket.dto.AuthRequest;
 import cgg.informatique.abl.webSocket.dto.SanitizedCompte;
 import cgg.informatique.abl.webSocket.dto.SanitizedUser;
 import cgg.informatique.abl.webSocket.entites.*;
+import cgg.informatique.abl.webSocket.game.lobby.LobbyRole;
+import cgg.informatique.abl.webSocket.game.match.Match;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.http.ResponseEntity;
@@ -54,25 +55,32 @@ public class CompteController {
     @PostMapping("/authenticate/{username}/{password}")
     public ResponseEntity apiAuth(@PathVariable String username, @PathVariable String password,
                           @Autowired  HttpServletRequest req) {
-        Compte userAccount = compteDao.findById(username).orElseThrow(IllegalArgumentException::new);
-        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userAccount, password);
-        Authentication auth = authManager.authenticate(authToken);
-        SecurityContext secContext = SecurityContextHolder.getContext();
-        secContext.setAuthentication(auth);
+        try {
+            Compte userAccount = compteDao.findById(username).orElseThrow(IllegalArgumentException::new);
+            UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userAccount, password);
+            Authentication auth = authManager.authenticate(authToken);
+            SecurityContext secContext = SecurityContextHolder.getContext();
+            secContext.setAuthentication(auth);
 
-        HttpSession session = req.getSession(true);
-        session.setAttribute(SPRING_SECURITY_CONTEXT_KEY, secContext);
+            HttpSession session = req.getSession(true);
+            session.setAttribute(SPRING_SECURITY_CONTEXT_KEY, secContext);
 
-        return ResponseEntity.ok().build();
+            return ResponseEntity.ok().build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @GetMapping("/comptes")
-    public List<SanitizedCompte> getAllCompte() { return compteDao.findAll().stream().map(cgg.informatique.abl.webSocket.entites.Compte::sanitize).collect(Collectors.toList()); }
+    public List<SanitizedCompte> getAllCompte() {
+        List<SanitizedCompte> comptes = compteDao.findAll().stream().map(cgg.informatique.abl.webSocket.entites.Compte::sanitize).collect(Collectors.toList());
+        System.out.println();
+        return comptes;
+    }
 
     @GetMapping("/comptes/{id}")
     public ResponseEntity<SanitizedCompte> getCompte(@PathVariable String id) {
         Optional<cgg.informatique.abl.webSocket.entites.Compte> compte = compteDao.findById(id);
-
 
         if (compte.isPresent()) {
             SanitizedUser compteSan = compte.get().sanitize();
@@ -235,17 +243,43 @@ public class CompteController {
 
         for (Combat combat : compte.getCombatsRouge()) {
             if (combat.getTemps() > tempsMax) {
-                points += combat.getPointsRouge();
+                points += pointsPourMatch(combat, LobbyRole.ROUGE);
             }
         }
 
         for (Combat combat : compte.getCombatsBlanc()) {
             if (combat.getTemps() > tempsMax) {
-                points += combat.getPointsBlanc();
+                points += pointsPourMatch(combat, LobbyRole.BLANC);
             }
         }
 
         return points;
+    }
+
+    private static int pointsPourMatch(Combat combat, LobbyRole role) {
+        int pointsRouge;
+        int pointsBlanc;
+
+        if (combat.getPointsRouge() == 10 && combat.getPointsBlanc() == 10) {
+            pointsRouge = Match.calculerPointsGagnant(combat.getRouge(), combat.getBlanc()) / 2;
+            pointsBlanc = Match.calculerPointsGagnant(combat.getBlanc(), combat.getRouge()) / 2;
+        } else if (combat.getPointsRouge() == 5 && combat.getPointsBlanc() == 5) {
+            pointsRouge = Match.calculerPointsGagnant(combat.getRouge(), combat.getBlanc()) / 2;
+            pointsBlanc = Match.calculerPointsGagnant(combat.getBlanc(), combat.getRouge()) / 2;
+        } else if (combat.getPointsRouge() == 0 && combat.getPointsBlanc() == 0) {
+            pointsRouge = 0;
+            pointsBlanc = 0;
+        } else if (combat.getPointsRouge() == 10) {
+            pointsRouge = Match.calculerPointsGagnant(combat.getRouge(), combat.getBlanc());
+            pointsBlanc = 0;
+        } else if (combat.getPointsBlanc() == 10) {
+            pointsRouge = 0;
+            pointsBlanc = Match.calculerPointsGagnant(combat.getBlanc(), combat.getRouge());
+        } else {
+            throw new IllegalArgumentException("échec calcul points");
+        }
+
+        return role == LobbyRole.BLANC ? pointsBlanc : pointsRouge;
     }
 
     private URI GenerateCreatedURI(cgg.informatique.abl.webSocket.entites.Compte compte) {

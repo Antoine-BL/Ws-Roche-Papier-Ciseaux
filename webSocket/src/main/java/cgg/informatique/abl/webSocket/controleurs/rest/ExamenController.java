@@ -88,7 +88,7 @@ public class ExamenController {
                 .forEach(eligiblesSensei::add);
 
         getTous()
-                .filter(c -> c.getRole().getRole().equals("Sensei"))
+                .filter(c -> c.getRole().getRole().equals("SENSEI"))
                 .map(Compte::sanitize)
                 .forEach(senseis::add);
 
@@ -107,14 +107,14 @@ public class ExamenController {
     }
 
     private static boolean estEligibleAncien(Compte c) {
-        return c.getRole().getRole().equals("Nouveau")
+        return c.getRole().getRole().equals("NOUVEAU")
                 && c.getCombatsArbitre().size() >= 30
                 && c.getCredits() >= 10;
     }
 
     private static boolean estEligibleSensei(Compte c) {
-        return  c.getRole().getRole().equals("Ancien")
-                && c.getGroupe().getGroupe().equals("Noir");
+        return  c.getRole().getRole().equals("ANCIEN")
+                && c.getGroupe().getGroupe().equals("NOIRE");
     }
 
     @GetMapping(value = "/eligibles/groupe")
