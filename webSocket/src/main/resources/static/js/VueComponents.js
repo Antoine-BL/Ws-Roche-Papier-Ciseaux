@@ -11,8 +11,7 @@ Vue.component('app-nav', {
         '            <app-nav-item v-if="currentPage != \'dojo\'" text="Dojo" destination="/"></app-nav-item>' +
         '            <app-nav-item v-if="currentPage != \'ecole\'" text="Notre École" destination="/ecole"></app-nav-item>' +
         '            <app-nav-item v-if="currentPage != \'kumite\' && user" text="Kumite" destination="/kumite"></app-nav-item>' +
-        '            <app-nav-item v-if="currentPage != \'passage\' && user && (user.role.role == \'Venerable\' || user.role.role == \'Sensei\')" text="Passage de Grades" destination="/passage"></app-nav-item>' +
-        '            <app-nav-item v-if="currentPage != \'passage\' && user && (user.role.role == \'Venerable\' || user.role.role == \'Sensei\')" text="Gestion des Membres" destination="/passage"></app-nav-item>' +
+        '            <app-nav-item v-if="currentPage != \'passage\' && user && (user.role.role == \'VENERABLE\' || user.role.role == \'SENSEI\')" text="Passage de Grades" destination="/passage"></app-nav-item>' +
         '            <a v-if="user == null" class="nav-item active btn btn-success" id="connexion" href="/connexion" role="button">Se connecter</a>' +
         '            <app-profile v-if="user" v-bind:user="user"></app-profile>' +
         '        </b-navbar-nav>\n' +
