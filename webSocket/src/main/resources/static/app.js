@@ -10,6 +10,38 @@ $(document).ready(() => {
         data: {
             user: null,
             messages: [],
+            connecte: false,
+            options: ["Public"],
+            selected: "Public",
+        },
+        computed: {
+            canSend: function() {
+                if (!this.user || !this.connecte) return false;
+
+                if (this.selected === "Public") {
+                    return this.user.role.role === "ANCIEN" || this.user.role.role === "SENSEI" || this.user.role.role === "VENERABLE";
+                } else if (this.selected === "Privé") {
+                    return this.user;
+                }
+            }
+        },
+        methods: {
+            send: function() {
+                if (envoyerPub) {
+                    wsu.sendTo(inputTopics.PUBLIC);
+                } else {
+                    wsu.sendTo(inputTopics.PRIVATE);
+                }
+                wsu.clear();
+            },
+            connecter: function() {
+                if (pretAConnecter) {
+                    wsu.connect('/webSocket', subscribe);
+                }
+                if (user) {
+                    this.options.push("Privé");
+                }
+            }
         }
     });
 
@@ -32,51 +64,23 @@ $(document).ready(() => {
         PRIVATE: '/topic/private/chat',
     });
 
-    $('#connexionMessagerie').show();
-    $('#messagerie').hide();
-    $('#btnConnexionMessagerie').click(connexion);
-    $('#btnEnvoyer').click(send);
-
     $("#frmEnvoyer").on('submit', function (e) {
         e.preventDefault();
     });
 
-    function connexion() {
-        if (pretAConnecter) {
-            wsu.connect('/webSocket', subscribe);
-        }
-    }
-
-    function send() {
-        if (envoyerPub) {
-            wsu.sendTo(inputTopics.PUBLIC);
-        } else {
-            wsu.sendTo(inputTopics.PRIVATE);
-        }
-        wsu.clear();
-    }
-
-    function setConnection(connected) {
-        $('#btnConnexionMessagerie').prop("disabled", connected);
-        $('#btnEnvoyer').prop("disabled", !connected);
-        $('#tbMessage').prop("disabled", !connected);
-        $('#ddBtn').prop("disabled", !connected);
-        $('#connexionMessagerie').toggle(!connected);
-        $('#messagerie').toggle(connected);
-    }
-
     function subscribe() {
-        setConnection(true);
-        wsu.subscribeTo(outputTopics.PUBLIC, '', 'publique');
+        app.connecte = true;
+        wsu.subscribeTo(outputTopics.PUBLIC, '', 'public');
         if (app.user) {
             wsu.subscribeTo(outputTopics.PRIVATE, '', 'privé');
         }
     }
 
     $("#menuDD a").click(function(){
-
-        $("#ddBtn").text($(this).text());
-        $("#ddBtn").val($(this).text());
-        envoyerPub = $(this).text() == 'Public';
+        const text = $(this).text();
+        const ddl =  $("#ddBtn");
+        ddl.text(text);
+        ddl.val(text);
+        envoyerPub = text === 'Public';
     });
 });
