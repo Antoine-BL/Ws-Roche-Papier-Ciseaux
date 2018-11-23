@@ -1,5 +1,8 @@
 language: java
 install: true
+branches:
+  except:
+    - dev
 jdk:
   - oraclejdk8
 script:
