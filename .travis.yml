@@ -14,6 +14,7 @@ addons:
   - 424v.cgodin.qc.ca
 after_success:
  - cd $TRAVIS_BUILD_DIR
+ - ssh ${user}@424v.cgodin.qc.ca "kill $(lsof -t -i:8082)"
+ - ssh "rm -f ${jarName}"
  - curl --insecure --ssl-req -T ${projectRoot}/build/libs/${jarName} --url ftp://${user}:${password}@424v.cgodin.qc.ca
- - ssh ${user}@424v.cgodin.qc.ca 'kill $(lsof -t -i:8082)'
  - ssh ${user}@424v.cgodin.qc.ca "nohup java -jar webSocket-0.0.1-SNAPSHOT.jar > ./log.txt &"
