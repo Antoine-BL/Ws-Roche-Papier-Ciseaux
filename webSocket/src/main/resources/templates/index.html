@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html   xmlns="http://www.w3.org/1999/xhtml">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:v-on="http://www.w3.org/1999/xhtml">
 <head>
     <title>Projet 1: Websocket</title>
     <link href="/webjars/bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -29,25 +29,23 @@
             <div class="justify-content-center align-items-center">
                 <div class="col border chat-col d-flex flex-column">
                     <h2 class="text-center p-2">Messagerie</h2>
-                    <div id="messagerie" style="display: none;" class="border-top row flex-grow-1 chat-text d-block">
+                    <div v-if="connecte" id="messagerie" style="display: none;" class="border-top row flex-grow-1 chat-text d-block">
                         <app-chat-message v-for="msg in messages" v-bind:message="msg"></app-chat-message>
                     </div>
-                    <div id="connexionMessagerie" class="border-top row flex-grow-1  align-items-center justify-content-center">
-                        <button id="btnConnexionMessagerie" class="btn btn-primary d-block">Cliquez ici pour recevoir des messages</button>
+                    <div v-if="!connecte" id="connexionMessagerie" class="border-top row flex-grow-1  align-items-center justify-content-center">
+                        <button v-on:click="connecter" class="btn btn-primary d-block">Cliquez ici pour recevoir des messages</button>
                     </div>
                     <div class="row m-2">
                         <form id="frmEnvoyer" class="form-inline w-100 border-top">
-                            <input disabled id="tbMessage" class="form-control mb-2 mr-sm-2 flex-grow-1" type="text" placeholder="Entrez votre message ici...(privé)" />
-                            <div v-if="user != null" class="dropdown mb-2 mr-2" id="ddlPubPrive">
-                                <button disabled id="ddBtn" class="btn btn-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    Public
-                                </button>
-                                <div id="menuDD" class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                    <a class="dropdown-item" href="#">Public</a>
-                                    <a class="dropdown-item" href="#">Privé</a>
-                                </div>
+                            <input id="tbMessage" :disabled="!connecte || !user" class="form-control mb-2 mr-sm-2 flex-grow-1" type="text" placeholder="Entrez votre message ici...(privé)" />
+                            <div v-if="user" class="dropdown mb-2 mr-2" id="ddlPubPrive">
+                                <b-form-select v-model="selected" :options="options" class="mb-3" />
                             </div>
-                            <button disabled id="btnEnvoyer" type="submit" class="btn btn-primary mb-2">Envoyer</button>
+                            <button :disabled="!canSend"  id="btnEnvoyer"
+                                    v-on:click="send"
+                                    type="submit" class="btn btn-primary mb-2">
+                                Envoyer
+                            </button>
                         </form>
                     </div>
                 </div>
