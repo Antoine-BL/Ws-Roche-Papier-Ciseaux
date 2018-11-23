@@ -51,11 +51,11 @@ public class CompteController {
         this.authManager = authManager;
     }
 
-    @PostMapping("/authenticate")
-    public ResponseEntity apiAuth(@RequestBody AuthRequest usernamePass,
+    @PostMapping("/authenticate/{username}/{password}")
+    public ResponseEntity apiAuth(@PathVariable String username, @PathVariable String password,
                           @Autowired  HttpServletRequest req) {
-        Compte userAccount = compteDao.findById(usernamePass.getUsername()).orElseThrow(IllegalArgumentException::new);
-        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userAccount, usernamePass.getPassword());
+        Compte userAccount = compteDao.findById(username).orElseThrow(IllegalArgumentException::new);
+        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userAccount, password);
         Authentication auth = authManager.authenticate(authToken);
         SecurityContext secContext = SecurityContextHolder.getContext();
         secContext.setAuthentication(auth);
@@ -208,8 +208,12 @@ public class CompteController {
             credits -= examen.isReussi() ? 10 : 5;
         }
 
-        if (compte.getRole().getId() > 0 && credits > 10) {
+        if (compte.getRole().getId() > 0) {
             credits -= 10;
+
+            if (credits < 0){
+                credits = 0;
+            }
         }
 
         return credits;
