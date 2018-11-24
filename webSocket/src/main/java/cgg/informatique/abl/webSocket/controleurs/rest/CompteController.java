@@ -14,6 +14,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -36,6 +37,7 @@ public class CompteController {
     private GroupeDao groupeDao;
     private RoleDao roleDao;
     private AuthenticationManager authManager;
+    private PasswordEncoder passwordEncoder;
 
     public CompteController(
             @Autowired CompteDao compteDao,
@@ -43,13 +45,15 @@ public class CompteController {
             @Autowired ExamenDao examenDao,
             @Autowired GroupeDao groupeDao,
             @Autowired AuthenticationManager authManager,
-            @Autowired RoleDao roleDao) {
+            @Autowired RoleDao roleDao,
+            @Autowired PasswordEncoder passwordEncoder) {
         this.compteDao = compteDao;
         this.combatDao = combatDao;
         this.examenDao = examenDao;
         this.groupeDao = groupeDao;
         this.roleDao = roleDao;
         this.authManager = authManager;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @PostMapping("/authenticate/{username}/{password}")
@@ -74,8 +78,22 @@ public class CompteController {
     @GetMapping("/comptes")
     public List<SanitizedCompte> getAllCompte() {
         List<SanitizedCompte> comptes = compteDao.findAll().stream().map(cgg.informatique.abl.webSocket.entites.Compte::sanitize).collect(Collectors.toList());
-        System.out.println();
         return comptes;
+    }
+
+    @GetMapping("/comptes/defaults")
+    public List<SanitizedCompte> getComptesDefaut() {
+        return compteDao.
+                findAll()
+                .stream()
+                .filter(this::isDefault)
+                .map(Compte::sanitize)
+                .collect(Collectors.toList());
+    }
+
+    private boolean isDefault(Compte compte) {
+        final String DEFAULT_PASSWORD = "Patate123";
+        return passwordEncoder.matches(DEFAULT_PASSWORD, compte.getPassword());
     }
 
     @GetMapping("/comptes/{id}")
