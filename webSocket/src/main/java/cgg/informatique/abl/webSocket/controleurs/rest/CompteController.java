@@ -319,7 +319,7 @@ public class CompteController {
      *
      -----------------------------------------------------------------------**/
 
-    @PostMapping(value = "anciennete/[id]")
+    @PostMapping(value = "anciennete/{id}")
     public String passageAnciennete(@PathVariable String id) {
         Compte compte = compteDao.findByCourriel(id).orElseThrow(IllegalStateException::new);
 
@@ -355,7 +355,7 @@ public class CompteController {
         examen = examenDao.save(examen);
     }
 
-    @PostMapping(value = "examen/reussi/[id]")
+    @PostMapping(value = "examen/reussi/{id}")
     public String genereExamenReussi(@PathVariable String id) {
         Compte professeur = compteDao.findByCourriel("v1@dojo").orElseThrow(IllegalStateException::new);
         Compte eleve = compteDao.findByCourriel(id).orElseThrow(IllegalStateException::new);
@@ -376,7 +376,7 @@ public class CompteController {
             return eleve.getAlias() + " n'est pas éligible à passer un examen";
         }
     }
-    @PostMapping(value = "examen/echec/[id]")
+    @PostMapping(value = "examen/echec/{id}")
     public String genereExamenEchec(@PathVariable String id) {
         Compte professeur = compteDao.findByCourriel("v1@dojo").orElseThrow(IllegalStateException::new);
         Compte eleve = compteDao.findByCourriel(id).orElseThrow(IllegalStateException::new);
