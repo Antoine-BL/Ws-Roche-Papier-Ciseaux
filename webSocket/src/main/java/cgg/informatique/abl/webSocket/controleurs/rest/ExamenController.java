@@ -106,7 +106,7 @@ public class ExamenController {
         return ResponseEntity.ok(eligiblesParNiveau);
     }
 
-    private static boolean estEligibleAncien(Compte c) {
+    public static boolean estEligibleAncien(Compte c) {
         return c.getRole().getRole().equals("NOUVEAU")
                 && c.getCombatsArbitre().size() >= 30
                 && c.getCredits() >= 10;

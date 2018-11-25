@@ -311,4 +311,83 @@ public class CompteController {
     public CompteDao getDao() {
         return compteDao;
     }
+
+
+    /**----------------------------------------------------------------------
+     *
+     * Les fonctions ci-dessous sont pour le prototype android uniquement
+     *
+     -----------------------------------------------------------------------**/
+
+    @PostMapping(value = "anciennete")
+    public String passageAnciennete(@RequestBody String id) {
+        Compte compte = compteDao.findById(id).orElseThrow(IllegalStateException::new);
+
+        if(ExamenController.estEligibleAncien(compte)){
+            int nouveauRole = compte.getRole().getId() + 1;
+            Optional<Role> role = roleDao.findById(nouveauRole);
+
+            if (!role.isPresent()) return "Une erreur est survenue";
+
+            compte.setRole(role.get());
+
+            compteDao.save(compte);
+
+            return compte.getAlias() + " est maintenant un ancien";
+        }
+        else{
+            return compte.getAlias() + " n'est pas éligible à devenir Ancient";
+        }
+    }
+
+    private boolean estEligibleExamen(Compte c){
+        return  (c.getGroupe().getId() < 6)
+                &&( c.getPoints() >= 100)
+                &&( c.getCredits() >= 10);
+    }
+    private void genereExamen(Compte professeur, Compte eleve, boolean estReussi){
+        long temps = System.currentTimeMillis();
+
+        Examen examen = new Examen(professeur, eleve);
+        examen.setReussi(estReussi);
+        examen.setTemps(temps);
+
+        examen = examenDao.save(examen);
+    }
+
+    @PostMapping(value = "examen/reussi")
+    public String genereExamenReussi(@RequestBody String id) {
+        Compte professeur = compteDao.findByCourriel("v1@dojo").orElseThrow(IllegalStateException::new);
+        Compte eleve = compteDao.findById(id).orElseThrow(IllegalStateException::new);
+
+        if(estEligibleExamen(eleve)){
+            int nouveauGroupe = eleve.getGroupe().getId() + 1;
+            Optional<Groupe> groupe = groupeDao.findById(nouveauGroupe);
+
+            if (!groupe.isPresent()) return "Une erreur est survenue";
+            eleve.setGroupe(groupe.get());
+            compteDao.save(eleve);
+
+            genereExamen(professeur, eleve, true);
+
+            return eleve.getAlias() + " vient de passer un examen";
+        }
+        else {
+            return eleve.getAlias() + " n'est pas éligible à passer un examen";
+        }
+    }
+    @PostMapping(value = "examen/echec")
+    public String genereExamenEchec(@RequestBody String id) {
+        Compte professeur = compteDao.findByCourriel("v1@dojo").orElseThrow(IllegalStateException::new);
+        Compte eleve = compteDao.findById(id).orElseThrow(IllegalStateException::new);
+
+        if(estEligibleExamen(eleve)){
+            genereExamen(professeur, eleve, false);
+
+            return eleve.getAlias() + " vient d'échouer un examen";
+        }
+        else {
+            return eleve.getAlias() + " n'est pas éligible à passer un examen";
+        }
+    }
 }
