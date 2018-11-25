@@ -14,7 +14,7 @@ public class Signaler extends Commande{
 
     @Override
     public void execute(LobbyCommandContext context) {
-        Lobby lobby = context.getLobby();
+        Lobby lobby = LobbyCommandContext.getLobby();
         Match match = lobby.getCurrentMatch();
 
         Signal signalDonne = Signal.valueOf(parametres.get(SIGNAL).toUpperCase());

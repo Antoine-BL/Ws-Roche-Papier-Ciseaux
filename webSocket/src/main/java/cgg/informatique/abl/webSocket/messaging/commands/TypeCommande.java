@@ -10,7 +10,9 @@ public enum TypeCommande {
     SALUER(Saluer.class),
     SIGNALER(Signaler.class),
     POSITION(Position.class),
-    MATCH_STATE(null);
+    MATCH_STATE(null),
+    DECONNECTER(null),
+    CONNECTER(null);
 
     public Class<? extends Commande> getMappedSubtype() {
         return mappedSubtype;

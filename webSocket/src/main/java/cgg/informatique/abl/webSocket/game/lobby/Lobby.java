@@ -40,6 +40,7 @@ public class Lobby implements Runnable, MatchHandler, SerializableLobby {
     private List<LobbyUserData> users;
     private RoleColl spectateurs;
     private RoleColl combattants;
+    private List<LobbyUserData> ailleurs;
     private LobbyUserData rouge;
     private LobbyUserData blanc;
     private LobbyUserData arbitre;
@@ -67,7 +68,6 @@ public class Lobby implements Runnable, MatchHandler, SerializableLobby {
         try {
             lobbyState = LobbyState.STANDBY;
             send("Lobby ouvert!");
-            waitForPlayers();
             mainLoop();
             send("Lobby closed");
             lobbyContext.lobbyClosed();
@@ -79,7 +79,7 @@ public class Lobby implements Runnable, MatchHandler, SerializableLobby {
     private void mainLoop() throws InterruptedException {
         long tickStart;
         long processingTime = 0;
-        while (lobbyState == LobbyState.ACTIVE) {
+        while (lobbyState != LobbyState.CLOSED) {
             Thread.sleep(Math.max(TICK_DURATION - processingTime, 0));
             tickStart = System.currentTimeMillis();
 
@@ -87,7 +87,6 @@ public class Lobby implements Runnable, MatchHandler, SerializableLobby {
 
             purgeInactiveUsers();
             
-            if (isEmpty()) becomeInactive();
             if (matchInProgress != null) matchInProgress.tick();
             processingTime = System.currentTimeMillis() - tickStart;
         }
@@ -117,7 +116,6 @@ public class Lobby implements Runnable, MatchHandler, SerializableLobby {
                 int remainingS = (LOBBY_TIMEOUT - WAIT_MESSAGE_INTERVAL * i)/ ONE_SECOND;
                 if (remainingS <= 0) {
                     send("Fermeture du lobby dû à l'inactivité");
-
 
                     lobbyState = LobbyState.CLOSED;
                 }
@@ -162,7 +160,7 @@ public class Lobby implements Runnable, MatchHandler, SerializableLobby {
         LobbyUserData userData = new LobbyUserData(u, this);
 
         this.users.add(userData);
-        userData.becomeRole(new LobbyPosition(LobbyRole.SPECTATEUR));
+        userData.becomeRole(new LobbyPosition(LobbyRole.AILLEURS));
 
         sendData("Bienvenue au lobby " + u.getAlias(), new DonneesReponseCommande(TypeCommande.JOINDRE, this.asSerializable()));
     }
@@ -247,6 +245,11 @@ public class Lobby implements Runnable, MatchHandler, SerializableLobby {
     }
 
     @Override
+    public LobbyUserData[] getAilleurs() {
+        return (LobbyUserData[])ailleurs.toArray();
+    }
+
+    @Override
     public LobbyUserData[] getSpectateurs() {
         return this.spectateurs.getContents();
     }
@@ -307,5 +310,15 @@ public class Lobby implements Runnable, MatchHandler, SerializableLobby {
 
     public void resetNbMatchArbitre() {
         this.nbMatchArbitre = 0;
+    }
+
+    public void addAilleurs(LobbyUserData user) {
+        this.ailleurs.add(user);
+        sendData("Connexion de " + user.getCourriel(), new DonneesReponseCommande(TypeCommande.CONNECTER, user));
+    }
+
+    public void removeAilleurs(LobbyUserData user) {
+        this.ailleurs.add(user);
+        sendData("Deconnexion de " + user.getCourriel(), new DonneesReponseCommande(TypeCommande.DECONNECTER, user));
     }
 }

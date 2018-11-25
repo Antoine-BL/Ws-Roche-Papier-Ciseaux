@@ -11,7 +11,7 @@ public class Combattre extends Commande{
 
     @Override
     public void execute(LobbyCommandContext context) {
-        Lobby lobby = context.getLobby();
+        Lobby lobby = LobbyCommandContext.getLobby();
         try {
             LobbyUserData lud = lobby.getLobbyUserData(getDe());
 

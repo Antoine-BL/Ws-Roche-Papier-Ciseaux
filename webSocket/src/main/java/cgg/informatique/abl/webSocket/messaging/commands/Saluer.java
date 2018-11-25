@@ -11,7 +11,7 @@ public class Saluer  extends Commande{
 
     @Override
     public void execute(LobbyCommandContext context) {
-        Lobby lobby = context.getLobby();
+        Lobby lobby = LobbyCommandContext.getLobby();
         Match match = lobby.getCurrentMatch();
         LobbyUserData lud = lobby.getLobbyUserData(getDe());
 

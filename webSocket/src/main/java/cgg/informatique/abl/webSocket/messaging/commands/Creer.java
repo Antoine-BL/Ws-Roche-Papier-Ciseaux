@@ -18,7 +18,7 @@ public class Creer extends Commande{
     public void execute(LobbyCommandContext context) {
         try {
             context.createLobby();
-            Thread thread = new Thread(context.getLobby());
+            Thread thread = new Thread(LobbyCommandContext.getLobby());
             thread.start();
             send("Lobby créé", context);
         } catch (IllegalStateException e) {

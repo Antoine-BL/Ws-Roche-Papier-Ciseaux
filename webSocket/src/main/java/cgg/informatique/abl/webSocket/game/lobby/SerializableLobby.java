@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 @JsonSerialize(as = SerializableLobby.class)
 public interface SerializableLobby {
+    LobbyUserData[] getAilleurs();
     LobbyUserData[] getSpectateurs();
     LobbyUserData[] getCombattants();
     LobbyUserData getBlanc();

@@ -19,7 +19,7 @@ public class ChangerRole extends Commande{
         try {
             if (parametres.size() >= 1) {
                 LobbyRole role = LobbyRole.valueOf(parametres.get(ROLE_INDEX).toUpperCase());
-                Lobby lobby = context.getLobby();
+                Lobby lobby = LobbyCommandContext.getLobby();
                 LobbyUserData user = lobby.getLobbyUserData(getDe());
 
                 LobbyPosition position = new LobbyPosition(role);
@@ -33,7 +33,7 @@ public class ChangerRole extends Commande{
 
                 lobby.getLobbyUserData(getDe()).sentCommand();
             } else {
-                Lobby lobby = context.getLobby();
+                Lobby lobby = LobbyCommandContext.getLobby();
                 LobbyUserData lud = lobby.getLobbyUserData(getDe());
                 LobbyRole role = lud.getRoleCombat();
 

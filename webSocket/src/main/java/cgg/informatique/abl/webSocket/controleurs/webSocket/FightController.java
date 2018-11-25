@@ -27,6 +27,7 @@ public class FightController implements LobbyCommandContext, LobbyContext {
                            @Autowired CombatDao combatDao) {
         this.msg = msg;
         this.combatDao = combatDao;
+        createLobby();
     }
 
     @MessageMapping("/battle/chat")
@@ -41,13 +42,16 @@ public class FightController implements LobbyCommandContext, LobbyContext {
         message.execute(this);
     }
 
-    public Lobby getLobby() {
+    public static Lobby getLobby() {
         if (lobby == null) throw new IllegalStateException("Aucun lobby d'ouvert");
         return lobby;
     }
 
     public void createLobby() {
-        if (lobby == null) lobby = new Lobby(msg, this);
+        if (lobby == null){
+            lobby = new Lobby(msg, this);
+            new Thread(lobby).start();
+        }
         else throw new IllegalStateException("Il existe déjà un lobby!");
     }
 

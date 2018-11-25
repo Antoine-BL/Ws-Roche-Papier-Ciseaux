@@ -18,7 +18,7 @@ public class Quitter extends Commande{
     @Override
     public void execute(LobbyCommandContext context) {
         try {
-            Lobby lobby = context.getLobby();
+            Lobby lobby = LobbyCommandContext.getLobby();
 
             LobbyUserData lub = lobby.getLobbyUserData(getDe());
             lobby.quitter(lub);

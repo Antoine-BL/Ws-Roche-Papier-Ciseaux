@@ -10,7 +10,7 @@ public class Joindre extends Commande{
     @Override
     public void execute(LobbyCommandContext context) {
         try {
-            Lobby lobby = context.getLobby();
+            Lobby lobby = LobbyCommandContext.getLobby();
 
             lobby.connect(this.getDe());
 
