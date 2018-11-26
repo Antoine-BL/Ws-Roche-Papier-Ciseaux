@@ -213,8 +213,11 @@ public class CompteController {
     @GetMapping("/monCompte")
     public ResponseEntity<SanitizedUser> getCurrentAccount(@Autowired Authentication auth) {
         if (auth != null) {
-            Compte compte = (Compte)auth.getPrincipal();
-            SanitizedUser compteSan = compte.sanitize();
+            String courriel = ((Compte)auth.getPrincipal()).getCourriel();
+            SanitizedUser compteSan = compteDao.findById(courriel)
+                    .orElseThrow(IllegalArgumentException::new)
+                    .sanitize();
+
             return ResponseEntity.ok(compteSan);
         }
         return ResponseEntity.noContent().build();
