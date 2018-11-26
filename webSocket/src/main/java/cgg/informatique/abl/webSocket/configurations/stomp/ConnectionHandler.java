@@ -2,8 +2,6 @@ package cgg.informatique.abl.webSocket.configurations.stomp;
 
 import cgg.informatique.abl.webSocket.controleurs.webSocket.FightController;
 import cgg.informatique.abl.webSocket.entites.Compte;
-import cgg.informatique.abl.webSocket.game.lobby.LobbyRole;
-import cgg.informatique.abl.webSocket.game.lobby.LobbyUserData;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.stomp.StompCommand;

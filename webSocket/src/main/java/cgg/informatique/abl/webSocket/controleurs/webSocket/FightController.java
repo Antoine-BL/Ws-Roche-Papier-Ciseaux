@@ -1,6 +1,7 @@
 package cgg.informatique.abl.webSocket.controleurs.webSocket;
 
 import cgg.informatique.abl.webSocket.dao.CombatDao;
+import cgg.informatique.abl.webSocket.dao.CompteDao;
 import cgg.informatique.abl.webSocket.game.lobby.Lobby;
 import cgg.informatique.abl.webSocket.game.lobby.LobbyContext;
 import cgg.informatique.abl.webSocket.entites.Combat;
@@ -22,11 +23,14 @@ public class FightController implements LobbyCommandContext, LobbyContext {
     private static Lobby lobby;
     private SimpMessagingTemplate msg;
     private CombatDao combatDao;
+    private CompteDao compteDao;
 
     public FightController(@Autowired SimpMessagingTemplate msg,
-                           @Autowired CombatDao combatDao) {
+                           @Autowired CombatDao combatDao,
+                           @Autowired CompteDao compteDao) {
         this.msg = msg;
         this.combatDao = combatDao;
+        this.compteDao = compteDao;
         createLobby();
     }
 
@@ -72,7 +76,12 @@ public class FightController implements LobbyCommandContext, LobbyContext {
 
     @Override
     public void persistMatch(Combat combat) {
-        combatDao.save(combat);
+        combatDao.saveAndFlush(combat);
+    }
+
+    @Override
+    public Compte getUser(String username) {
+        return this.compteDao.findById(username).orElseThrow(() -> new IllegalStateException("Compte invalide"));
     }
 
     private Compte authToCompte(Authentication auth) {

@@ -10,15 +10,19 @@ public enum TypeCommande {
     SALUER(Saluer.class),
     SIGNALER(Signaler.class),
     POSITION(Position.class),
-    MATCH_STATE(null),
-    DECONNECTER(null),
-    CONNECTER(null);
+    COMBAT(CombatHandler.class),
+    MATCH_STATE,
+    DECONNECTER,
+    CONNECTER,
+    ERREUR;
 
     public Class<? extends Commande> getMappedSubtype() {
         return mappedSubtype;
     }
 
     private Class<? extends Commande> mappedSubtype;
+
+    TypeCommande(){}
 
     TypeCommande(Class<? extends Commande> mappedSubtype) {
         this.mappedSubtype = mappedSubtype;

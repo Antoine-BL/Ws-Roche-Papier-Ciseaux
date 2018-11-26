@@ -39,6 +39,9 @@ public class CompteController {
     private AuthenticationManager authManager;
     private PasswordEncoder passwordEncoder;
 
+    public static Compte VENERABLE;
+    public static Compte SENSEI1;
+
     public CompteController(
             @Autowired CompteDao compteDao,
             @Autowired CombatDao combatDao,
@@ -54,6 +57,9 @@ public class CompteController {
         this.roleDao = roleDao;
         this.authManager = authManager;
         this.passwordEncoder = passwordEncoder;
+
+        VENERABLE = compteDao.findById("s1@dojo").get();
+        SENSEI1 = compteDao.findById("v1@dojo").get();
     }
 
     @PostMapping("/authenticate/{username}/{password}")

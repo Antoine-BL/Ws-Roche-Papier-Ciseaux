@@ -2,6 +2,7 @@ package cgg.informatique.abl.webSocket.game.lobby.stateHandlers;
 
 import cgg.informatique.abl.webSocket.game.lobby.Lobby;
 import cgg.informatique.abl.webSocket.game.lobby.LobbyPosition;
+import cgg.informatique.abl.webSocket.game.lobby.LobbyRole;
 import cgg.informatique.abl.webSocket.game.lobby.LobbyUserData;
 
 public class AilleursHandler extends LobbyRoleHandler {
@@ -19,7 +20,7 @@ public class AilleursHandler extends LobbyRoleHandler {
     @Override
     public LobbyPosition addToRole(LobbyUserData user, Integer position) {
         getContext().addAilleurs(user);
-        return null;
+        return new LobbyPosition(LobbyRole.AILLEURS);
     }
 
     @Override

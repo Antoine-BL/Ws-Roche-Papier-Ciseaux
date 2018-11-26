@@ -4,6 +4,7 @@ import cgg.informatique.abl.webSocket.game.lobby.Lobby;
 import cgg.informatique.abl.webSocket.game.lobby.LobbyPosition;
 import cgg.informatique.abl.webSocket.game.lobby.LobbyRole;
 import cgg.informatique.abl.webSocket.game.lobby.LobbyUserData;
+import cgg.informatique.abl.webSocket.messaging.DonneesReponseCommande;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 @JsonDeserialize()
@@ -16,10 +17,11 @@ public class ChangerRole extends Commande{
 
     @Override
     public void execute(LobbyCommandContext context) {
+        Lobby lobby = LobbyCommandContext.getLobby();
+
         try {
             if (parametres.size() >= 1) {
                 LobbyRole role = LobbyRole.valueOf(parametres.get(ROLE_INDEX).toUpperCase());
-                Lobby lobby = LobbyCommandContext.getLobby();
                 LobbyUserData user = lobby.getLobbyUserData(getDe());
 
                 LobbyPosition position = new LobbyPosition(role);
@@ -33,7 +35,6 @@ public class ChangerRole extends Commande{
 
                 lobby.getLobbyUserData(getDe()).sentCommand();
             } else {
-                Lobby lobby = LobbyCommandContext.getLobby();
                 LobbyUserData lud = lobby.getLobbyUserData(getDe());
                 LobbyRole role = lud.getRoleCombat();
 
@@ -44,7 +45,7 @@ public class ChangerRole extends Commande{
             send("Echec du changement de rôle. Raison: La position donnée doit être un eniter valide", context);
         } catch (Exception e){
             e.printStackTrace();
-            send("Echec du changement de rôle. Raison: " + e.getMessage(), context);
+            lobby.sendData("Echec du changement de rôle. Raison: " + e.getMessage(), new DonneesReponseCommande(TypeCommande.QUITTER));
         }
     }
 }

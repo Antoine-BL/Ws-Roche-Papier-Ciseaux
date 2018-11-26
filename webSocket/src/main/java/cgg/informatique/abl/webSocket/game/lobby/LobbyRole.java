@@ -12,7 +12,7 @@ public enum LobbyRole {
     ROUGE(RougeHandler.class),
     BLANC(BlancHandler.class),
     ARBITRE(ArbitreHandler.class),
-    AILLEURS(null);
+    AILLEURS(AilleursHandler.class);
     private Class<? extends LobbyRoleHandler> handlerClass;
 
     LobbyRole(Class<? extends LobbyRoleHandler> handlerClass) {

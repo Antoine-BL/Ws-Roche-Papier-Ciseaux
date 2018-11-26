@@ -51,26 +51,30 @@ public class Compte extends UserBase implements UserDetails, SanitizedCompte {
     @Column(name="TALENT")
     private int talent;
 
-
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "blanc",targetEntity = Combat.class)
+    @OneToMany(mappedBy = "blanc",targetEntity = Combat.class)
     @JsonManagedReference(value="combat-blanc")
     private List<Combat> combatsBlanc;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "rouge",targetEntity = Combat.class)
+    @OneToMany(mappedBy = "rouge",targetEntity = Combat.class)
     @JsonManagedReference(value="combat-rouge")
     private List<Combat> combatsRouge;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "arbitre",targetEntity = Combat.class)
+    @OneToMany(mappedBy = "arbitre",targetEntity = Combat.class)
     @JsonManagedReference(value="combat-arbitre")
     private List<Combat> combatsArbitre;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "professeur",targetEntity = Examen.class)
+    @OneToMany(mappedBy = "professeur",targetEntity = Examen.class)
     @JsonManagedReference(value="exam-prof")
     private List<Examen> examensProf;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "eleve",targetEntity = Examen.class)
+    @OneToMany(mappedBy = "eleve",targetEntity = Examen.class)
     @JsonManagedReference(value="exam-eleve")
     private List<Examen> examensEleve;
+
+    @Transient
+    private Integer points = null;
+    @Transient
+    private Integer credits = null;
 
     protected Compte() { }
 

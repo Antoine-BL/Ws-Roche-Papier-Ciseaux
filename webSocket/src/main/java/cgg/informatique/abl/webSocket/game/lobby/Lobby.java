@@ -11,6 +11,7 @@ import cgg.informatique.abl.webSocket.messaging.commands.TypeCommande;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class Lobby implements Runnable, MatchHandler, SerializableLobby {
     private static final int INDEX_ROUGE = 0;
@@ -37,10 +38,10 @@ public class Lobby implements Runnable, MatchHandler, SerializableLobby {
 
     private Thread lobbyThread;
 
-    private List<LobbyUserData> users;
+    private HashSet<LobbyUserData> users;
     private RoleColl spectateurs;
     private RoleColl combattants;
-    private List<LobbyUserData> ailleurs;
+    private HashSet<LobbyUserData> ailleurs;
     private LobbyUserData rouge;
     private LobbyUserData blanc;
     private LobbyUserData arbitre;
@@ -56,59 +57,61 @@ public class Lobby implements Runnable, MatchHandler, SerializableLobby {
         this.lobbyContext = ctxt;
 
         lobbyState = LobbyState.CLOSED;
-        users = Collections.synchronizedList(new ArrayList<>(27));
+        users = new HashSet<>(27);
         spectateurs = new RoleColl(LobbyRole.SPECTATEUR);
         combattants = new RoleColl(LobbyRole.COMBATTANT);
+        ailleurs = new HashSet<>();
     }
 
     @Override
     public void run() {
         lobbyThread = Thread.currentThread();
 
-        try {
-            lobbyState = LobbyState.STANDBY;
-            send("Lobby ouvert!");
-            mainLoop();
-            send("Lobby closed");
-            lobbyContext.lobbyClosed();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        lobbyState = LobbyState.STANDBY;
+        send("Lobby ouvert!");
+        mainLoop();
+        send("Lobby closed");
+        lobbyContext.lobbyClosed();
     }
 
-    private void mainLoop() throws InterruptedException {
+    public LobbyUserData updateUserInfo(LobbyUserData user) {
+        user.setUser(lobbyContext.getUser(user.getCourriel()));
+        return user;
+    }
+
+    private void mainLoop(){
         long tickStart;
         long processingTime = 0;
         while (lobbyState != LobbyState.CLOSED) {
-            Thread.sleep(Math.max(TICK_DURATION - processingTime, 0));
+            try { Thread.sleep(Math.max(TICK_DURATION - processingTime, 0));} catch (InterruptedException ignored) {}
             tickStart = System.currentTimeMillis();
 
             System.out.println("tick!");
 
-            purgeInactiveUsers();
+//            purgeInactiveUsers();
             
             if (matchInProgress != null) matchInProgress.tick();
             processingTime = System.currentTimeMillis() - tickStart;
         }
     }
 
-    private void purgeInactiveUsers() {
-        for (int i = 0; i < users.size(); i++) {
-            LobbyUserData user = users.get(i);
-
-            if (user.isTimedOut()) {
-                removeFromLobby(user);
-                quitter(user);
-                System.out.println(user.getUser().getAlias() + " kicked due to inactivity");
-            }
-
-            if (user.isInactive() && !user.isWarned()) {
-                user.setWarned(true);
-                send(user.getUser().getAlias() + " est inactif. Il sera bientôt sorti du lobby.");
-                System.out.println(user.getUser().getAlias() + " inactive");
-            }
-        }
-    }
+//    private void purgeInactiveUsers() {
+//        for (int i = 0; i < users.size(); i++) {
+////            LobbyUserData user = users.get(i);
+//
+//            if (user.isTimedOut()) {
+//                removeFromLobby(user);
+//                quitter(user);
+//                System.out.println(user.getUser().getAlias() + " kicked due to inactivity");
+//            }
+//
+//            if (user.isInactive() && !user.isWarned()) {
+//                user.setWarned(true);
+//                send(user.getUser().getAlias() + " est inactif. Il sera bientôt sorti du lobby.");
+//                System.out.println(user.getUser().getAlias() + " inactive");
+//            }
+//        }
+//    }
 
     private void waitForPlayers() {
         try {
@@ -155,7 +158,6 @@ public class Lobby implements Runnable, MatchHandler, SerializableLobby {
 
     public void connect(Compte u) {
         if (lobbyState == LobbyState.STANDBY) this.lobbyThread.interrupt();
-        if (users.stream().anyMatch(u::equals)) throw  new IllegalArgumentException("utilisateur déjà présent");
 
         LobbyUserData userData = new LobbyUserData(u, this);
 
@@ -167,24 +169,15 @@ public class Lobby implements Runnable, MatchHandler, SerializableLobby {
 
     public void posChanged(LobbyUserData user, LobbyPosition newPos, LobbyPosition oldPos) {
         sendData(String.format("%s a maintenant le role de %s", user.getAlias(), user.getRoleCombat()),
-                new DonneesReponseCommande(TypeCommande.ROLE, user, newPos, oldPos));
+                new DonneesReponseCommande(TypeCommande.ROLE, this.asSerializable()));
     }
 
     public void quitter(LobbyUserData u) {
         LobbyPosition pos = removeFromLobby(u);
         if (pos != null) {
             sendData(u.getUser().getAlias() + " a quitté",
-                    new DonneesReponseCommande(TypeCommande.QUITTER, u, pos));
-            sendDataTo(u.getUser().getAlias() + " a quitté",
-                    new DonneesReponseCommande(TypeCommande.QUITTER, u, pos));
+                    new DonneesReponseCommande(TypeCommande.JOINDRE, this.asSerializable()));
         }
-    }
-
-    private void sendDataTo(String message, DonneesReponseCommande donneesReponseCommande) {
-        this.messaging.convertAndSendToUser(
-                donneesReponseCommande.getDe().getCourriel(),
-                OUTPUT_TOPIC_COMMAND,
-                new ReponseCommande(COMPTE_LOBBY, message, donneesReponseCommande));
     }
 
     private synchronized LobbyPosition removeFromLobby(LobbyUserData utilisateur) {
@@ -246,7 +239,11 @@ public class Lobby implements Runnable, MatchHandler, SerializableLobby {
 
     @Override
     public LobbyUserData[] getAilleurs() {
-        return (LobbyUserData[])ailleurs.toArray();
+        LobbyUserData[] ailleursArr = new LobbyUserData[ailleurs.size()];
+
+        ailleurs.toArray(ailleursArr);
+
+        return ailleursArr;
     }
 
     @Override
@@ -318,7 +315,11 @@ public class Lobby implements Runnable, MatchHandler, SerializableLobby {
     }
 
     public void removeAilleurs(LobbyUserData user) {
-        this.ailleurs.add(user);
+        this.ailleurs.remove(user);
         sendData("Deconnexion de " + user.getCourriel(), new DonneesReponseCommande(TypeCommande.DECONNECTER, user));
+    }
+
+    public Compte getUser(String user) {
+        return lobbyContext.getUser(user);
     }
 }

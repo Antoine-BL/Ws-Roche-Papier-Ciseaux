@@ -5,6 +5,8 @@ import cgg.informatique.abl.webSocket.entites.Compte;
 import cgg.informatique.abl.webSocket.entites.Groupe;
 import cgg.informatique.abl.webSocket.entites.Role;
 
+import java.util.Objects;
+
 public class LobbyUserData extends UserBase implements SanitizedLobbyUser {
     private static int SECONDS = 1000;
     private static int MINUTES = 60 * SECONDS;
