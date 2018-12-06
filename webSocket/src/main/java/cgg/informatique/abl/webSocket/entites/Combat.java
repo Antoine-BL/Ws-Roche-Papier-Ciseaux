@@ -54,6 +54,7 @@ public class Combat {
         this.creditsArbitre = creditsArbitres;
         this.ceintureBlanc = ceintureBlanc;
         this.ceintureRouge = ceintureRouge;
+        this.temps = System.currentTimeMillis();
     }
 
     public static RougeStep Builder() {

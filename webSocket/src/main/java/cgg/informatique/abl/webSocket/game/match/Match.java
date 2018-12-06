@@ -209,8 +209,8 @@ public class Match implements SerializableMatch{
         Combat combat = Combat.Builder().setRouge(this.rouge.getCompte())
                 .setBlanc(this.blanc.getCompte())
                 .setArbitre(this.arbitre.getCompte())
-                .setResultat(pointsRouge, pointsBlanc, creditsArbitre)
                 .setCeintures(this.blanc.getUser().getGroupe(), this.rouge.getUser().getGroupe())
+                .setResultat(pointsRouge, pointsBlanc, creditsArbitre)
                 .build();
         resultat = combat;
     }
