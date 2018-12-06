@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class CombatBuilder implements Combat.RougeStep, Combat.BlancStep, Combat.ArbitreStep, Combat.ResultatStep {
+public class CombatBuilder implements Combat.RougeStep, Combat.BlancStep, Combat.ArbitreStep, Combat.ResultatStep, Combat.CeintureStep {
     private Compte rouge;
     private Compte blanc;
     private Compte arbitre;
@@ -27,7 +27,7 @@ public class CombatBuilder implements Combat.RougeStep, Combat.BlancStep, Combat
         return this;
     }
 
-    public Combat.ResultatStep setArbitre(Compte arbitre) {
+    public Combat.CeintureStep setArbitre(Compte arbitre) {
         this.arbitre = arbitre;
         return this;
     }
@@ -41,7 +41,7 @@ public class CombatBuilder implements Combat.RougeStep, Combat.BlancStep, Combat
         return this;
     }
 
-    public CombatBuilder setCeintures(Groupe ceintureBlanc, Groupe ceintureRouge) {
+    public Combat.ResultatStep setCeintures(Groupe ceintureBlanc, Groupe ceintureRouge) {
         this.ceintureBlanc = ceintureBlanc;
         this.ceintureRouge = ceintureRouge;
 

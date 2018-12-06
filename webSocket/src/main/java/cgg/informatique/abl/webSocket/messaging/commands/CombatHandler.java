@@ -70,13 +70,15 @@ public class CombatHandler extends Commande {
         return Combat.Builder()
                 .setRouge(utilisateurCourant)
                 .setBlanc(CompteController.SENSEI1)
-                .setArbitre(CompteController.VENERABLE);
+                .setArbitre(CompteController.VENERABLE)
+                .setCeintures(utilisateurCourant.getGroupe(), CompteController.SENSEI1.getGroupe());
     }
 
     private Combat.ResultatStep arbitre(Compte utilisateurCourant) {
         return Combat.Builder()
                 .setRouge(CompteController.VENERABLE)
                 .setBlanc(CompteController.SENSEI1)
-                .setArbitre(utilisateurCourant);
+                .setArbitre(utilisateurCourant)
+                .setCeintures(CompteController.VENERABLE.getGroupe(), CompteController.SENSEI1.getGroupe());
     }
 }

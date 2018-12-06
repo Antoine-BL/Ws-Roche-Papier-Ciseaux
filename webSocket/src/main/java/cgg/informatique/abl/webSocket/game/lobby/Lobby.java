@@ -174,10 +174,8 @@ public class Lobby implements Runnable, MatchHandler, SerializableLobby {
 
     public void quitter(LobbyUserData u) {
         LobbyPosition pos = removeFromLobby(u);
-        if (pos != null) {
-            sendData(u.getUser().getAlias() + " a quitté",
-                    new DonneesReponseCommande(TypeCommande.JOINDRE, this.asSerializable()));
-        }
+        sendData(u.getUser().getAlias() + " a quitté",
+                new DonneesReponseCommande(TypeCommande.JOINDRE, this.asSerializable()));
     }
 
     private synchronized LobbyPosition removeFromLobby(LobbyUserData utilisateur) {

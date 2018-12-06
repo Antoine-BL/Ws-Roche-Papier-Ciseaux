@@ -62,7 +62,7 @@ public class Combat {
 
     public interface RougeStep { BlancStep setRouge(Compte rouge); }
     public interface BlancStep { ArbitreStep setBlanc(Compte blanc); }
-    public interface ArbitreStep { ResultatStep setArbitre(Compte arbitre); }
+    public interface ArbitreStep { CeintureStep setArbitre(Compte arbitre); }
     public interface ResultatStep { CombatBuilder setResultat(int pointsRouge, int pointsBlanc, int creditArbitre); }
 
     public Long getId() {
@@ -128,5 +128,9 @@ public class Combat {
 
     public void setTemps(long temps) {
         this.temps = temps;
+    }
+
+    public interface CeintureStep {
+        ResultatStep setCeintures(Groupe rouge, Groupe blanc);
     }
 }
