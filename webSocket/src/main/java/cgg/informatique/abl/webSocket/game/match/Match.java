@@ -1,6 +1,7 @@
 package cgg.informatique.abl.webSocket.game.match;
 
 import cgg.informatique.abl.webSocket.entites.Compte;
+import cgg.informatique.abl.webSocket.entites.Groupe;
 import cgg.informatique.abl.webSocket.game.lobby.LobbyRole;
 import cgg.informatique.abl.webSocket.game.lobby.LobbyUserData;
 import cgg.informatique.abl.webSocket.game.lobby.RoleColl;
@@ -200,8 +201,8 @@ public class Match implements SerializableMatch{
         }
     }
 
-    public static int calculerPointsGagnant(Compte gagnant, Compte perdant) {
-        int delta = perdant.getGroupe().getId() - gagnant.getGroupe().getId();
+    public static int calculerPointsGagnant(Groupe gagnant, Groupe perdant) {
+        int delta = perdant.getId() - gagnant.getId();
         return recompensesSelonDelta.get(delta);
     }
 

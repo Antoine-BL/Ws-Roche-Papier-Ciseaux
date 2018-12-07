@@ -98,6 +98,21 @@ public class Combat {
         this.arbitre = arbitre;
     }
 
+    public Groupe getCeintureRouge() {
+        return ceintureRouge;
+    }
+
+    public void setCeintureRouge(Groupe ceintureRouge) {
+        this.ceintureRouge = ceintureRouge;
+    }
+
+    public Groupe getCeintureBlanc() {
+        return ceintureBlanc;
+    }
+
+    public void setCeintureBlanc(Groupe ceintureBlanc) {
+        this.ceintureBlanc = ceintureBlanc;
+    }
 
     public int getPointsRouge() {
         return pointsRouge;

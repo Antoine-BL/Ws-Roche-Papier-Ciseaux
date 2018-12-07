@@ -288,20 +288,20 @@ public class CompteController {
         int pointsBlanc;
 
         if (combat.getPointsRouge() == 10 && combat.getPointsBlanc() == 10) {
-            pointsRouge = Match.calculerPointsGagnant(combat.getRouge(), combat.getBlanc()) / 2;
-            pointsBlanc = Match.calculerPointsGagnant(combat.getBlanc(), combat.getRouge()) / 2;
+            pointsRouge = Match.calculerPointsGagnant(combat.getCeintureRouge(), combat.getCeintureBlanc()) / 2;
+            pointsBlanc = Match.calculerPointsGagnant(combat.getCeintureBlanc(), combat.getCeintureRouge()) / 2;
         } else if (combat.getPointsRouge() == 5 && combat.getPointsBlanc() == 5) {
-            pointsRouge = Match.calculerPointsGagnant(combat.getRouge(), combat.getBlanc()) / 2;
-            pointsBlanc = Match.calculerPointsGagnant(combat.getBlanc(), combat.getRouge()) / 2;
+            pointsRouge = Match.calculerPointsGagnant(combat.getCeintureRouge(), combat.getCeintureBlanc()) / 2;
+            pointsBlanc = Match.calculerPointsGagnant(combat.getCeintureBlanc(), combat.getCeintureRouge()) / 2;
         } else if (combat.getPointsRouge() == 0 && combat.getPointsBlanc() == 0) {
             pointsRouge = 0;
             pointsBlanc = 0;
         } else if (combat.getPointsRouge() == 10) {
-            pointsRouge = Match.calculerPointsGagnant(combat.getRouge(), combat.getBlanc());
+            pointsRouge = Match.calculerPointsGagnant(combat.getCeintureRouge(), combat.getCeintureBlanc());
             pointsBlanc = 0;
         } else if (combat.getPointsBlanc() == 10) {
             pointsRouge = 0;
-            pointsBlanc = Match.calculerPointsGagnant(combat.getBlanc(), combat.getRouge());
+            pointsBlanc = Match.calculerPointsGagnant(combat.getCeintureBlanc(), combat.getCeintureRouge());
         } else {
             throw new IllegalArgumentException("échec calcul points");
         }
