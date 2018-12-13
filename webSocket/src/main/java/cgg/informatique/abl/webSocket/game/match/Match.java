@@ -1,6 +1,5 @@
 package cgg.informatique.abl.webSocket.game.match;
 
-import cgg.informatique.abl.webSocket.entites.Compte;
 import cgg.informatique.abl.webSocket.entites.Groupe;
 import cgg.informatique.abl.webSocket.game.lobby.LobbyRole;
 import cgg.informatique.abl.webSocket.game.lobby.LobbyUserData;
@@ -17,7 +16,7 @@ public class Match implements SerializableMatch{
     private MatchUserData blanc;
     private MatchUserData rouge;
     private final MatchHandler matchHandler;
-    private MatchState state;
+    private MatchState etat;
     private long lastStateChange;
     private Combat resultat;
 
@@ -59,12 +58,12 @@ public class Match implements SerializableMatch{
     }
 
     public void tick() {
-        sendData(null, new DonneesReponseCommande(TypeCommande.MATCH_STATE, getChrono(), this.state, this.state.getMessage()));
-        if (state.getDuration() < timeSinceLastChange()) {
-            state.handleTimeout(this);
+        sendData(null, new DonneesReponseCommande(TypeCommande.MATCH_STATE, getChrono(), this.etat, this.etat.getMessage()));
+        if (etat.getDuree() < tempsDepuisDernierEtat()) {
+            etat.gererFinEtat(this);
         }
 
-        if (state == MatchState.EXIT) {
+        if (etat == MatchState.EXIT) {
             if (rouge.getLobbyUser().getRoleCombat() != LobbyRole.ROUGE
                 && blanc.getLobbyUser().getRoleCombat() != LobbyRole.BLANC
                 && arbitreReste) {
@@ -134,13 +133,13 @@ public class Match implements SerializableMatch{
 
     @Override
     public MatchState getMatchState() {
-        return this.state;
+        return this.etat;
     }
 
     @Override
     public Long getChrono() {
         try {
-            return (this.state.getDuration() - (System.currentTimeMillis() - lastStateChange)) / 1000;
+            return (this.etat.getDuree() - (System.currentTimeMillis() - lastStateChange)) / 1000;
         } catch (ArithmeticException e) {
             return 0L;
         }
@@ -155,11 +154,30 @@ public class Match implements SerializableMatch{
         return blanc;
     }
 
-    public void setMatchState(MatchState state) {
-        this.state = state;
-        state.handleStateChanged(this);
+    public void setMatchState(MatchState etat) {
+        this.etat = etat;
+        switch (etat) {
+            case EXIT:
+                //Action 1
+                break;
+            case OVER:
+                //Action 2
+                break;
+            case DECIDE:
+                //Action 3
+                break;
+            case READY:
+                //Action 4
+                break;
+            case START:
+                //Action 5
+                break;
+            case WAITING:
+                //Action 6
+                break;
+        }
         this.lastStateChange = System.currentTimeMillis();
-        matchHandler.sendData(state.getTransitionMessage(), new DonneesReponseCommande(TypeCommande.MATCH_STATE, getChrono(),this.state, this.state.getMessage()));
+        matchHandler.sendData(etat.getTransitionMessage(), new DonneesReponseCommande(TypeCommande.MATCH_STATE, getChrono(),this.etat, this.etat.getMessage()));
     }
 
     public void sendData(String message, DonneesReponseCommande donnees) {
@@ -216,7 +234,7 @@ public class Match implements SerializableMatch{
         resultat = combat;
     }
 
-    private long timeSinceLastChange() {
+    private long tempsDepuisDernierEtat() {
         return System.currentTimeMillis() - lastStateChange;
     }
 

@@ -13,17 +13,14 @@ public class Combat {
 
     @ManyToOne(fetch = FetchType.EAGER, targetEntity = Compte.class)
     @JoinColumn(name="ROUGE_ID")
-    @JsonBackReference(value="combat-rouge")
     private Compte rouge;
 
     @ManyToOne(fetch = FetchType.EAGER, targetEntity = Compte.class)
     @JoinColumn(name="BLANC_ID")
-    @JsonBackReference(value="combat-blanc")
     private Compte blanc;
 
     @ManyToOne(fetch = FetchType.EAGER, targetEntity = Compte.class)
     @JoinColumn(name="ARBITRE_ID")
-    @JsonBackReference(value="combat-arbitre")
     private Compte arbitre;
 
     @Column(name = "POINTS_ROUGE")

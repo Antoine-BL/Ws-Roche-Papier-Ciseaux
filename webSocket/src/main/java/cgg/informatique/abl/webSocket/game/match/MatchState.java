@@ -37,13 +37,13 @@ public enum MatchState {
         }
     }
 
-    public void handleTimeout(Match match) {
+    public void gererFinEtat(Match match) {
         MatchStateHandler handler = constructHandler(match);
 
         handler.handleTimeout();
     }
 
-    public long getDuration() {
+    public long getDuree() {
         return duration;
     }
 

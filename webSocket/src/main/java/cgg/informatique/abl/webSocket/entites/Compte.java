@@ -4,9 +4,7 @@ import cgg.informatique.abl.webSocket.controleurs.rest.CompteController;
 import cgg.informatique.abl.webSocket.dto.SanitizedCompte;
 import cgg.informatique.abl.webSocket.dto.SanitizedUser;
 import cgg.informatique.abl.webSocket.dto.UserBase;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -23,6 +21,9 @@ import java.util.List;
 @Table(name="COMPTES")
 @JsonSerialize(as=SanitizedCompte.class)
 @JsonIgnoreProperties(ignoreUnknown = true)
+@JsonIdentityInfo(
+        generator = ObjectIdGenerators.PropertyGenerator.class,
+        property = "courriel")
 public class Compte extends UserBase implements UserDetails, SanitizedCompte {
     @Id
     @Column(name="USERNAME")
@@ -52,15 +53,12 @@ public class Compte extends UserBase implements UserDetails, SanitizedCompte {
     private int talent;
 
     @OneToMany(mappedBy = "blanc",targetEntity = Combat.class)
-    @JsonManagedReference(value="combat-blanc")
     private List<Combat> combatsBlanc;
 
     @OneToMany(mappedBy = "rouge",targetEntity = Combat.class)
-    @JsonManagedReference(value="combat-rouge")
     private List<Combat> combatsRouge;
 
     @OneToMany(mappedBy = "arbitre",targetEntity = Combat.class)
-    @JsonManagedReference(value="combat-arbitre")
     private List<Combat> combatsArbitre;
 
     @OneToMany(mappedBy = "professeur",targetEntity = Examen.class)
