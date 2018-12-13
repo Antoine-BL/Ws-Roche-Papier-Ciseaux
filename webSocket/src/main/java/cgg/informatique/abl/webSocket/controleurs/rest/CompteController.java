@@ -6,6 +6,7 @@ import cgg.informatique.abl.webSocket.dto.SanitizedUser;
 import cgg.informatique.abl.webSocket.entites.*;
 import cgg.informatique.abl.webSocket.game.lobby.LobbyRole;
 import cgg.informatique.abl.webSocket.game.match.Match;
+import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.http.ResponseEntity;
@@ -21,10 +22,9 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.net.URI;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.springframework.security.web.context.HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY;
 
@@ -85,6 +85,26 @@ public class CompteController {
     public List<SanitizedCompte> getAllCompte() {
         List<SanitizedCompte> comptes = compteDao.findAll().stream().map(cgg.informatique.abl.webSocket.entites.Compte::sanitize).collect(Collectors.toList());
         return comptes;
+    }
+
+    /**
+     * @return la liste de tout les combats de l'utilisateur
+     */
+    @GetMapping("/myCombats")
+    public List<Combat> getAllMyCombat(@Autowired Authentication auth) {
+        List<Combat> myCombats = new ArrayList<>();
+        if (auth != null) {
+            String courriel = ((Compte)auth.getPrincipal()).getCourriel();
+            Compte compte = compteDao.findById(courriel)
+                    .orElseThrow(IllegalArgumentException::new);
+
+            myCombats = Stream.concat(combatDao.findAllByRouge(compte).stream(), combatDao.findAllByBlanc(compte).stream())
+                    .collect(Collectors.toList());
+
+            myCombats.sort( (c1, c2) -> c1.getTemps() < c2.getTemps() ? 1 : -1);
+        }
+
+        return myCombats;
     }
 
     @GetMapping("/comptes/defaults")
