@@ -16,12 +16,10 @@ public class Examen {
 
     @ManyToOne(fetch = FetchType.EAGER, targetEntity = Compte.class)
     @JoinColumn(name = "EVALUATEUR_ID")
-    @JsonBackReference(value="exam-prof")
     private SanitizedCompte professeur;
 
     @ManyToOne(fetch = FetchType.EAGER, targetEntity = Compte.class)
     @JoinColumn(name = "EVALUE_ID")
-    @JsonBackReference(value="exam-eleve")
     private SanitizedCompte eleve;
 
     @Column(name = "A_REUSSI")
@@ -29,11 +27,23 @@ public class Examen {
     @Column(name = "DATE")
     private long temps;
 
+    @ManyToOne(targetEntity = Groupe.class)
+    @JoinColumn(name="CEINTURE_ID")
+    private Groupe ceinture;
+
     public Examen() {}
 
     public Examen(Compte professeur, Compte eleve) {
         this.professeur = professeur;
         this.eleve = eleve;
+    }
+
+    public Groupe getCeinture() {
+        return ceinture;
+    }
+
+    public void setCeinture(Groupe ceinture) {
+        this.ceinture = ceinture;
     }
 
     public SanitizedUser getProfesseur() {
