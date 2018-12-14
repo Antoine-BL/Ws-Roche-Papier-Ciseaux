@@ -3,7 +3,7 @@ package cgg.informatique.abl.webSocket.controleurs.rest;
 import cgg.informatique.abl.webSocket.dao.AvatarDao;
 import cgg.informatique.abl.webSocket.entites.Avatar;
 //import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
-import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
+import java.util.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -40,6 +40,6 @@ public class AvatarController {
 
     private byte[] getB64Bytes(String b64) {
         String data = b64.split(",")[1];
-        return Base64.decode(data);
+        return Base64.getDecoder().decode(data);
     }
 }

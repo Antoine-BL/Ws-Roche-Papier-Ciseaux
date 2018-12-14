@@ -110,6 +110,24 @@ public class CompteController {
 
         return myCombats;
     }
+    /**
+     * @return la liste de tout les Examens de l'utilisateur
+     */
+    @GetMapping("/myExamens")
+    public List<Examen> getAllMyExamen(@Autowired Authentication auth) {
+        List<Examen> myExamens = new ArrayList<>();
+        if (auth != null) {
+            String courriel = ((Compte)auth.getPrincipal()).getCourriel();
+            Compte compte = compteDao.findById(courriel)
+                    .orElseThrow(IllegalArgumentException::new);
+
+            myExamens =examenDao.findByEleve(compte);
+
+            myExamens.sort( (e1, e2) -> e1.getTemps() < e2.getTemps() ? 1 : -1);
+        }
+
+        return myExamens;
+    }
 
     @GetMapping("/comptes/defaults")
     public ResponseEntity<List<SanitizedCompte>> getComptesDefaut() {
