@@ -314,43 +314,29 @@ public class CompteController {
 
         for (Combat combat : compte.getCombatsRouge()) {
             if (combat.getTemps() > tempsMax) {
-                points += pointsPourMatch(combat, LobbyRole.ROUGE);
+                points += pointsPourRouge(combat);
             }
         }
 
         for (Combat combat : compte.getCombatsBlanc()) {
             if (combat.getTemps() > tempsMax) {
-                points += pointsPourMatch(combat, LobbyRole.BLANC);
+                points += pointsPourBlanc(combat);
             }
         }
 
         return points;
     }
 
-    private static int pointsPourMatch(Combat combat, LobbyRole role) {
-        int pointsRouge;
-        int pointsBlanc;
+    private static int pointsPourRouge(Combat combat) {
+        int points = Match.calculerPointsGagnant(combat.getCeintureRouge(), combat.getCeintureBlanc());
 
-        if (combat.getPointsRouge() == 10 && combat.getPointsBlanc() == 10) {
-            pointsRouge = Match.calculerPointsGagnant(combat.getCeintureRouge(), combat.getCeintureBlanc()) / 2;
-            pointsBlanc = Match.calculerPointsGagnant(combat.getCeintureBlanc(), combat.getCeintureRouge()) / 2;
-        } else if (combat.getPointsRouge() == 5 && combat.getPointsBlanc() == 5) {
-            pointsRouge = Match.calculerPointsGagnant(combat.getCeintureRouge(), combat.getCeintureBlanc()) / 2;
-            pointsBlanc = Match.calculerPointsGagnant(combat.getCeintureBlanc(), combat.getCeintureRouge()) / 2;
-        } else if (combat.getPointsRouge() == 0 && combat.getPointsBlanc() == 0) {
-            pointsRouge = 0;
-            pointsBlanc = 0;
-        } else if (combat.getPointsRouge() == 10) {
-            pointsRouge = Match.calculerPointsGagnant(combat.getCeintureRouge(), combat.getCeintureBlanc());
-            pointsBlanc = 0;
-        } else if (combat.getPointsBlanc() == 10) {
-            pointsRouge = 0;
-            pointsBlanc = Match.calculerPointsGagnant(combat.getCeintureBlanc(), combat.getCeintureRouge());
-        } else {
-            throw new IllegalArgumentException("échec calcul points");
-        }
+        return (combat.getPointsRouge() / 10) * points;
+    }
 
-        return role == LobbyRole.BLANC ? pointsBlanc : pointsRouge;
+    private static int pointsPourBlanc(Combat combat) {
+        int points = Match.calculerPointsGagnant(combat.getCeintureBlanc(), combat.getCeintureRouge());
+
+        return (combat.getPointsBlanc() / 10) * points;
     }
 
     private URI GenerateCreatedURI(cgg.informatique.abl.webSocket.entites.Compte compte) {
