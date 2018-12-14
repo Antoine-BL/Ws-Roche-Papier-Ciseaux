@@ -6,7 +6,6 @@ import cgg.informatique.abl.webSocket.dto.SanitizedUser;
 import cgg.informatique.abl.webSocket.entites.*;
 import cgg.informatique.abl.webSocket.game.lobby.LobbyRole;
 import cgg.informatique.abl.webSocket.game.match.Match;
-import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.http.ResponseEntity;
@@ -42,6 +41,8 @@ public class CompteController {
     public static Compte VENERABLE;
     public static Compte SENSEI1;
 
+    public static GetDefaultAccountsTask accountsTask;
+
     public CompteController(
             @Autowired CompteDao compteDao,
             @Autowired CombatDao combatDao,
@@ -60,6 +61,9 @@ public class CompteController {
 
         VENERABLE = compteDao.findById("s1@dojo").get();
         SENSEI1 = compteDao.findById("v1@dojo").get();
+
+        accountsTask = new GetDefaultAccountsTask();
+        new Thread(accountsTask).run();
     }
 
     @PostMapping("/authenticate/{username}/{password}")
@@ -108,18 +112,20 @@ public class CompteController {
     }
 
     @GetMapping("/comptes/defaults")
-    public List<SanitizedCompte> getComptesDefaut() {
-        return compteDao.
-                findAll()
-                .stream()
-                .filter(this::isDefault)
-                .map(Compte::sanitize)
-                .collect(Collectors.toList());
-    }
+    public ResponseEntity<List<SanitizedCompte>> getComptesDefaut() {
+        synchronized (accountsTask) {
+            try {
+                if (accountsTask.getDefaultAccounts() == null) {
+                    accountsTask.wait();
+                } else {
+                    return ResponseEntity.ok(accountsTask.getDefaultAccounts());
+                }
+            } catch (InterruptedException e) {
+                return ResponseEntity.ok(accountsTask.getDefaultAccounts());
+            }
+        }
 
-    private boolean isDefault(Compte compte) {
-        final String DEFAULT_PASSWORD = "Patate123";
-        return passwordEncoder.matches(DEFAULT_PASSWORD, compte.getPassword());
+        return ResponseEntity.badRequest().build();
     }
 
     @GetMapping("/comptes/{id}")
@@ -417,6 +423,35 @@ public class CompteController {
         }
         else {
             return eleve.getAlias() + " n'est pas éligible à passer un examen";
+        }
+    }
+
+    private class GetDefaultAccountsTask implements Runnable {
+        private List<SanitizedCompte> defaultAccounts;
+        private static final String DEFAULT_PASSWORD = "";
+
+        public List<SanitizedCompte> getDefaultAccounts() {
+            return defaultAccounts;
+        }
+
+        @Override
+        public void run() {
+            List<SanitizedCompte> comptes =
+                compteDao.
+                    findAll()
+                    .stream()
+                    .filter(this::isDefault)
+                    .map(Compte::sanitize)
+                    .collect(Collectors.toList());
+            synchronized (this) {
+                defaultAccounts = comptes;
+                notifyAll();
+            }
+        }
+
+        private boolean isDefault(Compte compte) {
+            final String DEFAULT_PASSWORD = "Patate123";
+            return passwordEncoder.matches(DEFAULT_PASSWORD, compte.getPassword());
         }
     }
 }
