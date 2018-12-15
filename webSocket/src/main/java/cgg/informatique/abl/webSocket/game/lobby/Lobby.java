@@ -29,7 +29,7 @@ public class Lobby implements Runnable, MatchHandler, SerializableLobby {
 
     private static final int ONE_SECOND = 1000;
 
-    private static final int TICK_RATE_HZ = 1;
+    private static final int TICK_RATE_HZ = 60;
     private static final int TICK_DURATION = ONE_SECOND / TICK_RATE_HZ;
 
     private static final int LOBBY_TIMEOUT = 90 * ONE_SECOND;
@@ -47,16 +47,16 @@ public class Lobby implements Runnable, MatchHandler, SerializableLobby {
     private LobbyUserData arbitre;
     private int nbMatchArbitre = 0;
 
-    private volatile LobbyState lobbyState;
     private Match matchInProgress;
     private final SimpMessagingTemplate messaging;
     private LobbyContext lobbyContext;
+
+    private boolean running = true;
 
     public Lobby(SimpMessagingTemplate messaging, LobbyContext ctxt) {
         this.messaging = messaging;
         this.lobbyContext = ctxt;
 
-        lobbyState = LobbyState.CLOSED;
         users = new HashSet<>(27);
         spectateurs = new RoleColl(LobbyRole.SPECTATEUR);
         combattants = new RoleColl(LobbyRole.COMBATTANT);
@@ -67,11 +67,14 @@ public class Lobby implements Runnable, MatchHandler, SerializableLobby {
     public void run() {
         lobbyThread = Thread.currentThread();
 
-        lobbyState = LobbyState.STANDBY;
         send("Lobby ouvert!");
         mainLoop();
         send("Lobby closed");
         lobbyContext.lobbyClosed();
+    }
+
+    public void stop() {
+        this.running = false;
     }
 
     public LobbyUserData updateUserInfo(LobbyUserData user) {
@@ -82,60 +85,14 @@ public class Lobby implements Runnable, MatchHandler, SerializableLobby {
     private void mainLoop(){
         long tickStart;
         long processingTime = 0;
-        while (lobbyState != LobbyState.CLOSED) {
+        while (running) {
             try { Thread.sleep(Math.max(TICK_DURATION - processingTime, 0));} catch (InterruptedException ignored) {}
             tickStart = System.currentTimeMillis();
 
-            System.out.println("tick!");
-
-//            purgeInactiveUsers();
-            
+            if (isReadyForMatch()) startMatch();
             if (matchInProgress != null) matchInProgress.tick();
             processingTime = System.currentTimeMillis() - tickStart;
         }
-    }
-
-//    private void purgeInactiveUsers() {
-//        for (int i = 0; i < users.size(); i++) {
-////            LobbyUserData user = users.get(i);
-//
-//            if (user.isTimedOut()) {
-//                removeFromLobby(user);
-//                quitter(user);
-//                System.out.println(user.getUser().getAlias() + " kicked due to inactivity");
-//            }
-//
-//            if (user.isInactive() && !user.isWarned()) {
-//                user.setWarned(true);
-//                send(user.getUser().getAlias() + " est inactif. Il sera bientôt sorti du lobby.");
-//                System.out.println(user.getUser().getAlias() + " inactive");
-//            }
-//        }
-//    }
-
-    private void waitForPlayers() {
-        try {
-            for (int i = 0; lobbyState == LobbyState.STANDBY; i++) {
-                int remainingS = (LOBBY_TIMEOUT - WAIT_MESSAGE_INTERVAL * i)/ ONE_SECOND;
-                if (remainingS <= 0) {
-                    send("Fermeture du lobby dû à l'inactivité");
-
-                    lobbyState = LobbyState.CLOSED;
-                }
-
-                send(String.format(WAIT_MESSAGE_TMP, remainingS));
-                Thread.sleep(WAIT_MESSAGE_INTERVAL);
-            }
-        } catch (InterruptedException e) {
-            send("Lobby actif");
-            lobbyState = LobbyState.ACTIVE;
-        }
-    }
-
-    private void becomeInactive() {
-        send("Lobby inactif");
-        lobbyState = LobbyState.STANDBY;
-        waitForPlayers();
     }
 
     public void send(String message) {
@@ -157,8 +114,6 @@ public class Lobby implements Runnable, MatchHandler, SerializableLobby {
     }
 
     public void connect(Compte u) {
-        if (lobbyState == LobbyState.STANDBY) this.lobbyThread.interrupt();
-
         LobbyUserData userData = new LobbyUserData(u, this);
 
         this.users.add(userData);
@@ -194,8 +149,6 @@ public class Lobby implements Runnable, MatchHandler, SerializableLobby {
     }
 
     public void startMatch() {
-        ensureReadyForMatch();
-
         Match match = new Match(this.arbitre, this);
         match.choisirParticipantsParmi(combattants);
 
@@ -204,11 +157,8 @@ public class Lobby implements Runnable, MatchHandler, SerializableLobby {
         matchInProgress = match;
     }
 
-    private void ensureReadyForMatch() {
-        if (matchInProgress != null) throw new IllegalStateException("Un match est déjà en cours.");
-
-        if (combattants.size() < 2) throw new IllegalStateException("Il faut un minimum de 2 combattants avant de débuter un combat");
-        if (arbitre == null) throw new IllegalStateException("L'arbitre doit être présent");
+    private boolean isReadyForMatch() {
+        return matchInProgress == null && combattants.size() >= 2 && arbitre != null;
     }
 
     @Override

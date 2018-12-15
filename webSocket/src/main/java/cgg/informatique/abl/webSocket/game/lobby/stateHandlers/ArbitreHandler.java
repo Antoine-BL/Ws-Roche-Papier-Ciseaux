@@ -15,12 +15,6 @@ public class ArbitreHandler extends LobbyRoleHandler {
     @Override
     public LobbyPosition removeFromRole(LobbyUserData user) {
         getContext().setArbitre(null);
-        Match match = getContext().getCurrentMatch();
-        MatchState state = match == null ? MatchState.OVER : match.getMatchState();
-
-        if (state != MatchState.OVER && state != MatchState.EXIT) {
-            match.refAtFault();
-        }
 
         return new LobbyPosition(LobbyRole.ARBITRE);
     }

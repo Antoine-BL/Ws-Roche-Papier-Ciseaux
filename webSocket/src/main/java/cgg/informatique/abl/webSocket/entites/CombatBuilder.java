@@ -1,19 +1,16 @@
 package cgg.informatique.abl.webSocket.entites;
 
-import cgg.informatique.abl.webSocket.dao.CombatDao;
-import org.springframework.beans.factory.annotation.Autowired;
+import cgg.informatique.abl.webSocket.dto.MatchResult;
 import org.springframework.stereotype.Component;
 
 @Component
-public class CombatBuilder implements Combat.RougeStep, Combat.BlancStep, Combat.ArbitreStep, Combat.ResultatStep, Combat.CeintureStep {
+public class CombatBuilder implements Combat.RougeStep, Combat.BlancStep, Combat.ArbitreStep, Combat.ResultatStep {
     private Compte rouge;
     private Compte blanc;
     private Compte arbitre;
     private int pointsRouge;
     private int pointsBlanc;
     private int creditsArbitre;
-    private Groupe ceintureRouge;
-    private Groupe ceintureBlanc;
 
     CombatBuilder(){}
 
@@ -27,28 +24,21 @@ public class CombatBuilder implements Combat.RougeStep, Combat.BlancStep, Combat
         return this;
     }
 
-    public Combat.CeintureStep setArbitre(Compte arbitre) {
+    public Combat.ResultatStep setArbitre(Compte arbitre) {
         this.arbitre = arbitre;
         return this;
     }
 
     @Override
-    public CombatBuilder setResultat(int pointsRouge, int pointsBlanc, int creditArbitre) {
-        this.pointsRouge = pointsRouge;
-        this.pointsBlanc = pointsBlanc;
-        this.creditsArbitre = creditArbitre;
-
-        return this;
-    }
-
-    public Combat.ResultatStep setCeintures(Groupe ceintureBlanc, Groupe ceintureRouge) {
-        this.ceintureBlanc = ceintureBlanc;
-        this.ceintureRouge = ceintureRouge;
+    public CombatBuilder setResultat(MatchResult resultat) {
+        this.pointsRouge = resultat.getPointsRouge();
+        this.pointsBlanc = resultat.getPointsBlanc();
+        this.creditsArbitre = resultat.getCreditsArbitre();
 
         return this;
     }
 
     public Combat build() {
-        return new Combat(rouge, blanc, arbitre, pointsRouge, pointsBlanc, creditsArbitre, ceintureRouge, ceintureBlanc);
+        return new Combat(rouge, blanc, arbitre, pointsRouge, pointsBlanc, creditsArbitre, rouge.getGroupe(), blanc.getGroupe());
     }
 }

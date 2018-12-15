@@ -15,12 +15,6 @@ public class BlancHandler extends LobbyRoleHandler {
     @Override
     public LobbyPosition removeFromRole(LobbyUserData user) {
         getContext().setBlanc(null);
-        Match match = getContext().getCurrentMatch();
-        MatchState state = match == null ? MatchState.OVER : match.getMatchState();
-
-        if (state != MatchState.OVER && !(state == MatchState.EXIT && match.getBlanc().isSaluting())) {
-            match.blancLeft();
-        }
 
         return new LobbyPosition(LobbyRole.BLANC);
     }

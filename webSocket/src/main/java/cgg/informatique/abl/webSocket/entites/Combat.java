@@ -1,7 +1,6 @@
 package cgg.informatique.abl.webSocket.entites;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-
+import cgg.informatique.abl.webSocket.dto.MatchResult;
 import javax.persistence.*;
 
 @Entity
@@ -60,8 +59,8 @@ public class Combat {
 
     public interface RougeStep { BlancStep setRouge(Compte rouge); }
     public interface BlancStep { ArbitreStep setBlanc(Compte blanc); }
-    public interface ArbitreStep { CeintureStep setArbitre(Compte arbitre); }
-    public interface ResultatStep { CombatBuilder setResultat(int pointsRouge, int pointsBlanc, int creditArbitre); }
+    public interface ArbitreStep { ResultatStep setArbitre(Compte arbitre); }
+    public interface ResultatStep { CombatBuilder setResultat(MatchResult resultat); }
 
     public Long getId() {
         return id;

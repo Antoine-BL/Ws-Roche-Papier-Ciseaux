@@ -1,17 +1,15 @@
 package cgg.informatique.abl.webSocket.game.match.stateHandlers;
 
 import cgg.informatique.abl.webSocket.game.match.Match;
+import cgg.informatique.abl.webSocket.game.match.MatchState;
 
-public class OverHandler extends MatchStateHandler {
-    public OverHandler(Match context) {
+public class DebutHandler extends MatchStateHandler {
+    public DebutHandler(Match context) {
         super(context);
     }
 
     @Override
     public void handleTimeout() {
-        getContext().matchEnded();
+        getContext().setEtat(MatchState.CHOIX);
     }
-
-    @Override
-    public void handleStateChanged() { }
 }

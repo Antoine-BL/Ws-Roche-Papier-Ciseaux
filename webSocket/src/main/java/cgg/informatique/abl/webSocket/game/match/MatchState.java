@@ -6,20 +6,17 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 public enum MatchState {
-    WAITING(15, "Que les combattants se présentent à l'avant", WaitingHandler.class, "Attente"),
-    READY(15, "Rei!", ReadyHandler.class, "Prêt"),
-    START(3, "Hajime!", StartHandler.class, "Combat!"),
-    DECIDE(15, "L'arbitre doit décider d'un verdict", DecideHandler.class, "Décision"),
-    EXIT(20, "Les combattants peuvent quitter", ExitHandler.class, "Quitter"),
-    OVER(0, "Fin du match. Les joueurs sont retournés à leurs positions", OverHandler.class, "");
+    DEBUT("Les combattants se présentent à l'avant", DebutHandler.class,"Début"),
+    CHOIX("Les combattants ont choisi leurs attaques", ChoixHandler.class, "Choix des attaques"),
+    GAGNANT("Le gagnant est choisi", GagnantHandler.class, "Choix du gagnant"),
+    PAUSE("Pause avant le prochain combat", PauseHandler.class, "Pause");
+
     private Class<? extends MatchStateHandler> handlerClass;
     private static final long SECOND = 1000;
-    private long duration;
     private String transitionMessage;
     private String nom;
 
-    MatchState(int nbSeconds, String transitionMessage, Class<? extends MatchStateHandler> handlerClass, String nom) {
-        duration = nbSeconds * SECOND;
+    MatchState(String transitionMessage, Class<? extends MatchStateHandler> handlerClass, String nom) {
         this.handlerClass = handlerClass;
         this.transitionMessage = transitionMessage;
         this.nom = nom;
@@ -44,6 +41,7 @@ public enum MatchState {
     }
 
     public long getDuree() {
+        long duration = 2 * SECOND;
         return duration;
     }
 
@@ -53,9 +51,5 @@ public enum MatchState {
 
     public String getMessage() {
         return this.nom;
-    }
-
-    public void handleStateChanged(Match match) {
-        constructHandler(match).handleStateChanged();
     }
 }

@@ -299,32 +299,41 @@ public class CompteController {
     }
 
     public static Integer getPointsPour(Compte compte) {
-        int points = 0;
-        if (compte.getExamensEleve() == null) return 0;
-        if (compte.getCombatsRouge() == null) return 0;
-        if (compte.getCombatsBlanc() == null) return 0;
+        if (compte.getExamensEleve() == null || compte.getCombatsRouge() == null || compte.getCombatsBlanc() == null)
+            return 0;
 
-        long tempsMax = compte
+        long tempsMax = trouverTempsDernierExamCompte(compte);
+
+        return calculerTotalPointsCombatsDepuisTempsPourCompte(tempsMax, compte);
+    }
+
+    private static int calculerTotalPointsCombatsDepuisTempsPourCompte(long temps, Compte compte) {
+        int points = 0;
+
+        points += compte.getCombatsRouge()
+                .stream()
+                .filter(c -> c.getTemps() > temps)
+                .mapToInt(CompteController::pointsPourRouge)
+                .sum();
+
+        points += compte.getCombatsBlanc()
+                .stream()
+                .filter(c -> c.getTemps() > temps)
+                .mapToInt(CompteController::pointsPourBlanc)
+                .sum();
+
+        return points;
+    }
+
+    private static long trouverTempsDernierExamCompte(Compte compte) {
+        return
+            compte
                 .getExamensEleve()
                 .stream()
                 .filter(Examen::isReussi)
                 .map(Examen::getTemps)
                 .max(Comparator.comparing(Long::valueOf))
                 .orElse(-1L);
-
-        for (Combat combat : compte.getCombatsRouge()) {
-            if (combat.getTemps() > tempsMax) {
-                points += pointsPourRouge(combat);
-            }
-        }
-
-        for (Combat combat : compte.getCombatsBlanc()) {
-            if (combat.getTemps() > tempsMax) {
-                points += pointsPourBlanc(combat);
-            }
-        }
-
-        return points;
     }
 
     private static int pointsPourRouge(Combat combat) {

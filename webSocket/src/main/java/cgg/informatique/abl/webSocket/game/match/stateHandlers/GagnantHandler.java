@@ -3,16 +3,14 @@ package cgg.informatique.abl.webSocket.game.match.stateHandlers;
 import cgg.informatique.abl.webSocket.game.match.Match;
 import cgg.informatique.abl.webSocket.game.match.MatchState;
 
-public class ExitHandler extends MatchStateHandler {
-    public ExitHandler(Match context) {
+public class GagnantHandler extends MatchStateHandler {
+    public GagnantHandler(Match context) {
         super(context);
     }
 
     @Override
     public void handleTimeout() {
-        getContext().setMatchState(MatchState.OVER);
+        getContext().indiquerGagnant();
+        getContext().setEtat(MatchState.PAUSE);
     }
-
-    @Override
-    public void handleStateChanged() { }
 }
