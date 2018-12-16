@@ -102,7 +102,8 @@ public class CompteController {
             Compte compte = compteDao.findById(courriel)
                     .orElseThrow(IllegalArgumentException::new);
 
-            myCombats = Stream.concat(combatDao.findAllByRouge(compte).stream(), combatDao.findAllByBlanc(compte).stream())
+            myCombats = Stream.of(combatDao.findAllByRouge(compte), combatDao.findAllByBlanc(compte), combatDao.findAllByArbitre(compte))
+                    .flatMap(Collection::stream)
                     .collect(Collectors.toList());
 
             myCombats.sort( (c1, c2) -> c1.getTemps() < c2.getTemps() ? 1 : -1);
@@ -359,6 +360,7 @@ public class CompteController {
     public CompteDao getDao() {
         return compteDao;
     }
+
 
 
     /**----------------------------------------------------------------------
