@@ -9,8 +9,6 @@ public class PauseHandler extends MatchStateHandler {
 
     @Override
     public void handleTimeout() {
-        getContext().viderTatami();
-        getContext().enregistrerCombat();
         getContext().endMatch();
     }
 }

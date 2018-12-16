@@ -10,7 +10,8 @@ public class GagnantHandler extends MatchStateHandler {
 
     @Override
     public void handleTimeout() {
-        getContext().indiquerGagnant();
+        getContext().enregistrerCombat();
+        getContext().viderTatami();
         getContext().setEtat(MatchState.PAUSE);
     }
 }

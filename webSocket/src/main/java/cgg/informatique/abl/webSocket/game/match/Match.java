@@ -14,7 +14,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 @JsonSerialize(as=SerializableMatch.class)
 public class Match implements SerializableMatch{
-    private final int POURCENTAGE_FAUTE = 5;
+    private final int POURCENTAGE_FAUTE = 1;
 
     private final MatchUserData arbitre;
     private MatchUserData blanc;
@@ -71,15 +71,9 @@ public class Match implements SerializableMatch{
     public void tick() {
         sendData(null, new DonneesReponseCommande(TypeCommande.MATCH_STATE, this));
         if (etat.getDuree() < tempsDepuisDernierEtat()) {
+            System.out.println(etat);
             etat.gererFinEtat(this);
         }
-    }
-
-    public void handleRound() {
-        matchHandler.sendData(String.format("Attaque Rouge: %s",rouge.getAttack()),
-                new DonneesReponseCommande(TypeCommande.ATTAQUER, rouge, rouge.getAttack()));
-        matchHandler.sendData(String.format("Attaque Blanc: %s",blanc.getAttack()),
-                new DonneesReponseCommande(TypeCommande.ATTAQUER, blanc, blanc.getAttack()));
     }
 
     public MatchUserData getParticipant(LobbyUserData user) {
@@ -143,6 +137,8 @@ public class Match implements SerializableMatch{
                 .setResultat(resultat)
                 .build();
 
+        matchHandler.saveMatch(combat);
+
         sendData(null, new DonneesReponseCommande(TypeCommande.COMBAT, combat));
     }
 
@@ -172,18 +168,22 @@ public class Match implements SerializableMatch{
     }
 
     private int calculerReponse() {
+        int attBlanc = ThreadLocalRandom.current().nextInt(1, 4);
+        int attRouge = ThreadLocalRandom.current().nextInt(1,4);
+
+        blanc.setAttack(Attack.values()[attBlanc]);
+        rouge.setAttack(Attack.values()[attRouge]);
+
         int roleJ1 = rouge.getLobbyUser().getRole().getId();
         int roleJ2 = blanc.getLobbyUser().getRole().getId();
-
-        boolean j1EstVenerable = roleJ1 == 3;
-        boolean j2EstVenerable = roleJ2 == 3;
+        boolean j1EstVenerable = roleJ1 == 4;
+        boolean j2EstVenerable = roleJ2 == 4;
         if (j1EstVenerable || j2EstVenerable) {
             return  roleJ1 - roleJ2;
         }
 
         return tableauResultatsRochePapierCiseaux[blanc.getAttack().ordinal()][rouge.getAttack().ordinal()];
     }
-
 
     public void effectuerMatch() {
        int reponse = calculerReponse();
@@ -206,6 +206,8 @@ public class Match implements SerializableMatch{
            resultat.setPointsRouge(0);
            resultat.setPointsBlanc(10);
        }
+
+       sendData(null, new DonneesReponseCommande(TypeCommande.ATTAQUER, rouge.getAttack(), blanc.getAttack()));
     }
 
     public void indiquerGagnant() {
@@ -213,7 +215,12 @@ public class Match implements SerializableMatch{
         LobbyRole signal;
         if (resultat.getCreditsArbitre() < 0) {
             message = String.format("%s a commis une grave faute", arbitre.getNom());
-            signal = resultat.getPointsRouge() == 10 ? LobbyRole.ROUGE : LobbyRole.BLANC;
+
+            if (resultat.getPointsBlanc() == 0 && resultat.getPointsRouge() == 0) {
+                signal = ThreadLocalRandom.current().nextInt(0,2) == 0 ? LobbyRole.ROUGE : LobbyRole.BLANC;
+            } else {
+                signal = resultat.getPointsRouge() == 10 ? LobbyRole.ROUGE : LobbyRole.BLANC;
+            }
         } else if (resultat.getPointsRouge() == 10 || resultat.getPointsBlanc() == 10) {
             MatchUserData gagnant = resultat.getPointsRouge() == 10 ? rouge : blanc;
             MatchUserData perdant = resultat.getPointsRouge() == 10 ? blanc : rouge;

@@ -10,7 +10,7 @@ public class ChoixHandler extends MatchStateHandler {
 
     @Override
     public void handleTimeout() {
-        getContext().effectuerMatch();
+        getContext().indiquerGagnant();
         getContext().setEtat(MatchState.GAGNANT);
     }
 }

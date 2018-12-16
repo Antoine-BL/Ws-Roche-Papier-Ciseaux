@@ -25,7 +25,7 @@ public class Lobby implements Runnable, MatchHandler, SerializableLobby {
 
     private static final int ONE_SECOND = 1000;
 
-    private static final int TICK_RATE_HZ = 60;
+    private static final int TICK_RATE_HZ = 2;
     private static final int TICK_DURATION = ONE_SECOND / TICK_RATE_HZ;
 
     private HashSet<LobbyUserData> users;
@@ -136,7 +136,9 @@ public class Lobby implements Runnable, MatchHandler, SerializableLobby {
         Match match = new Match(this.arbitre, this);
         match.choisirParticipantsParmi(combattants);
 
-        send(String.format("Combattants choisis: %s en blanc vs %s en rouge", match.getBlanc().getCourriel(), match.getRouge().getCourriel()));
+        match.getRouge().getLobbyUser().becomeRole(new LobbyPosition(LobbyRole.ROUGE));
+        match.getBlanc().getLobbyUser().becomeRole(new LobbyPosition(LobbyRole.BLANC));
+
         nbMatchArbitre++;
         matchInProgress = match;
     }
@@ -159,6 +161,9 @@ public class Lobby implements Runnable, MatchHandler, SerializableLobby {
     @Override
     public void saveMatch(Combat combat) {
         this.lobbyContext.persistMatch(combat);
+        rouge.setUser(lobbyContext.getUser(rouge.getCourriel()));
+        blanc.setUser(lobbyContext.getUser(blanc.getCourriel()));
+        arbitre.setUser(lobbyContext.getUser(arbitre.getCourriel()));
     }
 
     public Match getCurrentMatch() {

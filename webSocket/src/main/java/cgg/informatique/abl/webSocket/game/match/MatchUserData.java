@@ -53,7 +53,6 @@ public class MatchUserData extends UserBase {
 
     public void setAttack(Attack attack) {
         this.attack = attack;
-        match.sendData(getNom() + " a choisi son attaque", new DonneesReponseCommande(TypeCommande.ATTAQUER, this));
     }
 
     public String getNom() {

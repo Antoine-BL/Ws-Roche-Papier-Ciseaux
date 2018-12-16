@@ -10,6 +10,7 @@ public class DebutHandler extends MatchStateHandler {
 
     @Override
     public void handleTimeout() {
+        getContext().effectuerMatch();
         getContext().setEtat(MatchState.CHOIX);
     }
 }
