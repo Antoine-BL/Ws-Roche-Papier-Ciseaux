@@ -149,25 +149,6 @@ Vue.component('app-slot', {
             this.classSalue = bowClass;
             window.setTimeout(() => this.classSalue = unbowClass, 1000)
         },
-        ippon: function(gagnant) {
-            let flagUpClass;
-            let flagDownClass;
-
-            if (gagnant === "blanc") {
-                flagUpClass = 'flag-up-l';
-                flagDownClass = 'flag-down-l';
-                this.flagRight = false;
-            } else if (gagnant === "rouge") {
-                flagUpClass = 'flag-up-r';
-                flagDownClass = 'flag-down-r';
-                this.flagRight = true;
-            }
-
-            this.classDrapeau = flagDownClass;
-            window.setTimeout(() => {
-                this.classDrapeau = flagUpClass;
-            }, 1000);
-        }
     }
 });
 

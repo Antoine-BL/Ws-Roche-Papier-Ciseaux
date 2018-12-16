@@ -38,7 +38,11 @@ public class ConnectionHandler implements ChannelInterceptor {
 
         Compte user = getUserFrom(headerAccessor);
 
-        FightController.getLobby().connect(user);
+        try {
+            FightController.getLobby().getLobbyUserData(user);
+        } catch (IllegalArgumentException e) {
+            FightController.getLobby().connect(user);
+        }
     }
 
     private Compte getUserFrom(StompHeaderAccessor headerAccessor) {

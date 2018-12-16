@@ -6,6 +6,7 @@ class Commande{
 }
 const debugDisabled = true;
 let app;
+let Commands;
 $(document).ready(() => {
     let heartbeatIntervalId;
     const subscribeTopics = Object.freeze({
@@ -18,64 +19,31 @@ $(document).ready(() => {
         COMMAND: '/app/battle/command',
         HEARTBEAT: '/app/battle/heartbeat',
     });
-    const Commands = Object.freeze({
+    Commands = Object.freeze({
         ROLE: {
-            handle: (donnees) => changerRole(donnees.de, donnees.parametres[0], donnees.parametres[1]),
+            handle: (donnees) => app.initLobby(donnees.parametres[0]),
         },
         JOINDRE: {
-            handle: (donnees) => {
-                app.initLobby(donnees.parametres[0]);
-            },
-        },
-        COMBATTRE: {
-            handle: (donnees) => changerPosition(donnees.de, donnees.parametres[0]),
+            handle: (donnees) => app.initLobby(donnees.parametres[0]),
         },
         SIGNALER: {
-            handle: (donnees) => signal(donnees.parametres[0], donnees.parametres[1]),
-        },
-        MATCH_STATE: {
-            handle: (donnees) => {
-                app.chrono = donnees.parametres[0];
-                if (donnees.parametres.length >= 2) {
-                    app.state = donnees.parametres[1];
-                    app.message = donnees.parametres.length >= 3 ? app.message : donnees.parametres[2];
-                }
-                if (app.state !== 'DECIDE' && app.state !== 'START') {
-                    app.$refs.blanc.attack = null;
-                    app.$refs.rouge.attack = null
-                }
-            },
-        },
-        SALUER:{
-            handle: (donnees) => {
-                joueurSalue(donnees.de);
-            }
-        },
-        POSITION: {
-            handle: (donnees) => {
-                joueurApproche(donnees.de);
-            }
+            handle: (donnees) => app.afficherChoixArbitre(donnees.parametres[0]),
         },
         ATTAQUER: {
             handle: donnees => {
                 const params = donnees.parametres;
-                const objCible = donnees.de.roleCombat === "ROUGE" ? app.$refs.rouge : app.$refs.blanc;
-
-                if (params.length >= 1) {
-                    objCible.attack = params[0].toLowerCase();
-                } else {
-                    objCible.attack = 'rien';
-                }
+                app.$refs.rouge.attack = params[0].toLowerCase();
+                app.$refs.blanc.attack = params[1].toLowerCase();
             },
         },
-        QUITTER: {
+        MATCH_STATE: {
+            handle: (donnees) => donnees,
+        },
+        COMBAT: {
             handle: (donnees) => {
-                app.removeFrom(donnees.parametres[0]);
-                if (donnees.de.courriel === app.user.courriel) {
-                    app.dansLobby = false;
-                    window.clearInterval(heartbeatIntervalId);
-                    websocket.unsubscribeFrom(subscribeTopics.LOBBY);
-                }
+                app.$refs.rouge.attack = null;
+                app.$refs.blanc.attack = null;
+                app.$refs.arbitre.attack = null;
             },
         },
     });
@@ -136,7 +104,6 @@ $(document).ready(() => {
                 app.arbitre = lobby.arbitre;
                 app.blanc = lobby.blanc;
                 app.state = lobby.match ? lobby.match.state : 'OVER';
-                app.dansLobby = true;
             },
             removeFrom: function(lobbyPos) {
                 Roles[lobbyPos.role].remove(lobbyPos);
@@ -178,38 +145,12 @@ $(document).ready(() => {
                 this.messages.push(el);
                 const container = $('#messagerie')[0];
                 container.scrollTop = container.scrollHeight;
+            },
+            afficherChoixArbitre : function (choix) {
+                app.$refs.arbitre.attack = choix.toLowerCase();
             }
         }
     });
-
-    function signal(signal, cible) {
-        if (signal === "IPPON"){
-            app.$refs.arbitre.ippon(cible.roleCombat.toLowerCase());
-        }
-    }
-
-    function joueurApproche(joueur) {
-        if (joueur.roleCombat === 'ROUGE') {
-            app.$refs.rouge.classApproche = 'approche-r';
-        } else if (joueur.roleCombat === 'BLANC') {
-            app.$refs.blanc.classApproche = 'approche-l';
-        }
-    }
-
-    function joueurSalue(joueur) {
-        if (joueur.roleCombat === 'ROUGE') {
-            app.$refs.rouge.saluer();
-        } else if (joueur.roleCombat === 'BLANC') {
-            app.$refs.blanc.saluer();
-        }
-    }
-
-    function changerRole(utilisateur, newPos, oldPos) {
-        if (oldPos) {
-            app.removeFrom(oldPos);
-        }
-        app.setUser(utilisateur, newPos);
-    }
 
     $.ajax("/api/monCompte", {
         success: initWebSocket
@@ -234,28 +175,23 @@ $(document).ready(() => {
             setConnection(true);
             websocket.subscribeTo(subscribeTopics.CHAT, '');
             websocket.subscribeTo(subscribeTopics.COMMAND, 'chat-robot', 'Commande');
+            websocket.subscribeTo(subscribeTopics.LOBBY, 'chat-lobby', 'Lobby', handleCommand);
+            app.dansLobby = true;
         }
 
         function handleCommand(command) {
             if (!command.donnees) return;
             const donnees = command.donnees;
-            Commands[donnees.typeCommande].handle(donnees);
-        }
-
-        function heartbeat() {
-            websocket.sendTo(sendTopics.HEARTBEAT, {
-                de: account,
-                heartbeat: true,
-            });
+            try {
+                Commands[donnees.typeCommande].handle(donnees);
+            } catch (e) {
+                console.error("Unknown command: " + donnees.typeCommande);
+            }
         }
 
         function send() {
             if (websocket.isCommand) {
                 const commandName = websocket.readCommand().typeCommande.toUpperCase();
-                if (commandName === "JOINDRE") {
-                    heartbeatIntervalId = window.setInterval(heartbeat, 500);
-                    websocket.subscribeTo(subscribeTopics.LOBBY, 'chat-lobby', 'Lobby', handleCommand);
-                }
 
                 websocket.sendCommandTo(sendTopics.COMMAND);
             } else {

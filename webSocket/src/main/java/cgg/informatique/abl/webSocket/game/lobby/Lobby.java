@@ -25,7 +25,7 @@ public class Lobby implements Runnable, MatchHandler, SerializableLobby {
 
     private static final int ONE_SECOND = 1000;
 
-    private static final int TICK_RATE_HZ = 2;
+    private static final int TICK_RATE_HZ = 1;
     private static final int TICK_DURATION = ONE_SECOND / TICK_RATE_HZ;
 
     private HashSet<LobbyUserData> users;
@@ -65,9 +65,11 @@ public class Lobby implements Runnable, MatchHandler, SerializableLobby {
         this.running = false;
     }
 
-    public LobbyUserData updateUserInfo(LobbyUserData user) {
-        user.setUser(lobbyContext.getUser(user.getCourriel()));
-        return user;
+    public void updateUserInfo(Compte user) {
+        try {
+            LobbyUserData lud = getLobbyUserData(user);
+            lud.setUser(getUser(user.getUsername()));
+        } catch (IllegalArgumentException ignored) {}
     }
 
     private void mainLoop(){
@@ -117,6 +119,10 @@ public class Lobby implements Runnable, MatchHandler, SerializableLobby {
                 new DonneesReponseCommande(TypeCommande.JOINDRE, this.asSerializable()));
     }
 
+    @Override
+    public void ensureCoherentRole() {
+    }
+
     private synchronized LobbyPosition removeFromLobby(LobbyUserData utilisateur) {
         LobbyPosition pos = utilisateur.leaveCurrentRole();
 
@@ -161,9 +167,10 @@ public class Lobby implements Runnable, MatchHandler, SerializableLobby {
     @Override
     public void saveMatch(Combat combat) {
         this.lobbyContext.persistMatch(combat);
-        rouge.setUser(lobbyContext.getUser(rouge.getCourriel()));
-        blanc.setUser(lobbyContext.getUser(blanc.getCourriel()));
-        arbitre.setUser(lobbyContext.getUser(arbitre.getCourriel()));
+
+        updateUserInfo(matchInProgress.getRouge().getCompte());
+        updateUserInfo(matchInProgress.getArbitre().getCompte());
+        updateUserInfo(matchInProgress.getBlanc().getCompte());
     }
 
     public Match getCurrentMatch() {

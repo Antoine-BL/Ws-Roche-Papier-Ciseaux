@@ -9,7 +9,7 @@ class WebSocketClient {
     }
 
     static get COMMAND_PREFIX() {
-        return '/';
+        return 'ASJDFoiSDNFGowenagoinmdsflmaroiunwea';
     }
 
     static get PARAM_SEPARATOR() {

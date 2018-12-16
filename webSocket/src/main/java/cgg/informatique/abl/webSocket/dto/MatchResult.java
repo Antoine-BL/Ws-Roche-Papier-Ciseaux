@@ -33,4 +33,12 @@ public class MatchResult {
     public void setCreditsArbitre(int creditsArbitre) {
         this.creditsArbitre = creditsArbitre;
     }
+
+    public boolean isTie() {
+        return pointsBlanc == 5 && pointsRouge == 5;
+    }
+
+    public boolean isRefFault() {
+        return creditsArbitre < 1;
+    }
 }

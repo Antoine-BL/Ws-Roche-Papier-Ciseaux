@@ -103,14 +103,17 @@ public class RoleColl{
     }
 
     public LobbyUserData getBestOpponentFor(LobbyUserData u) {
-        int lowestDelta = Arrays.stream(getNonNull())
-            .filter(c -> !c.equals(u))
+        LobbyUserData[] nonNullNotMe = Arrays.stream(getNonNull())
+                .filter(c -> !c.getCourriel().equals(u.getCourriel()))
+                .toArray(LobbyUserData[]::new);
+
+        int lowestDelta = Arrays.stream(nonNullNotMe)
             .map(u::skillDeltaWith)
             .min((delta1, delta2) -> delta1 < delta2 ? delta1 : delta2)
             .orElseThrow(() -> new IllegalArgumentException("Aucun adversaire"));
 
         LobbyUserData[] participantsWithLowestDelta =
-                Arrays.stream(getNonNull())
+                Arrays.stream(nonNullNotMe)
                 .filter(user -> u.skillDeltaWith(user) == lowestDelta)
                 .toArray(LobbyUserData[]::new);
 

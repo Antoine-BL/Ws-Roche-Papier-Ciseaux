@@ -11,4 +11,5 @@ public interface MatchHandler {
     void sendData(String message, DonneesReponseCommande reponse);
     void send(String message);
     void quitter(LobbyUserData userData);
+    void ensureCoherentRole();
 }
