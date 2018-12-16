@@ -45,6 +45,9 @@ public class Compte extends UserBase implements UserDetails, SanitizedCompte {
     @JoinColumn(name="GROUPE_ID")
     private Groupe groupe;
 
+    @Column(name="ANCIENDEPUIS")
+    private long ancienDepuis;
+
     @Column(name="CHOUCHOU")
     private int chouchou;
     @Column(name="ENTRAINEMENT")
@@ -71,6 +74,14 @@ public class Compte extends UserBase implements UserDetails, SanitizedCompte {
     private Integer points = null;
     @Transient
     private Integer credits = null;
+
+    public long getAncienDepuis() {
+        return ancienDepuis;
+    }
+
+    public void setAncienDepuis(long ancienDepuis) {
+        this.ancienDepuis = ancienDepuis;
+    }
 
     protected Compte() { }
 

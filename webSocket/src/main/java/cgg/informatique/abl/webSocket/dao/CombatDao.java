@@ -9,4 +9,5 @@ import java.util.List;
 public interface CombatDao extends JpaRepository<Combat, Long> {
     List<Combat> findAllByRouge(Compte rouge);
     List<Combat> findAllByBlanc(Compte blanc);
+    List<Combat> findAllByArbitre(Compte blanc);
 }
