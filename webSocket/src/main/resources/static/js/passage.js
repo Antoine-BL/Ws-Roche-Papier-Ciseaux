@@ -56,7 +56,6 @@ $(document).ready(function (){
     }
 
     function demotionRole(id) {
-        console.log('demotionRole');
         $.ajax({
             url: "/api/compte/demotion/" + id,
             'type': 'POST',

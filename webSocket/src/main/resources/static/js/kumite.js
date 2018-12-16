@@ -38,6 +38,14 @@ $(document).ready(() => {
         MATCH_STATE: {
             handle: (donnees) => donnees,
         },
+        UPDATE_USER: {
+            handle: (donnees) => {
+                const updatedUser = donnees.parametres[0];
+                if (updatedUser.courriel === app.user.courriel) {
+                    app.user = updatedUser;
+                }
+            },
+        },
         COMBAT: {
             handle: (donnees) => {
                 app.$refs.rouge.attack = null;

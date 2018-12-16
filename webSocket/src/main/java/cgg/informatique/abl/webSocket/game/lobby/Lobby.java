@@ -65,11 +65,17 @@ public class Lobby implements Runnable, MatchHandler, SerializableLobby {
         this.running = false;
     }
 
-    public void updateUserInfo(Compte user) {
+    public void setUserInfo(Compte user) {
         try {
             LobbyUserData lud = getLobbyUserData(user);
-            lud.setUser(getUser(user.getUsername()));
+            lud.setUser(user);
+            sendData(null, new DonneesReponseCommande(TypeCommande.UPDATE_USER, user, user));
         } catch (IllegalArgumentException ignored) {}
+    }
+
+    public void updateUserInfo(Compte user) {
+        Compte updatedUser = getUser(user.getUsername());
+        setUserInfo(updatedUser);
     }
 
     private void mainLoop(){
