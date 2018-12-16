@@ -8,7 +8,6 @@ const debugDisabled = true;
 let app;
 let Commands;
 $(document).ready(() => {
-    let heartbeatIntervalId;
     const subscribeTopics = Object.freeze({
         CHAT: '/topic/battle/chat',
         COMMAND: '/topic/battle/command',
@@ -44,6 +43,12 @@ $(document).ready(() => {
                 app.$refs.rouge.attack = null;
                 app.$refs.blanc.attack = null;
                 app.$refs.arbitre.attack = null;
+
+                $.ajax("/api/monCompte", {
+                    success: (user) => {
+                        app.user = user;
+                    }
+                });
             },
         },
     });
@@ -156,9 +161,8 @@ $(document).ready(() => {
         success: initWebSocket
     });
 
-    function initWebSocket(data){
-        const account = data;
-        app.user = data;
+    function initWebSocket(account){
+        app.user = account;
 
         websocket = new WebSocketClient($('#tbMessage'), app, account, app);
 
