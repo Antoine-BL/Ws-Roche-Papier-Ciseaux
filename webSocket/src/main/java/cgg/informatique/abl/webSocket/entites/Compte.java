@@ -62,11 +62,9 @@ public class Compte extends UserBase implements UserDetails, SanitizedCompte {
     private List<Combat> combatsArbitre;
 
     @OneToMany(mappedBy = "professeur",targetEntity = Examen.class)
-    @JsonManagedReference(value="exam-prof")
     private List<Examen> examensProf;
 
     @OneToMany(mappedBy = "eleve",targetEntity = Examen.class)
-    @JsonManagedReference(value="exam-eleve")
     private List<Examen> examensEleve;
 
     @Transient

@@ -11,13 +11,9 @@ import cgg.informatique.abl.webSocket.messaging.commands.TypeCommande;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class Lobby implements Runnable, MatchHandler, SerializableLobby {
-    private static final int INDEX_ROUGE = 0;
-    private static final int INDEX_BLANC = 1;
     private static final String OUTPUT_TOPIC = "/topic/battle/lobby";
-    private static final String OUTPUT_TOPIC_COMMAND = "/topic/battle/command";
     public static final Compte COMPTE_LOBBY = Compte.Builder()
             .avecCourriel("lobby@server.ca")
             .avecMotDePasse("")
@@ -31,12 +27,6 @@ public class Lobby implements Runnable, MatchHandler, SerializableLobby {
 
     private static final int TICK_RATE_HZ = 60;
     private static final int TICK_DURATION = ONE_SECOND / TICK_RATE_HZ;
-
-    private static final int LOBBY_TIMEOUT = 90 * ONE_SECOND;
-    private static final int WAIT_MESSAGE_INTERVAL = 10* ONE_SECOND;
-    private static final String WAIT_MESSAGE_TMP = "En attente de joueurs (%ds restantes)";
-
-    private Thread lobbyThread;
 
     private HashSet<LobbyUserData> users;
     private RoleColl spectateurs;
@@ -65,8 +55,6 @@ public class Lobby implements Runnable, MatchHandler, SerializableLobby {
 
     @Override
     public void run() {
-        lobbyThread = Thread.currentThread();
-
         send("Lobby ouvert!");
         mainLoop();
         send("Lobby closed");
@@ -107,10 +95,6 @@ public class Lobby implements Runnable, MatchHandler, SerializableLobby {
         synchronized (messaging) {
             messaging.convertAndSend(OUTPUT_TOPIC, reponse);
         }
-    }
-
-    private void sendData(DonneesReponseCommande donnees) {
-        sendData(null, donnees);
     }
 
     public void connect(Compte u) {
@@ -179,10 +163,6 @@ public class Lobby implements Runnable, MatchHandler, SerializableLobby {
 
     public Match getCurrentMatch() {
         return matchInProgress;
-    }
-
-    private boolean isEmpty() {
-        return users.isEmpty();
     }
 
     @Override

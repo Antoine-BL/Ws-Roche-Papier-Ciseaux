@@ -2,18 +2,17 @@ package cgg.informatique.abl.webSocket.game.match;
 
 import cgg.informatique.abl.webSocket.dto.MatchResult;
 import cgg.informatique.abl.webSocket.entites.Groupe;
-import cgg.informatique.abl.webSocket.game.lobby.LobbyPosition;
-import cgg.informatique.abl.webSocket.game.lobby.LobbyRole;
-import cgg.informatique.abl.webSocket.game.lobby.LobbyUserData;
-import cgg.informatique.abl.webSocket.game.lobby.RoleColl;
+import cgg.informatique.abl.webSocket.game.lobby.*;
 import cgg.informatique.abl.webSocket.entites.Combat;
 import cgg.informatique.abl.webSocket.messaging.DonneesReponseCommande;
 import cgg.informatique.abl.webSocket.messaging.commands.TypeCommande;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
+@JsonSerialize(as=SerializableMatch.class)
 public class Match implements SerializableMatch{
     private final int POURCENTAGE_FAUTE = 5;
 
@@ -58,7 +57,7 @@ public class Match implements SerializableMatch{
     public Match(LobbyUserData arbitre, MatchHandler matchHandler) {
         this.arbitre = new MatchUserData(arbitre, this);
         this.matchHandler = matchHandler;
-        etat = MatchState.DEBUT;
+        setEtat(MatchState.DEBUT);
     }
 
     public void choisirParticipantsParmi(RoleColl liste) {
@@ -70,9 +69,8 @@ public class Match implements SerializableMatch{
     }
 
     public void tick() {
-        sendData(null, new DonneesReponseCommande(TypeCommande.MATCH_STATE, getChrono(), this.etat, this.etat.getMessage()));
+        sendData(null, new DonneesReponseCommande(TypeCommande.MATCH_STATE, this));
         if (etat.getDuree() < tempsDepuisDernierEtat()) {
-            sendData(etat.getTransitionMessage(), new DonneesReponseCommande(etat));
             etat.gererFinEtat(this);
         }
     }
@@ -106,6 +104,7 @@ public class Match implements SerializableMatch{
     }
 
     public void setEtat(MatchState etat) {
+        sendData(etat.getTransitionMessage(), new DonneesReponseCommande(TypeCommande.MATCH_STATE, ((Lobby)matchHandler).asSerializable()));
         this.etat = etat;
         lastStateChange = System.currentTimeMillis();
     }
@@ -233,5 +232,9 @@ public class Match implements SerializableMatch{
         rouge.getLobbyUser().becomeRole(new LobbyPosition(LobbyRole.COMBATTANT));
         blanc.getLobbyUser().becomeRole(new LobbyPosition(LobbyRole.COMBATTANT));
         arbitre.getLobbyUser().becomeRole(new LobbyPosition(LobbyRole.ARBITRE));
+    }
+
+    public void endMatch() {
+        matchHandler.matchEnded();
     }
 }
