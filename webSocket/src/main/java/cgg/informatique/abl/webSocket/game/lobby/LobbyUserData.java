@@ -114,6 +114,11 @@ public class LobbyUserData extends UserBase implements SanitizedLobbyUser {
         return this.user.getGroupe();
     }
 
+    @Override
+    public long getAncienDepuis() {
+        return this.user.getAncienDepuis();
+    }
+
     public int getPosition() {
         return position;
     }
