@@ -1,5 +1,6 @@
 package cgg.informatique.abl.webSocket.controleurs.rest;
 
+import cgg.informatique.abl.webSocket.controleurs.webSocket.FightController;
 import cgg.informatique.abl.webSocket.dao.*;
 import cgg.informatique.abl.webSocket.dto.SanitizedCompte;
 import cgg.informatique.abl.webSocket.dto.SanitizedUser;
@@ -182,7 +183,8 @@ public class CompteController {
 
         compte.setGroupe(groupe.get());
 
-        compteDao.save(compte);
+        Compte newCompte = compteDao.save(compte);
+        FightController.getLobby().setUserInfo(newCompte);
 
         return ResponseEntity.ok().build();
     }
@@ -213,7 +215,9 @@ public class CompteController {
 
         compte.setRole(role.get());
 
-        compteDao.save(compte);
+        Compte newRole = compteDao.save(compte);
+        FightController.getLobby().setUserInfo(newRole);
+
 
         return ResponseEntity.ok().build();
     }
@@ -228,7 +232,9 @@ public class CompteController {
 
         compte.setRole(role.get());
 
-        compteDao.save(compte);
+        Compte newCompte = compteDao.save(compte);
+
+        FightController.getLobby().setUserInfo(newCompte);
 
         return ResponseEntity.ok().build();
     }
@@ -360,8 +366,6 @@ public class CompteController {
     public CompteDao getDao() {
         return compteDao;
     }
-
-
 
     /**----------------------------------------------------------------------
      *

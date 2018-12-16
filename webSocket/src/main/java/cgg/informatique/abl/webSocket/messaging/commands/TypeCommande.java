@@ -11,6 +11,7 @@ public enum TypeCommande {
     SIGNALER(Signaler.class),
     POSITION(Position.class),
     COMBAT(CombatHandler.class),
+    UPDATE_USER,
     MATCH_STATE,
     DECONNECTER,
     CONNECTER,
