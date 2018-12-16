@@ -26,50 +26,32 @@
     <div class="container-fluid">
         <div class="row justify-content-center chat-col mt-4">
             <div id="divArena" class="col-8 d-flex flex-column justify-content-center align-items-center">
-                <app-controls class="row border"
-                              v-on:debuter-match="debuterMatch"
-                              v-on:attaque="attaque"
-                              v-on:position="position"
-                              v-on:saluer="saluer"
-                              v-on:signaler="signaler"
-                              v-on:rester="rester"
-                              v-if="user && user.roleCombat && user.roleCombat != 'SPECTATEUR' && user.roleCombat != 'COMBATTANT'"
-                              v-bind:role="user.roleCombat"
-                              v-bind:state="state">
-                </app-controls>
                 <div class="row justify-content-center">
                     Spectateurs:
                 </div>
-                <app-rangee v-on:move-to-child="role"
-                            v-bind:initial-users="spectateurs"
+                <app-rangee v-bind:initial-users="spectateurs"
                             v-bind:disabled="!dansLobby"
                             role="spectateur"></app-rangee>
                 <div class="row justify-content-center">
                     Compétiteurs en attente:
                 </div>
-                <app-rangee v-on:move-to-child="role"
-                            v-bind:initial-users="combattants"
+                <app-rangee v-bind:initial-users="combattants"
                             v-bind:disabled="!dansLobby"
                             role="combattant"></app-rangee>
                 <div class="row justify-content-center">
                     <span v-if="state == 'OVER'">Surface de combat:</span>
                     <span v-else>{{message}}: {{chrono}}</span>
                 </div>
-                <div class="row justify-content-between">
+                <div class="w-100 row justify-content-between">
                     <app-slot ref="blanc"
-                              v-on:move-to="role"
                               v-bind:user="blanc"
-                              v-bind:disabled="state == 'OVER'"
                               role="blanc"></app-slot>
                     <app-slot ref="arbitre"
-                              v-on:move-to="role"
-                              v-bind:user="arbitre"
+                             v-bind:user="arbitre"
                               v-bind:disabled="!dansLobby"
                               role="arbitre"></app-slot>
                     <app-slot ref="rouge"
-                              v-on:move-to="role"
-                              v-bind:user="rouge"
-                              v-bind:disabled="state == 'OVER'"
+                             v-bind:user="rouge"
                               role="rouge"></app-slot>
                 </div>
             </div>

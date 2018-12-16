@@ -12,7 +12,8 @@ public enum MatchState {
     PAUSE("Pause avant le prochain combat", PauseHandler.class, "Pause");
 
     private Class<? extends MatchStateHandler> handlerClass;
-    private static final long SECOND = 1000;
+    private static final long SECONDS = 1000;
+    private static final long ROUND_DURATION = 2 * SECONDS;
     private String transitionMessage;
     private String nom;
 
@@ -41,8 +42,7 @@ public enum MatchState {
     }
 
     public long getDuree() {
-        long duration = 2 * SECOND;
-        return duration;
+        return ROUND_DURATION;
     }
 
     public String getTransitionMessage() {

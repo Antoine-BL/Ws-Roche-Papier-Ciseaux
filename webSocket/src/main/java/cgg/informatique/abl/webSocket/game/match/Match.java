@@ -213,15 +213,15 @@ public class Match implements SerializableMatch{
     public void indiquerGagnant() {
         String message;
         LobbyRole signal;
-        if (resultat.getCreditsArbitre() < 0) {
+        if (resultat.isRefFault()) {
             message = String.format("%s a commis une grave faute", arbitre.getNom());
 
-            if (resultat.getPointsBlanc() == 0 && resultat.getPointsRouge() == 0) {
+            if (resultat.isTie()) {
                 signal = ThreadLocalRandom.current().nextInt(0,2) == 0 ? LobbyRole.ROUGE : LobbyRole.BLANC;
             } else {
                 signal = resultat.getPointsRouge() == 10 ? LobbyRole.ROUGE : LobbyRole.BLANC;
             }
-        } else if (resultat.getPointsRouge() == 10 || resultat.getPointsBlanc() == 10) {
+        } else if (!resultat.isTie()) {
             MatchUserData gagnant = resultat.getPointsRouge() == 10 ? rouge : blanc;
             MatchUserData perdant = resultat.getPointsRouge() == 10 ? blanc : rouge;
             signal = resultat.getPointsRouge() == 10 ? LobbyRole.ROUGE : LobbyRole.BLANC;
@@ -238,7 +238,7 @@ public class Match implements SerializableMatch{
     public void viderTatami() {
         rouge.getLobbyUser().becomeRole(new LobbyPosition(LobbyRole.COMBATTANT));
         blanc.getLobbyUser().becomeRole(new LobbyPosition(LobbyRole.COMBATTANT));
-        arbitre.getLobbyUser().becomeRole(new LobbyPosition(LobbyRole.ARBITRE));
+        matchHandler.ensureCoherentRole();
     }
 
     public void endMatch() {

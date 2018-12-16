@@ -339,13 +339,13 @@ public class CompteController {
     private static int pointsPourRouge(Combat combat) {
         int points = Match.calculerPointsGagnant(combat.getCeintureRouge(), combat.getCeintureBlanc());
 
-        return (combat.getPointsRouge() / 10) * points;
+        return (int)Math.floor((combat.getPointsRouge() / 10.0) * points);
     }
 
     private static int pointsPourBlanc(Combat combat) {
         int points = Match.calculerPointsGagnant(combat.getCeintureBlanc(), combat.getCeintureRouge());
 
-        return (combat.getPointsBlanc() / 10) * points;
+        return (int)Math.floor((combat.getPointsBlanc() / 10.0) * points);
     }
 
     private URI GenerateCreatedURI(cgg.informatique.abl.webSocket.entites.Compte compte) {
