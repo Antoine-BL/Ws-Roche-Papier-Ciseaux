@@ -8,6 +8,7 @@ import cgg.informatique.abl.webSocket.dto.ExamDto;
 import cgg.informatique.abl.webSocket.dto.SanitizedCompte;
 import cgg.informatique.abl.webSocket.entites.Compte;
 import cgg.informatique.abl.webSocket.entites.Examen;
+import cgg.informatique.abl.webSocket.entites.Groupe;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -56,6 +57,10 @@ public class ExamenController {
         Examen examen = new Examen(professeur, eleve);
         examen.setReussi(exam.isReussi());
         examen.setTemps(exam.getTemps());
+
+        int nouveauGroupe = eleve.getGroupe().getId() + 1;
+        Optional<Groupe> groupe = groupeDao.findById(nouveauGroupe);
+        examen.setCeinture(groupe.orElse(null));
 
         examen = examenDao.save(examen);
 

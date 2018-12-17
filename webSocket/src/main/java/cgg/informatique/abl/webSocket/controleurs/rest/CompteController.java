@@ -213,6 +213,9 @@ public class CompteController {
 
         if (!role.isPresent()) return ResponseEntity.badRequest().build();
 
+        if(role.get().getId()==3){
+            compte.setAncienDepuis(new Date().getTime());
+        }
         compte.setRole(role.get());
 
         Compte newRole = compteDao.save(compte);
