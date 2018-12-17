@@ -173,7 +173,7 @@ public class CompteController {
         return ResponseEntity.created(GenerateCreatedURI(compteAjoute)).build();
     }
 
-    @PostMapping("/compte/ceinture/{id}")
+    @PostMapping("/compte/ceinture/{courriel}")
     public ResponseEntity promotionCeinture(@PathVariable String courriel) {
         Compte compte = compteDao.findByCourriel(courriel).orElseThrow(IllegalStateException::new);
         int nouveauGroupe = compte.getGroupe().getId() + 1;

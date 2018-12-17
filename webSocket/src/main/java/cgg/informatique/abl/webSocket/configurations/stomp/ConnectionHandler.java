@@ -2,6 +2,8 @@ package cgg.informatique.abl.webSocket.configurations.stomp;
 
 import cgg.informatique.abl.webSocket.controleurs.webSocket.FightController;
 import cgg.informatique.abl.webSocket.entites.Compte;
+import cgg.informatique.abl.webSocket.messaging.DonneesReponseCommande;
+import cgg.informatique.abl.webSocket.messaging.commands.TypeCommande;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.stomp.StompCommand;
@@ -40,6 +42,7 @@ public class ConnectionHandler implements ChannelInterceptor {
 
         try {
             FightController.getLobby().getLobbyUserData(user);
+            FightController.getLobby().sendData(null, new DonneesReponseCommande(TypeCommande.JOINDRE, FightController.getLobby().asSerializable()));
         } catch (IllegalArgumentException e) {
             FightController.getLobby().connect(user);
         }

@@ -44,6 +44,21 @@ $(document).ready(() => {
                 if (updatedUser.courriel === app.user.courriel) {
                     app.user = updatedUser;
                 }
+
+                findAndReplace(app.spectateurs, updatedUser);
+                findAndReplace(app.combattants, updatedUser);
+
+                if (app.arbitre && app.arbitre.courriel === updatedUser.courriel) {
+                    app.arbitre.groupe = updatedUser.groupe;
+                }
+
+                if (app.rouge && app.rouge.courriel === updatedUser.courriel) {
+                    app.rouge.groupe = updatedUser.groupe;
+                }
+
+                if (app.blanc && app.blanc.courriel === updatedUser.courriel) {
+                    app.blanc.groupe = updatedUser.groupe;
+                }
             },
         },
         COMBAT: {
@@ -88,6 +103,14 @@ $(document).ready(() => {
         },
     });
     let websocket;
+
+    function findAndReplace(list, user) {
+        for (let i = 0; i < list.length; i++) {
+            if (list[i] && list[i].courriel === user.courriel) {
+                list.splice(i, 1, user)
+            }
+        }
+    }
 
     app = new Vue({
         el: '#app',
@@ -189,6 +212,8 @@ $(document).ready(() => {
             websocket.subscribeTo(subscribeTopics.COMMAND, 'chat-robot', 'Commande');
             websocket.subscribeTo(subscribeTopics.LOBBY, 'chat-lobby', 'Lobby', handleCommand);
             app.dansLobby = true;
+
+            websocket.sendCommandTo(sendTopics.COMMAND, new Commande('JOINDRE', []));
         }
 
         function handleCommand(command) {
@@ -197,6 +222,7 @@ $(document).ready(() => {
             try {
                 Commands[donnees.typeCommande].handle(donnees);
             } catch (e) {
+                console.error(e);
                 console.error("Unknown command: " + donnees.typeCommande);
             }
         }
